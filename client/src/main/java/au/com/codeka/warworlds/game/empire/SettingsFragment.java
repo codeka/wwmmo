@@ -32,10 +32,7 @@ import androidx.annotation.Nullable;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.common.collect.Lists;
-
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -327,6 +324,8 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       @Override
       public void onEmpireReset() {
         runnable.run();
+
+        // TODO: ??
         ServerGreeter.clearHello();
 
         // redirect you to the main page.

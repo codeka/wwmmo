@@ -15,15 +15,12 @@ import java.util.List;
 import java.util.TreeMap;
 
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.ctrl.FleetList;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.FleetMergeDialog;
-import au.com.codeka.warworlds.game.FleetMoveFragment;
 import au.com.codeka.warworlds.game.FleetMoveFragmentArgs;
 import au.com.codeka.warworlds.game.FleetSplitDialog;
-import au.com.codeka.warworlds.game.empire.FleetsFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.Fleet;
 import au.com.codeka.warworlds.model.FleetManager;
@@ -105,17 +102,11 @@ public class FleetFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        startActivity(new Intent(requireContext(), WelcomeFragment.class));
-      } else {
-        StarManager.eventBus.register(eventHandler);
-        star = StarManager.i.getStar(args.getStarID());
-        if (star != null) {
-          refreshStarDetails();
-        }
-      }
-    });
+    StarManager.eventBus.register(eventHandler);
+    star = StarManager.i.getStar(args.getStarID());
+    if (star != null) {
+      refreshStarDetails();
+    }
   }
 
   @Override

@@ -22,7 +22,6 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseFleetUpgrade;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
@@ -101,17 +100,10 @@ public class EnemyPlanetFragment extends BaseFragment {
     ShieldManager.eventBus.register(eventHandler);
     StarManager.eventBus.register(eventHandler);
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        // TODO: should we ever fail?
-        NavHostFragment.findNavController(this).navigate(R.id.welcomeFragment);
-      } else {
-        star = StarManager.i.getStar(args.getStarID());
-        if (star != null) {
-          refreshStarDetails();
-        }
-      }
-    });
+    star = StarManager.i.getStar(args.getStarID());
+    if (star != null) {
+      refreshStarDetails();
+    }
   }
 
   @Override

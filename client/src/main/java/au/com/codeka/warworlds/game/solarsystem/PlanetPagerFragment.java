@@ -11,20 +11,16 @@ import androidx.appcompat.app.ActionBar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.navigation.NavArgs;
 import androidx.viewpager.widget.ViewPager;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.constraints.Null;
-
 import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.common.model.BasePlanet;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -78,17 +74,11 @@ public class PlanetPagerFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        // TODO: is this still a thing?
-      } else {
-        StarManager.eventBus.register(eventHandler);
-        Star star = StarManager.i.getStar(args.getStarID());
-        if (star != null) {
-          refresh(star);
-        }
-      }
-    });
+    StarManager.eventBus.register(eventHandler);
+    Star star = StarManager.i.getStar(args.getStarID());
+    if (star != null) {
+      refresh(star);
+    }
   }
 
   private final Object eventHandler = new Object() {

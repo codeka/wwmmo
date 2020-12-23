@@ -29,7 +29,6 @@ import android.text.Html;
 import android.util.Base64;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.Design;
 import au.com.codeka.common.model.DesignKind;
@@ -41,7 +40,6 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.game.DesignHelper;
-import au.com.codeka.warworlds.game.SitrepFragment;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -183,6 +181,7 @@ public class Notifications {
 
   private static void handleBlitzResetNotification(Context context) {
     log.info("Blitz reset notification received.");
+    // TODO:??
     ServerGreeter.clearHello();
     BackgroundDetector.i.resetBackStack();
   }

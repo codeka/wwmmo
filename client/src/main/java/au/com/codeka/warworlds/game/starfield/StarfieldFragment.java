@@ -27,14 +27,12 @@ import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.BaseStar.StarType;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.InfobarView;
 import au.com.codeka.warworlds.ctrl.MiniChatView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.ScoutReportDialog;
 import au.com.codeka.warworlds.game.StarRenameDialog;
-import au.com.codeka.warworlds.game.alliance.AllianceFragment;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
 import au.com.codeka.warworlds.game.empire.EmpireFragmentArgs;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
@@ -140,32 +138,26 @@ public class StarfieldFragment extends BaseFragment {
   @Override
   public void onResume() {
     super.onResume();
-    ServerGreeter.waitForHello(
-        requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        return;
-      }
 
-      MyEmpire myEmpire = EmpireManager.i.getEmpire();
-      if (myEmpire == null) {
-        return;
-      }
+    MyEmpire myEmpire = EmpireManager.i.getEmpire();
+    if (myEmpire == null) {
+      return;
+    }
 
-      BaseStar homeStar = myEmpire.getHomeStar();
-      if (homeStar != null && (
-          StarfieldFragment.this.homeStar == null || !StarfieldFragment.this.homeStar.getKey()
-          .equals(homeStar.getKey()))) {
-        StarfieldFragment.this.homeStar = (Star) homeStar;
-      }
+    BaseStar homeStar = myEmpire.getHomeStar();
+    if (homeStar != null && (
+        StarfieldFragment.this.homeStar == null || !StarfieldFragment.this.homeStar.getKey()
+        .equals(homeStar.getKey()))) {
+      StarfieldFragment.this.homeStar = (Star) homeStar;
+    }
 
-      if (args != null && args.getStarCoord() != null) {
-        requireMainActivity().getStarfieldManager().warpTo(args.getStarCoord());
-      }
+    if (args != null && args.getStarCoord() != null) {
+      requireMainActivity().getStarfieldManager().warpTo(args.getStarCoord());
+    }
 
-      // Now that we've processed the arguments, don't do it again.
-      setArguments(null);
-      args = null;
-    });
+    // Now that we've processed the arguments, don't do it again.
+    setArguments(null);
+    args = null;
 
     if (starRenamePurchase != null) {
       showStarRenamePopup(starRenamePurchase);

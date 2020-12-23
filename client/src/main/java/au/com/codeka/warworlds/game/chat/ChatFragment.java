@@ -27,7 +27,6 @@ import javax.annotation.Nonnull;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -93,37 +92,35 @@ public class ChatFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      refreshConversations();
+    refreshConversations();
 
-      if (firstRefresh) {
-        firstRefresh = false;
+    if (firstRefresh) {
+      firstRefresh = false;
 
-        if (args != null) {
-          final int conversationID = args.getConversationID();
-          if (conversationID != 0) {
-            int position = 0;
-            for (; position < conversations.size(); position++) {
-              if (conversations.get(position).getID() == conversationID) {
-                break;
-              }
-            }
-            if (position < conversations.size()) {
-              final int finalPosition = position;
-              handler.post(() -> viewPager.setCurrentItem(finalPosition));
+      if (args != null) {
+        final int conversationID = args.getConversationID();
+        if (conversationID != 0) {
+          int position = 0;
+          for (; position < conversations.size(); position++) {
+            if (conversations.get(position).getID() == conversationID) {
+              break;
             }
           }
-
-          if (args.getEmpireID() > 0) {
-            handler.post(() -> ChatManager.i.startConversation(args.getEmpireID()));
+          if (position < conversations.size()) {
+            final int finalPosition = position;
+            handler.post(() -> viewPager.setCurrentItem(finalPosition));
           }
         }
-      }
 
-      // Anonymous users can't chat, so disable the controls for sending messages.
-      chatMsg.setEnabled(!Util.isAnonymous());
-      send.setEnabled(!Util.isAnonymous());
-    });
+        if (args.getEmpireID() > 0) {
+          handler.post(() -> ChatManager.i.startConversation(args.getEmpireID()));
+        }
+      }
+    }
+
+    // Anonymous users can't chat, so disable the controls for sending messages.
+    chatMsg.setEnabled(!Util.isAnonymous());
+    send.setEnabled(!Util.isAnonymous());
   }
 
   @Override
