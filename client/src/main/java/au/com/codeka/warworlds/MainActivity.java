@@ -1,22 +1,34 @@
 package au.com.codeka.warworlds;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Gravity;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.io.File;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.ctrl.DebugView;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.opengl.RenderSurfaceView;
 import au.com.codeka.warworlds.ui.DrawerController;
@@ -26,14 +38,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * The main activity of the whole app. All our fragments are children of this.
  */
-// TODO: when there's no other activities, get rid of BaseActivity.
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
   private static final Log log = new Log("MainActivity");
+
+  public static final int AUTH_RECOVERY_REQUEST = 2397;
 
   private DrawerController drawerController;
   private StarfieldManager starfieldManager;
   private ImagePickerHelper imagePickerHelper;
   private NavController navController;
+  private DebugView debugView;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,6 +73,27 @@ public class MainActivity extends BaseActivity {
     renderSurfaceView.create();
     starfieldManager = new StarfieldManager(renderSurfaceView);
     starfieldManager.create();
+
+    if (Util.isDebug()) {
+      debugView = new DebugView(this);
+      WindowManager.LayoutParams debugViewLayout = new WindowManager.LayoutParams(
+          WindowManager.LayoutParams.MATCH_PARENT,
+          WindowManager.LayoutParams.WRAP_CONTENT,
+          WindowManager.LayoutParams.TYPE_APPLICATION,
+          WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE |
+              WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+          PixelFormat.TRANSLUCENT);
+      debugViewLayout.gravity = Gravity.TOP;
+    }
+
+    int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+    if (result != ConnectionResult.SUCCESS) {
+      Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, result, 0);
+      if (dialog != null) {
+        dialog.show();
+        finish();
+      }
+    }
   }
 
   @Override
@@ -105,6 +140,15 @@ public class MainActivity extends BaseActivity {
   }
 
   @Override
+  protected void onResume() {
+    super.onResume();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      getWindow().setNavigationBarColor(Color.BLACK);
+    }
+  }
+
+  @Override
   protected void onStop() {
     super.onStop();
     drawerController.stop();
@@ -116,6 +160,13 @@ public class MainActivity extends BaseActivity {
 
     starfieldManager.destroy();
     starfieldManager = null;
+  }
+
+  @Override
+  public void onTrimMemory(int level) {
+    if (level == TRIM_MEMORY_UI_HIDDEN) {
+      MemoryTrimmer.trimMemory();
+    }
   }
 
   @Override

@@ -2,7 +2,6 @@ package au.com.codeka.warworlds.ctrl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.warworlds.BaseActivity;
+import au.com.codeka.warworlds.MainActivity;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.NotesDialog;
@@ -165,7 +164,8 @@ public class FleetList extends FrameLayout {
         FleetManager.i.updateNotes(fleet);
       });
 
-      dialog.show(((BaseActivity) context).getSupportFragmentManager(), "");
+      // TODO: doing a dialog.show() here is dumb...
+      dialog.show(((MainActivity) getContext()).getSupportFragmentManager(), "");
       return true;
     });
 

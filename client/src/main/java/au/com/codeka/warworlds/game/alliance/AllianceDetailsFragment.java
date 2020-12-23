@@ -158,7 +158,8 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
     Button changeBtn = view.findViewById(R.id.change_details_btn);
     if (changeBtn != null) {
       changeBtn.setOnClickListener(
-          v -> NavHostFragment.findNavController(this).navigate(R.id.allianceChangeDetailsFragment));
+          v -> NavHostFragment.findNavController(this)
+              .navigate(R.id.allianceChangeDetailsFragment));
     }
 
     Button joinBtn = view.findViewById(R.id.join_btn);

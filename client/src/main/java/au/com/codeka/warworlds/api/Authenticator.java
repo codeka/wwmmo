@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BaseActivity;
+import au.com.codeka.warworlds.MainActivity;
 import au.com.codeka.warworlds.Util;
 import au.com.codeka.warworlds.model.Realm;
 import okhttp3.Response;
@@ -89,7 +89,7 @@ public class Authenticator {
           throw new ApiException("Cannot retry, no activity given.", e);
         }
         Intent intent = e.getIntent();
-        activity.startActivityForResult(intent, BaseActivity.AUTH_RECOVERY_REQUEST);
+        activity.startActivityForResult(intent, MainActivity.AUTH_RECOVERY_REQUEST);
         log.warning("Got UserRecoverableAuthException, TODO");
       } catch (GoogleAuthException | IOException e) {
         log.error("Exception: ", e);
