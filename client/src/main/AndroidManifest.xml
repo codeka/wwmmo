@@ -59,10 +59,8 @@
       </intent-filter>
     </activity>
 
-    <activity android:name="au.com.codeka.warworlds.EmpireResetActivity" />
-    <activity android:name="au.com.codeka.warworlds.BlitzResetActivity" android:exported="true" />
     <activity
-      android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsActivity"
+      android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsFragment"
       android:windowSoftInputMode="stateUnchanged" />
     <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceDetailsActivity" />
 

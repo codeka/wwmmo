@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_welcomeFragment_to_empireSetupFragment"
             app:destination="@id/empireSetupFragment" />
+        <action
+            android:id="@+id/action_welcomeFragment_to_empireResetFragment"
+            app:destination="@id/empireResetFragment" />
     </fragment>
     <fragment
             android:id="@+id/globalOptionsFragment"
@@ -236,6 +239,23 @@
     <fragment
         android:id="@+id/allianceFragment"
         android:name="au.com.codeka.warworlds.game.alliance.AllianceFragment"
-        android:label="AllianceFragment" />
-
+        android:label="AllianceFragment" >
+        <action
+            android:id="@+id/action_allianceFragment_to_allianceChangeDetailsFragment"
+            app:destination="@id/allianceChangeDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/empireResetFragment"
+        android:name="au.com.codeka.warworlds.EmpireResetFragment"
+        android:label="EmpireResetFragment" >
+        <action
+            android:id="@+id/action_empireResetFragment_to_welcomeFragment"
+            app:destination="@id/welcomeFragment"
+            app:popUpTo="@id/main_nav"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/allianceChangeDetailsFragment"
+        android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsFragment"
+        android:label="AllianceChangeDetailsFragment" />
 </navigation>

@@ -30,7 +30,6 @@ import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.eventbus.EventHandler;
-import au.com.codeka.warworlds.game.empire.EnemyEmpireFragment;
 import au.com.codeka.warworlds.game.empire.EnemyEmpireFragmentArgs;
 import au.com.codeka.warworlds.model.Alliance;
 import au.com.codeka.warworlds.model.AllianceManager;
@@ -180,7 +179,7 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
     Button changeBtn = view.findViewById(R.id.change_details_btn);
     if (changeBtn != null) {
       changeBtn.setOnClickListener(
-          v -> startActivity(new Intent(activity, AllianceChangeDetailsActivity.class)));
+          v -> NavHostFragment.findNavController(this).navigate(R.id.allianceChangeDetailsFragment));
     }
 
     Button joinBtn = view.findViewById(R.id.join_btn);
