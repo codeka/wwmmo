@@ -4,10 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +22,6 @@ import au.com.codeka.RomanNumeralFormatter;
 import au.com.codeka.common.model.BaseBuildRequest;
 import au.com.codeka.common.model.BaseColony;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.model.Colony;
 import au.com.codeka.warworlds.model.EmpireManager;
@@ -80,13 +75,11 @@ public class BuildFragment extends BaseFragment {
   @Override
   public void onStart() {
     super.onStart();
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      StarManager.eventBus.register(eventHandler);
-      Star star = StarManager.i.getStar(args.getStarID());
-      if (star != null) {
-        updateStar(star);
-      }
-    });
+    StarManager.eventBus.register(eventHandler);
+    Star star = StarManager.i.getStar(args.getStarID());
+    if (star != null) {
+      updateStar(star);
+    }
   }
 
   @Override

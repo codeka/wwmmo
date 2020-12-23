@@ -21,7 +21,6 @@ import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseEmpireRank;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.alliance.KickRequestDialog;
 import au.com.codeka.warworlds.game.chat.ChatFragmentArgs;
@@ -70,18 +69,12 @@ public class EnemyEmpireFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        // TODO:??
-      } else {
-        empire = EmpireManager.i.getEmpire(args.getEmpireID());
-        if (empire != null) {
-          // Make sure it's update to date as well.
-          EmpireManager.i.refreshEmpire(args.getEmpireID(), true);
-          refresh();
-        }
-      }
-    });
+    empire = EmpireManager.i.getEmpire(args.getEmpireID());
+    if (empire != null) {
+      // Make sure it's update to date as well.
+      EmpireManager.i.refreshEmpire(args.getEmpireID(), true);
+      refresh();
+    }
   }
 
   @Override

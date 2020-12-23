@@ -13,7 +13,6 @@ import androidx.navigation.fragment.NavHostFragment;
 import au.com.codeka.common.model.BaseFleet;
 import au.com.codeka.warworlds.ActivityBackgroundGenerator;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.ctrl.PlanetDetailsView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -57,17 +56,11 @@ public class EmptyPlanetFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        // TODO: should we return errors?
-      } else {
-        StarManager.eventBus.register(eventHandler);
-        Star star = StarManager.i.getStar(args.getStarID());
-        if (star != null) {
-          refresh(star);
-        }
-      }
-    });
+    StarManager.eventBus.register(eventHandler);
+    Star star = StarManager.i.getStar(args.getStarID());
+    if (star != null) {
+      refresh(star);
+    }
   }
 
   @Override
@@ -76,7 +69,7 @@ public class EmptyPlanetFragment extends BaseFragment {
     StarManager.eventBus.unregister(eventHandler);
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onStarFetched(Star s) {
       if (star != null && !star.getKey().equals(s.getKey())) {

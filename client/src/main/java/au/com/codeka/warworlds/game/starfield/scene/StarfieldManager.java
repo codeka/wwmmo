@@ -24,7 +24,6 @@ import au.com.codeka.common.model.BaseSector;
 import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.ShipDesign;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.eventbus.EventHandler;
 import au.com.codeka.warworlds.game.starfield.StarfieldFragment;
@@ -110,11 +109,7 @@ public class StarfieldManager {
   }
 
   public void create() {
-    ServerGreeter.waitForHello(null, (success, greeting) -> {
-      if (success) {
-        onConnected();
-      }
-    });
+    onConnected();
 
     camera.setCameraUpdateListener(cameraUpdateListener);
     gestureDetector.create();

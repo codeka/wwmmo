@@ -37,7 +37,6 @@ import au.com.codeka.common.model.Design;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
 import au.com.codeka.warworlds.concurrency.Threads;
@@ -176,10 +175,7 @@ public class SitrepFragment extends BaseFragment {
   @Override
   public void onResume() {
     super.onResume();
-
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      refresh();
-    });
+    refresh();
   }
 
   @Override
@@ -340,10 +336,8 @@ public class SitrepFragment extends BaseFragment {
   }
 
   private void refresh() {
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      refreshReportItems();
-      refreshTitle();
-    });
+    refreshReportItems();
+    refreshTitle();
   }
 
   private class SituationReportAdapter extends BaseAdapter {

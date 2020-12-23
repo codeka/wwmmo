@@ -44,7 +44,6 @@ import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
 import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.game.DesignHelper;
-import au.com.codeka.warworlds.game.SitrepFragment;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.ChatMessage;
@@ -190,6 +189,7 @@ public class Notifications {
 
   private static void handleBlitzResetNotification(Context context) {
     log.info("Blitz reset notification received.");
+    // TODO:??
     ServerGreeter.clearHello();
     BackgroundDetector.i.resetBackStack();
   }

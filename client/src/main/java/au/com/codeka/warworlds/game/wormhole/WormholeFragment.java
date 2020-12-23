@@ -27,7 +27,6 @@ import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.App;
 import au.com.codeka.warworlds.R;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.api.ApiClient;
 import au.com.codeka.warworlds.api.ApiException;
@@ -90,7 +89,7 @@ public class WormholeFragment extends BaseFragment {
       public void onClick(View v) {
         RenameDialog dialog = new RenameDialog();
         dialog.setWormhole(star);
-        dialog.show(getFragmentManager(), "");
+        dialog.show(getChildFragmentManager(), "");
       }
     });
 
@@ -187,16 +186,13 @@ public class WormholeFragment extends BaseFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(),
-        (success, greeting) -> {
-          Bundle extras = requireArguments();
-          int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
+    Bundle extras = requireArguments();
+    int starID = (int) extras.getLong("au.com.codeka.warworlds.StarID");
 
-          star = StarManager.i.getStar(starID);
-          if (star != null) {
-            refreshStar();
-          }
-        });
+    star = StarManager.i.getStar(starID);
+    if (star != null) {
+      refreshStar();
+    }
 
     StarManager.eventBus.register(eventHandler);
   }

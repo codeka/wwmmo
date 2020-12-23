@@ -1,14 +1,11 @@
 package au.com.codeka.warworlds.game.empire;
 
 import android.content.Intent;
-import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.ServerGreeter;
-import au.com.codeka.warworlds.ServerGreeter.ServerGreeting;
 import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.WelcomeFragment;
