@@ -243,7 +243,21 @@
         <action
             android:id="@+id/action_allianceFragment_to_allianceChangeDetailsFragment"
             app:destination="@id/allianceChangeDetailsFragment" />
+        <action
+            android:id="@+id/action_allianceFragment_to_allianceDetailsFragment"
+            app:destination="@id/allianceDetailsFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/allianceDetailsFragment"
+        android:name="au.com.codeka.warworlds.game.alliance.AllianceDetailsFragment"
+        android:label="AllianceDetailsFragment">
+        <argument android:name="allianceID" app:argType="integer" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/allianceChangeDetailsFragment"
+        android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsFragment"
+        android:label="AllianceChangeDetailsFragment" />
     <fragment
         android:id="@+id/empireResetFragment"
         android:name="au.com.codeka.warworlds.EmpireResetFragment"
@@ -254,8 +268,4 @@
             app:popUpTo="@id/main_nav"
             app:popUpToInclusive="true" />
     </fragment>
-    <fragment
-        android:id="@+id/allianceChangeDetailsFragment"
-        android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsFragment"
-        android:label="AllianceChangeDetailsFragment" />
 </navigation>
