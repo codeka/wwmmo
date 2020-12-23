@@ -59,11 +59,6 @@
       </intent-filter>
     </activity>
 
-    <activity
-      android:name="au.com.codeka.warworlds.game.alliance.AllianceChangeDetailsFragment"
-      android:windowSoftInputMode="stateUnchanged" />
-    <activity android:name="au.com.codeka.warworlds.game.alliance.AllianceDetailsActivity" />
-
     <service
             android:name=".notifications.NotificationMessagingService"
             android:exported="false">

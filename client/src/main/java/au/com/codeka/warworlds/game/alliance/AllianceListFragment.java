@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.fragment.NavHostFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,14 +57,10 @@ public class AllianceListFragment extends Fragment {
       RankListAdapter.ItemEntry item =
           (RankListAdapter.ItemEntry) rankListAdapter.getItem(position);
       if (item.alliance != null) {
-        Intent intent = new Intent(getActivity(), AllianceDetailsActivity.class);
-        intent.putExtra("au.com.codeka.warworlds.AllianceKey", item.alliance.getKey());
-
-        Messages.Alliance.Builder alliance_pb = Messages.Alliance.newBuilder();
-        item.alliance.toProtocolBuffer(alliance_pb);
-        intent.putExtra("au.com.codeka.warworlds.Alliance", alliance_pb.build().toByteArray());
-
-        getActivity().startActivity(intent);
+        AllianceDetailsFragmentArgs args =
+            new AllianceDetailsFragmentArgs.Builder(item.alliance.getID()).build();
+        NavHostFragment.findNavController(this).navigate(
+            R.id.allianceDetailsFragment, args.toBundle());
       }
     });
 
@@ -85,7 +82,7 @@ public class AllianceListFragment extends Fragment {
     ShieldManager.eventBus.unregister(eventHandler);
   }
 
-  private Object eventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onAllianceUpdated(Alliance alliance) {
       refresh();
@@ -99,7 +96,7 @@ public class AllianceListFragment extends Fragment {
 
   private void onAllianceCreate() {
     AllianceCreateDialog dialog = new AllianceCreateDialog();
-    dialog.show(getActivity().getSupportFragmentManager(), "");
+    dialog.show(getChildFragmentManager(), "");
   }
 
   private void refresh() {

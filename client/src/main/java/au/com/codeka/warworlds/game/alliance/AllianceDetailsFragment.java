@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -26,7 +25,6 @@ import au.com.codeka.Cash;
 import au.com.codeka.common.TimeFormatter;
 import au.com.codeka.common.model.BaseAllianceMember;
 import au.com.codeka.common.model.BaseEmpireRank;
-import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -40,8 +38,6 @@ import au.com.codeka.warworlds.model.EmpireShieldManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.ShieldManager;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-
 import javax.annotation.Nonnull;
 
 public class AllianceDetailsFragment extends Fragment implements TabManager.Reloadable {
@@ -50,8 +46,9 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
   private LayoutInflater layoutInflater;
   private View view;
   private boolean refreshPosted;
-  private int allianceID;
   private Alliance alliance;
+
+  private AllianceDetailsFragmentArgs args;
 
   @Override
   public View onCreateView(
@@ -60,29 +57,11 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
     handler = new Handler();
     activity = getActivity();
 
-    Bundle args = getArguments();
-    if (args != null) {
-      String key = args.getString("au.com.codeka.warworlds.AllianceKey");
-      if (key != null) {
-        allianceID = Integer.parseInt(key);
-        byte[] alliance_bytes = args.getByteArray("au.com.codeka.warworlds.Alliance");
-        if (alliance_bytes != null) {
-          try {
-            Messages.Alliance alliance_pb = Messages.Alliance.parseFrom(alliance_bytes);
-            alliance = new Alliance();
-            alliance.fromProtocolBuffer(alliance_pb);
-          } catch (InvalidProtocolBufferException e) {
-            // Ignore.
-          }
-        }
-      }
-    }
-
-    if (alliance == null && allianceID == 0) {
+    args = AllianceDetailsFragmentArgs.fromBundle(requireArguments());
+    if (args.getAllianceID() == 0) {
       MyEmpire myEmpire = EmpireManager.i.getEmpire();
       alliance = (Alliance) myEmpire.getAlliance();
       if (alliance != null) {
-        allianceID = alliance.getID();
         alliance = null;
       }
     }
@@ -90,13 +69,13 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
     Alliance myAlliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
     if (myAlliance == null) {
       view = inflater.inflate(R.layout.alliance_details_potential, container, false);
-    } else if (myAlliance.getID() == allianceID) {
+    } else if (myAlliance.getID() == args.getAllianceID()) {
       view = inflater.inflate(R.layout.alliance_details_mine, container, false);
     } else {
       view = inflater.inflate(R.layout.alliance_details_enemy, container, false);
     }
 
-    AllianceManager.i.fetchAlliance(allianceID, alliance -> {
+    AllianceManager.i.fetchAlliance(args.getAllianceID(), alliance -> {
       AllianceDetailsFragment.this.alliance = alliance;
       refreshAlliance();
     });
@@ -108,23 +87,23 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
   @Override
   public void onStart() {
     super.onStart();
-    AllianceManager.eventBus.register(mEventHandler);
-    EmpireManager.eventBus.register(mEventHandler);
-    ShieldManager.eventBus.register(mEventHandler);
+    AllianceManager.eventBus.register(eventHandler);
+    EmpireManager.eventBus.register(eventHandler);
+    ShieldManager.eventBus.register(eventHandler);
   }
 
   @Override
   public void onStop() {
     super.onStop();
-    AllianceManager.eventBus.unregister(mEventHandler);
-    EmpireManager.eventBus.unregister(mEventHandler);
-    ShieldManager.eventBus.unregister(mEventHandler);
+    AllianceManager.eventBus.unregister(eventHandler);
+    EmpireManager.eventBus.unregister(eventHandler);
+    ShieldManager.eventBus.unregister(eventHandler);
   }
 
-  private Object mEventHandler = new Object() {
+  private final Object eventHandler = new Object() {
     @EventHandler
     public void onAllianceUpdated(Alliance alliance) {
-      if (alliance.getID() == allianceID) {
+      if (alliance.getID() == args.getAllianceID()) {
         AllianceDetailsFragment.this.alliance = alliance;
         fullRefresh();
       }
@@ -165,15 +144,15 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
     Button depositBtn = view.findViewById(R.id.bank_deposit);
     if (depositBtn != null) depositBtn.setOnClickListener(v -> {
       DepositRequestDialog dialog = new DepositRequestDialog();
-      dialog.setAllianceID(allianceID);
-      dialog.show(getParentFragmentManager(), "");
+      dialog.setAllianceID(args.getAllianceID());
+      dialog.show(getChildFragmentManager(), "");
     });
 
     Button withdrawBtn = view.findViewById(R.id.bank_withdraw);
     if (withdrawBtn != null) withdrawBtn.setOnClickListener(v -> {
       WithdrawRequestDialog dialog = new WithdrawRequestDialog();
-      dialog.setAllianceID(allianceID);
-      dialog.show(getParentFragmentManager(), "");
+      dialog.setAllianceID(args.getAllianceID());
+      dialog.show(getChildFragmentManager(), "");
     });
 
     Button changeBtn = view.findViewById(R.id.change_details_btn);
@@ -185,14 +164,14 @@ public class AllianceDetailsFragment extends Fragment implements TabManager.Relo
     Button joinBtn = view.findViewById(R.id.join_btn);
     if (joinBtn != null) joinBtn.setOnClickListener(v -> {
       JoinRequestDialog dialog = new JoinRequestDialog();
-      dialog.setAllianceID(allianceID);
-      dialog.show(getParentFragmentManager(), "");
+      dialog.setAllianceID(args.getAllianceID());
+      dialog.show(getChildFragmentManager(), "");
     });
 
     Button leaveBtn = view.findViewById(R.id.leave_btn);
     if (leaveBtn != null) leaveBtn.setOnClickListener(v -> {
       LeaveConfirmDialog dialog = new LeaveConfirmDialog();
-      dialog.show(getParentFragmentManager(), "");
+      dialog.show(getChildFragmentManager(), "");
     });
 
     if (alliance != null) {
