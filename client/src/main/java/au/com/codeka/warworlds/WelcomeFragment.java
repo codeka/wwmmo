@@ -39,6 +39,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.protobuf.Messages;
+import au.com.codeka.warworlds.api.greeter.GreetingWatcher;
+import au.com.codeka.warworlds.api.greeter.ServerGreeter;
 import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.ctrl.TransparentWebView;
 import au.com.codeka.warworlds.eventbus.EventHandler;
@@ -141,50 +143,9 @@ public class WelcomeFragment extends BaseFragment {
     empireIconView.setImageBitmap(null);
 
     helloWatcher = new HelloWatcher();
-    ServerGreeter.addHelloWatcher(helloWatcher);
+    requireMainActivity().getServerGreeter().setGreetingWatcher(helloWatcher);
 
     ShieldManager.eventBus.register(eventHandler);
-
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (success) {
-        // we'll display a bit of debugging info along with the 'connected' message
-        long maxMemoryBytes = Runtime.getRuntime().maxMemory();
-        int memoryClass =
-            ((ActivityManager) requireContext().getSystemService(Context.ACTIVITY_SERVICE))
-                .getMemoryClass();
-
-        String serverVersion = "?";
-        Messages.HelloResponse helloResponse = ServerGreeter.getHelloResponse();
-        if (helloResponse != null) {
-          serverVersion = helloResponse.getServerVersion();
-        }
-        DecimalFormat formatter = new DecimalFormat("#,##0");
-        String msg = String.format(Locale.ENGLISH,
-            "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s Server: %s",
-            memoryClass,
-            formatter.format(maxMemoryBytes),
-            Util.getVersion(),
-            Util.isDebug() ? " (debug)" : "",
-            serverVersion);
-        connectionStatus.setText(msg);
-        connectionStatus.setTextColor(Color.WHITE);
-        startGameButton.setEnabled(true);
-        startGameIntent = null;
-
-        MyEmpire empire = EmpireManager.i.getEmpire();
-        if (empire != null) {
-          empireNameView.setText(empire.getDisplayName());
-          empireIconView.setImageBitmap(EmpireShieldManager.i.getShield(requireContext(), empire));
-        }
-
-        final SharedPreferences prefs = Util.getSharedPreferences();
-        String currAccountName = prefs.getString("AccountName", null);
-        if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
-          reauthButtonView.setText("Sign in");
-        }
-        maybeShowSignInPrompt();
-      }
-    });
   }
 
   private void onReauthClick() {
@@ -230,6 +191,7 @@ public class WelcomeFragment extends BaseFragment {
           DocumentBuilder builder = builderFactory.newDocumentBuilder();
           return builder.parse(response.getEntity().getContent());
         }
+
       } catch (Exception e) {
         log.error("Error fetching MOTD.", e);
       }
@@ -280,7 +242,7 @@ public class WelcomeFragment extends BaseFragment {
   @Override
   public void onPause() {
     super.onPause();
-    ServerGreeter.removeHelloWatcher(helloWatcher);
+    requireMainActivity().getServerGreeter().setGreetingWatcher(null);
     ShieldManager.eventBus.unregister(eventHandler);
   }
 
@@ -295,7 +257,7 @@ public class WelcomeFragment extends BaseFragment {
     }
   };
 
-  private class HelloWatcher implements ServerGreeter.HelloWatcher {
+  private class HelloWatcher implements GreetingWatcher {
     private int numRetries = 0;
 
     @Override
@@ -351,6 +313,44 @@ public class WelcomeFragment extends BaseFragment {
           startGameIntent = intent;
           break;
       }
+    }
+
+    @Override
+    public void onComplete(String serverVersion) {
+      // Make sure the StarfieldManager gets started.
+      requireMainActivity().getStarfieldManager().create();
+
+      // we'll display a bit of debugging info along with the 'connected' message
+      long maxMemoryBytes = Runtime.getRuntime().maxMemory();
+      int memoryClass =
+          ((ActivityManager) requireContext().getSystemService(Context.ACTIVITY_SERVICE))
+              .getMemoryClass();
+
+      DecimalFormat formatter = new DecimalFormat("#,##0");
+      String msg = String.format(Locale.ENGLISH,
+          "Connected\r\nMemory Class: %d - Max bytes: %s\r\nVersion: %s%s Server: %s",
+          memoryClass,
+          formatter.format(maxMemoryBytes),
+          Util.getVersion(),
+          Util.isDebug() ? " (debug)" : "",
+          serverVersion);
+      connectionStatus.setText(msg);
+      connectionStatus.setTextColor(Color.WHITE);
+      startGameButton.setEnabled(true);
+      startGameIntent = null;
+
+      MyEmpire empire = EmpireManager.i.getEmpire();
+      if (empire != null) {
+        empireNameView.setText(empire.getDisplayName());
+        empireIconView.setImageBitmap(EmpireShieldManager.i.getShield(requireContext(), empire));
+      }
+
+      final SharedPreferences prefs = Util.getSharedPreferences();
+      String currAccountName = prefs.getString("AccountName", null);
+      if (currAccountName != null && currAccountName.endsWith("@anon.war-worlds.com")) {
+        reauthButtonView.setText("Sign in");
+      }
+      maybeShowSignInPrompt();
     }
   }
 }

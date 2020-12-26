@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.game.empire;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -27,9 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.SkuDetails;
 import com.google.common.collect.Lists;
@@ -42,7 +39,6 @@ import au.com.codeka.common.model.BaseEmpire;
 import au.com.codeka.warworlds.ImagePickerHelper;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.StyledDialog;
 import au.com.codeka.warworlds.TabManager;
 import au.com.codeka.warworlds.WelcomeFragment;
@@ -325,8 +321,7 @@ public class SettingsFragment extends BaseFragment implements TabManager.Reloada
       public void onEmpireReset() {
         runnable.run();
 
-        // TODO: ??
-        ServerGreeter.clearHello();
+        requireMainActivity().getServerGreeter().clearHello();
 
         // redirect you to the main page.
         startActivity(new Intent(getActivity(), WelcomeFragment.class));

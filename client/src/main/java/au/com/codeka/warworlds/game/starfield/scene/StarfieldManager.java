@@ -256,6 +256,11 @@ public class StarfieldManager {
    * still showing.
    */
   public void onConnected() {
+    if (EmpireManager.i.getEmpire() == null) {
+      // Can happen on first run when you don't have an empire set up yet. We'll wait.
+      return;
+    }
+
     if (initialized) {
       return;
     }

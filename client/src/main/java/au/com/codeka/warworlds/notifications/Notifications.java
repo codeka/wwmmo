@@ -11,10 +11,8 @@ import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -42,7 +40,6 @@ import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.GlobalOptions;
 import au.com.codeka.warworlds.R;
 import au.com.codeka.warworlds.RealmContext;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.game.DesignHelper;
 import au.com.codeka.warworlds.model.ChatConversation;
 import au.com.codeka.warworlds.model.ChatManager;
@@ -189,8 +186,8 @@ public class Notifications {
 
   private static void handleBlitzResetNotification(Context context) {
     log.info("Blitz reset notification received.");
-    // TODO:??
-    ServerGreeter.clearHello();
+    // TODO??
+//    ServerGreeter.clearHello();
     BackgroundDetector.i.resetBackStack();
   }
 
