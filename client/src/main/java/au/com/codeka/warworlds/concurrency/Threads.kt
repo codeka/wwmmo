@@ -96,12 +96,14 @@ enum class Threads {
   }
 
   companion object {
+    @JvmStatic
     fun checkOnThread(thread: Threads) {
       // Note: We don't use Preconditions.checkState because we want a nice error message and don't
       // want to allocate the string for the message every time.
       check(thread.isCurrentThread) { "Unexpectedly not on $thread" }
     }
 
+    @JvmStatic
     fun checkNotOnThread(thread: Threads) {
       check(!thread.isCurrentThread) { "Unexpectedly on $thread" }
     }

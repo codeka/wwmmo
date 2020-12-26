@@ -200,7 +200,8 @@ public class AccountsFragment extends BaseFragment {
     if (RealmContext.i.getCurrentRealm() != null) {
       RealmContext.i.getCurrentRealm().getAuthenticator().logout();
     }
-    ServerGreeter.clearHello();
+
+    requireMainActivity().getServerGreeter().clearHello();
 
     NavHostFragment.findNavController(this).popBackStack();
   }

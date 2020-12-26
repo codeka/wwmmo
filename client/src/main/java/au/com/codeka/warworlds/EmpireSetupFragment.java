@@ -38,8 +38,7 @@ public class EmpireSetupFragment extends BaseFragment {
     super.onViewCreated(view, savedInstanceState);
 
     empireName = view.findViewById(R.id.empire_setup_name);
-    View rootView = view.findViewById(android.R.id.content);
-    ActivityBackgroundGenerator.setBackground(rootView);
+    ActivityBackgroundGenerator.setBackground(view);
 
     final Button doneButton = view.findViewById(R.id.empire_setup_done);
     final Button switchAccountBtn = view.findViewById(R.id.switch_account_btn);
@@ -85,7 +84,7 @@ public class EmpireSetupFragment extends BaseFragment {
           pleaseWaitDialog.dismiss();
 
           // say 'hello' again, to reset the empire details
-          ServerGreeter.clearHello();
+          requireMainActivity().getServerGreeter().clearHello();
 
           NavHostFragment.findNavController(EmpireSetupFragment.this).popBackStack();
         }).errorCallback((request, error) -> {

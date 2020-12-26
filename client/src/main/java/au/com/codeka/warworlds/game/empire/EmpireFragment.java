@@ -1,14 +1,10 @@
 package au.com.codeka.warworlds.game.empire;
 
-import android.content.Intent;
-
 import androidx.annotation.Nullable;
 
 import au.com.codeka.common.Log;
-import au.com.codeka.warworlds.ServerGreeter;
 import au.com.codeka.warworlds.TabFragmentFragment;
 import au.com.codeka.warworlds.TabManager;
-import au.com.codeka.warworlds.WelcomeFragment;
 import au.com.codeka.warworlds.model.EmpireManager;
 
 /**
@@ -81,14 +77,7 @@ public class EmpireFragment extends TabFragmentFragment {
   public void onResume() {
     super.onResume();
 
-    ServerGreeter.waitForHello(requireMainActivity(), (success, greeting) -> {
-      if (!success) {
-        startActivity(new Intent(requireContext(), WelcomeFragment.class));
-        return;
-      }
-
-      // make sure we have a current empire
-      EmpireManager.i.refreshEmpire();
-    });
+    // make sure we have a current empire
+    EmpireManager.i.refreshEmpire();
   }
 }

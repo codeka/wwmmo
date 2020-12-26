@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Gravity;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -20,14 +21,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 
 import java.io.File;
 
 import au.com.codeka.common.Log;
+import au.com.codeka.warworlds.api.greeter.ServerGreeter;
+import au.com.codeka.warworlds.api.greeter.StrictModeEnabler;
 import au.com.codeka.warworlds.ctrl.DebugView;
 import au.com.codeka.warworlds.game.starfield.scene.StarfieldManager;
 import au.com.codeka.warworlds.opengl.RenderSurfaceView;
@@ -47,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
   private StarfieldManager starfieldManager;
   private ImagePickerHelper imagePickerHelper;
   private NavController navController;
-  private DebugView debugView;
+  private ServerGreeter serverGreeter;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -55,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
     Util.loadProperties();
     Util.setup(this);
+    StrictModeEnabler.maybeEnableStrictMode();
+
+    PreferenceManager.setDefaultValues(this, R.xml.global_options, false);
 
     if (onBlueStacks()) {
       Toast.makeText(
@@ -64,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
       finish();
     }
 
+    // Get the ServerGreeter started as early as possible.
+    serverGreeter = new ServerGreeter();
+    serverGreeter.sayHello(this);
+
     setContentView(R.layout.main_activity);
     setSupportActionBar(findViewById(R.id.toolbar));
 
@@ -72,10 +82,9 @@ public class MainActivity extends AppCompatActivity {
     RenderSurfaceView renderSurfaceView = findViewById(R.id.render_surface);
     renderSurfaceView.create();
     starfieldManager = new StarfieldManager(renderSurfaceView);
-    starfieldManager.create();
 
     if (Util.isDebug()) {
-      debugView = new DebugView(this);
+      DebugView debugView = new DebugView(this);
       WindowManager.LayoutParams debugViewLayout = new WindowManager.LayoutParams(
           WindowManager.LayoutParams.MATCH_PARENT,
           WindowManager.LayoutParams.WRAP_CONTENT,
@@ -84,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
               WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
           PixelFormat.TRANSLUCENT);
       debugViewLayout.gravity = Gravity.TOP;
+      ViewGroup container = findViewById(R.id.main_container);
+      container.addView(debugView);
     }
 
     int result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
@@ -194,6 +205,10 @@ public class MainActivity extends AppCompatActivity {
 
   public NavController getNavController() {
     return navController;
+  }
+
+  public ServerGreeter getServerGreeter() {
+    return serverGreeter;
   }
 
   private boolean onBlueStacks() {
