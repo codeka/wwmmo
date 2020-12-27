@@ -120,6 +120,10 @@ public class SectorManager extends BaseManager {
               eventBus.publish(new SectorListChangedEvent());
             }).build();
         RequestManager.i.sendRequest(request);
+      } else {
+        // Even if there's no missing sectors, we'll still want to fire an event since everything
+        // was cached.
+        eventBus.publish(new SectorListChangedEvent());
       }
     }
   }

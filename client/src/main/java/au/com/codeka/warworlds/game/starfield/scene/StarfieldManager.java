@@ -83,6 +83,7 @@ public class StarfieldManager {
   private long sectorTop;
   private long sectorRight;
   private long sectorBottom;
+  private boolean sectorsEmpty = false;
 
   /** A mapping of IDs to {@link SceneObject} representing stars and fleets. */
   private final LongSparseArray<SceneObject> sceneObjects = new LongSparseArray<>();
@@ -278,10 +279,12 @@ public class StarfieldManager {
    */
   private void updateSectorBounds(long left, long top, long right, long bottom) {
     // Remove the objects that are now out of bounds.
-    for (long sy = sectorTop; sy <= sectorBottom; sy++) {
-      for (long sx = sectorLeft; sx <= sectorRight; sx++) {
-        if (sy < top || sy > bottom || sx < left || sx > right) {
-          removeSector(new Pair<>(sx, sy));
+    if (!sectorsEmpty) {
+      for (long sy = sectorTop; sy <= sectorBottom; sy++) {
+        for (long sx = sectorLeft; sx <= sectorRight; sx++) {
+          if (sy < top || sy > bottom || sx < left || sx > right) {
+            removeSector(new Pair<>(sx, sy));
+          }
         }
       }
     }
@@ -289,7 +292,8 @@ public class StarfieldManager {
     // Create the background for all of the new sectors.
     for (long sy = top; sy <= bottom; sy ++) {
       for (long sx = left; sx <= right; sx ++) {
-        if (sy < sectorTop || sy > sectorBottom || sx < sectorLeft || sx > sectorRight) {
+        if (sectorsEmpty || sy < sectorTop || sy > sectorBottom || sx < sectorLeft
+            || sx > sectorRight) {
           createSectorBackground(sx, sy);
         }
       }
@@ -309,6 +313,7 @@ public class StarfieldManager {
     sectorLeft = left;
     sectorBottom = bottom;
     sectorRight = right;
+    sectorsEmpty = false;
   }
 
   /**
@@ -673,6 +678,10 @@ public class StarfieldManager {
         removeSector(new Pair<>(sx, sy));
       }
     }
+
+    // Since we've removed all the sectors, mark the sectors empty so we know we need to rebuild
+    // everything
+    sectorsEmpty = true;
   }
 
   /** Remove all objects in the given sector from the scene. */
