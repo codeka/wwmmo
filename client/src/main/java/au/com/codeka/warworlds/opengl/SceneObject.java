@@ -89,6 +89,7 @@ public class SceneObject {
     children.add(child);
     child.scene = scene;
     child.parent = this;
+    child.onSceneChange();
   }
 
   public void removeChild(SceneObject child) {
@@ -97,11 +98,18 @@ public class SceneObject {
       children.remove(child);
       child.scene = null;
       child.parent = null;
+      child.onSceneChange();
     }
   }
 
   public void removeAllChildren() {
     if (children != null) {
+      for (SceneObject child : children) {
+        child.scene = null;
+        child.parent = null;
+        child.onSceneChange();
+      }
+
       children.clear();
     }
   }
@@ -242,6 +250,13 @@ public class SceneObject {
     clipVector[6] = 0.0f;
     clipVector[7] = 1.0f;
     Matrix.multiplyMV(outVec, offset, modelViewProjMatrix, 0, clipVector, 4);
+  }
+
+  /**
+   * Called when this {@link SceneObject} is attached or detached from a {@link Scene} (that is,
+   * whenever the value of {@link #getScene()} would change).
+   */
+  protected void onSceneChange() {
   }
 
   /** Sub classes should implement this to actually draw this {@link SceneObject}. */

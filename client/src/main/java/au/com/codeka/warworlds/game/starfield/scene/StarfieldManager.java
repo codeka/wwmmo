@@ -617,7 +617,7 @@ public class StarfieldManager {
         -(centerSectorX - sectorX) * 1024.0f,
         (centerSectorY - sectorY) * 1024.0f);
 
-    Pair<Long, Long> xy = new Pair(sectorX, sectorY);
+    Pair<Long, Long> xy = new Pair<>(sectorX, sectorY);
     addSectorSceneObject(xy, backgroundSceneObject);
     synchronized (backgroundSceneObjects) {
       backgroundSceneObjects.put(xy, backgroundSceneObject);
