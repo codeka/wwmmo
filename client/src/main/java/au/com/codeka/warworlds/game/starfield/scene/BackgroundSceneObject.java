@@ -74,6 +74,14 @@ public class BackgroundSceneObject extends SceneObject {
     }
   }
 
+  @Override
+  protected void onSceneChange() {
+    super.onSceneChange();
+
+    // We may have delayed this call until attached to a scene, so do it again.
+    setZoomAmount(zoomAmount);
+  }
+
   private void ensureTacticalObject() {
     Scene scene = getScene();
     if (scene == null) {
