@@ -75,31 +75,6 @@ android {
   }
 }
 
-def deployPath = file("${rootDir}/../deploy/${project.name}")
-
-def publish = project.tasks.create("publishAll")
-def deploy = project.tasks.create("deploy")
-
-android.applicationVariants.all { variant ->
-  variant.outputs.each { output ->
-    if (variant.versionName) {
-      version "${variant.versionName}.${variant.versionCode}"
-    } else {
-      version "${variant.versionCode}"
-    }
-
-    def task = project.tasks.create("publish${variant.name.capitalize()}", Copy)
-    task.from(output.outputFile)
-    task.into(deployPath)
-    task.rename('.*', "wwmmo2-${variant.name}-${version}.apk")
-    task.dependsOn variant.assembleProvider
-    publish.dependsOn task
-    if (variant.name == "release") {
-      deploy.dependsOn task
-    }
-  }
-}
-
 def getVersionCodeFromGit() {
   // Same as running:
   // git rev-list <checked out branch name> | wc -l
