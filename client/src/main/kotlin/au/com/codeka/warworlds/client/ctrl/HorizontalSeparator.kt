@@ -13,7 +13,7 @@ import androidx.appcompat.widget.AppCompatTextView
 class HorizontalSeparator : AppCompatTextView {
   private var paint: Paint
 
-  constructor(context: Context?) : super(context) {
+  constructor(context: Context) : super(context) {
     paint = Paint()
     paint.setARGB(255, 14, 215, 254)
     paint.style = Paint.Style.STROKE
@@ -22,7 +22,7 @@ class HorizontalSeparator : AppCompatTextView {
   /**
    * Constructs a new HorizontalSeparator.
    */
-  constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
     paint = Paint()
     paint.setARGB(255, 14, 215, 254)
     paint.style = Paint.Style.STROKE

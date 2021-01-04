@@ -21,13 +21,13 @@ if (signingPropsFile.isFile()) {
 }
 
 android {
-  compileSdkVersion 29
-  buildToolsVersion '29.0.2'
+  compileSdkVersion 30
+  buildToolsVersion '30.0.2'
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
-    minSdkVersion 19
-    targetSdkVersion 29
+    minSdkVersion 21
+    targetSdkVersion 30
     versionCode getVersionCodeFromGit()
     versionName "2.0"
     multiDexEnabled true
@@ -92,7 +92,7 @@ android.applicationVariants.all { variant ->
     task.from(output.outputFile)
     task.into(deployPath)
     task.rename('.*', "wwmmo2-${variant.name}-${version}.apk")
-    task.dependsOn variant.assemble
+    task.dependsOn variant.assembleProvider
     publish.dependsOn task
     if (variant.name == "release") {
       deploy.dependsOn task
@@ -107,18 +107,18 @@ def getVersionCodeFromGit() {
 }
 
 dependencies {
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.1'
 
-  implementation 'androidx.appcompat:appcompat:1.1.0'
-  implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
-  implementation 'androidx.core:core-ktx:1.2.0'
-  implementation 'androidx.preference:preference:1.1.1'
+  implementation 'androidx.appcompat:appcompat:1.2.0'
+  implementation 'androidx.constraintlayout:constraintlayout:2.1.0-alpha2'
+  implementation 'androidx.core:core-ktx:1.3.2'
+  implementation 'androidx.preference:preference-ktx:1.1.1'
   implementation 'androidx.transition:transition:1.3.1'
-  implementation 'com.google.android.material:material:1.2.0-alpha06'
-  implementation 'com.google.android.gms:play-services-base:17.2.1'
-  implementation 'com.google.android.gms:play-services-auth:18.0.0'
-  implementation 'com.google.firebase:firebase-core:17.4.1'
-  implementation 'com.google.firebase:firebase-messaging:20.1.7'
+  implementation 'com.google.android.material:material:1.3.0-beta01'
+  implementation 'com.google.android.gms:play-services-base:17.5.0'
+  implementation 'com.google.android.gms:play-services-auth:19.0.0'
+  implementation 'com.google.firebase:firebase-core:18.0.0'
+  implementation 'com.google.firebase:firebase-messaging:21.0.1'
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.squareup.picasso:picasso:2.71828'
   implementation 'com.squareup.wire:wire-runtime:3.1.0'

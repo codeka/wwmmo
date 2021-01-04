@@ -2,8 +2,9 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.common.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/star.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\star.proto";
 
 //
 // Details of an empire's rank (such as number of ships, number of colonies etc)

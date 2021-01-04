@@ -2,8 +2,9 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.server.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/star.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\star.proto";
 
 // A suspicious event is something we record when a client sends us something that we don't expect.
 // It could be an early indication of attempted cheating, or bugs in the client or something else.

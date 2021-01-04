@@ -14,7 +14,7 @@ import java.io.InputStreamReader
  * a transparent background seems to be totally different depending on which version of the Android
  * API your device is.
  */
-class TransparentWebView(context: Context?, attrs: AttributeSet?) : WebView(context, attrs) {
+class TransparentWebView(context: Context, attrs: AttributeSet?) : WebView(context, attrs) {
   override fun loadData(data: String, mimeType: String?, encoding: String?) {
     super.loadData(data, mimeType, encoding)
     setTransparent()

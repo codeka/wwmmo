@@ -2,8 +2,9 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.server.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/account.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\account.proto";
 
 message LoginEvent {
   optional int64 timestamp = 1;
