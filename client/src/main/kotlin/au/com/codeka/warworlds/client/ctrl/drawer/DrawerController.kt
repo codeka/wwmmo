@@ -158,7 +158,7 @@ class DrawerController(
             empireMenuItem.icon = BitmapDrawable(activity.resources, bitmap)
           }
 
-          override fun onBitmapFailed(e: Exception, errorDrawable: Drawable) {
+          override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
             empireMenuItem.icon = errorDrawable
           }
 

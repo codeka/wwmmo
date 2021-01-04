@@ -178,8 +178,8 @@ class ScreenStack(private val activity: MainActivity, private val container: Vie
             } else {
               val name = "shared-" + RANDOM.nextLong()
               if (sharedView.fromViewId != 0 && sharedView.toViewId != 0) {
-                container.findViewById<View>(sharedView.fromViewId).transitionName = name
-                view.findViewById<View>(sharedView.toViewId).transitionName = name
+                container.findViewById<View>(sharedView.fromViewId)?.transitionName = name
+                view.findViewById<View>(sharedView.toViewId)?.transitionName = name
               } else if (sharedView.fromView != null && sharedView.toViewId != 0) {
                 sharedView.fromView.transitionName = name
                 val toView = view.findViewById<View>(sharedView.toViewId)

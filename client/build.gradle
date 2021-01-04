@@ -65,7 +65,7 @@ android {
       buildConfigField "String", "DEFAULT_SERVER", "\"http://game2.war-worlds.com/\""
     }
     debug {
-      buildConfigField "String", "DEFAULT_SERVER", "\"http://game2.war-worlds.com/\""
+      buildConfigField "String", "DEFAULT_SERVER", "\"http://127.0.0.1:8080/\""
     }
   }
   packagingOptions {

@@ -54,7 +54,8 @@ class NameGenerator {
         val vocab = Vocabulary(path)
         var line: String
         while (ins.readLine().also { line = it ?: "" } != null) {
-          for (word in line.split("[^a-zA-Z]+").toTypedArray()) {
+          for (word in line.split(Regex("[^a-zA-Z]+")).toTypedArray()) {
+            log.info("Word: $word")
             val letters = word.trim { it <= ' ' }
             if (letters.isEmpty()) {
               continue

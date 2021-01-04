@@ -36,7 +36,7 @@ object Program {
 
     val options = FirebaseOptions.Builder()
         .setCredentials(Configuration.i.getFirebaseCredentials())
-        .setDatabaseUrl("https://wwmmo-93bac.firebaseio.com")
+        .setDatabaseUrl("https://wwmmo-2.firebaseio.com")
         .build()
     FirebaseApp.initializeApp(options)
 

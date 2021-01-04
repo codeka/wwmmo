@@ -10,14 +10,20 @@ def build_and_run_server():
     os.system("adb reverse tcp:8080 tcp:8080")
     os.system("adb reverse tcp:8081 tcp:8081")
 
-    os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd +
-              " --daemon :server:installDist -Pandroid.debug.obsoleteApi=true")
+    err = os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd +
+                    " --daemon :server:installDist -Pandroid.debug.obsoleteApi=true")
+    if err != 0:
+        return err
 
     classpath = ""
     for jar in pathlib.Path(common.installPath, "lib").glob("*.jar"):
         if classpath != "":
             classpath += os.pathsep
         classpath += str(jar)
+
+    # TODO: If we keep getting 'is neither empty nor does it contain an installation' errors, we
+    # should manually create the bin/ and lib/ folder in the installation directory first to trick
+    # the build into thinking it's a valid installation...
 
     cmd = [
         "java",

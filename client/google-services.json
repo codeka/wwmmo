@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "809181406384-5vvsp7umsbcggaj6lrbn15uekep2hpvs.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds2",
+            "certificate_hash": "8a68ea8582deaf807fd7ca27503d8e0d04642ee9"
+          }
+        },
+        {
+          "client_id": "809181406384-ugkeaq0qs7llgkb2a2tperiapohbpoq8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds2",
+            "certificate_hash": "53ecbe3df659fc5df421c894ae4df3656d532546"
+          }
+        },
+        {
           "client_id": "809181406384-1uo6le381oo1k0og8udkphc9993re2ks.apps.googleusercontent.com",
           "client_type": 3
         }
