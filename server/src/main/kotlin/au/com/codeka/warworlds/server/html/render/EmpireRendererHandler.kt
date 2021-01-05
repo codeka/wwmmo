@@ -70,7 +70,7 @@ class EmpireRendererHandler : RendererHandler() {
   }
 
   private fun mergeShieldImage(shieldImage: BufferedImage): BufferedImage {
-    val finalImage = ImageIO.read(File("data\\renderer\\empire\\shield.png"))
+    val finalImage = ImageIO.read(File("data/renderer/empire/shield.png"))
     val width = finalImage.width
     val height = finalImage.height
     val fx = shieldImage.width.toFloat() / width.toFloat()

@@ -8,10 +8,7 @@ import com.google.gson.InstanceCreator
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import com.google.gson.stream.JsonReader
-import java.io.ByteArrayInputStream
-import java.io.FileReader
-import java.io.IOException
-import java.io.UnsupportedEncodingException
+import java.io.*
 import java.lang.reflect.Type
 import java.nio.charset.StandardCharsets
 
@@ -48,13 +45,14 @@ class Configuration private constructor() {
       // just try whatever in the current directory
       fileName = "config.json"
     }
-    log.info("Loading config from: %s", fileName)
+    val file = File(fileName)
+    log.info("Loading config from: %s", file.absolutePath)
     val gson = GsonBuilder()
         .registerTypeAdapter(
             Configuration::class.java,
             InstanceCreator { i } as InstanceCreator<Configuration>)
         .create()
-    val jsonReader = JsonReader(FileReader(fileName))
+    val jsonReader = JsonReader(FileReader(file))
     jsonReader.isLenient = true // allow comments (and a few other things)
     gson.fromJson<Any>(jsonReader, Configuration::class.java)
   }
