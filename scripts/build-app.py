@@ -28,6 +28,6 @@ if os.path.exists(apksPath):
 print("Install with:")
 print("  java -jar " + str(bundleTool) + " build-apks --connected-device --bundle=" +
       str(destPath.resolve()) + " --output " + str(apksPath.resolve()) + " --ks " +
-      str(pathlib.Path(common.rootPath, "../keystore.jks")) +
+      str(pathlib.Path(common.rootPath, "../wwmmo2.jks")) +
       " --ks-key-alias Codeka && java -jar " + str(bundleTool) + " install-apks --apks " +
       str(apksPath))
