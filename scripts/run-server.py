@@ -6,6 +6,8 @@ import signal
 import subprocess
 import time
 
+dataPath = pathlib.Path(common.rootPath, 'server/src/main/data')
+
 def build_and_run_server():
     os.system("adb reverse tcp:8080 tcp:8080")
     os.system("adb reverse tcp:8081 tcp:8081")
@@ -28,17 +30,16 @@ def build_and_run_server():
     cmd = [
         "java",
         "-classpath", classpath,
-        "-DConfigFile=" + str(common.installPath) + "/data/config-debug.json",
+        "-DConfigFile=" + str(dataPath) + "/config-debug.json",
         "-Djava.util.logging.config.file=logging-debug.properties",
         "au.com.codeka.warworlds.server.Program"
         ]
-
 
     # Note: running the server via the batch file is kind of annoying on Windows due to the way
     # it does dumb stuff on Ctrl+C. So we set our classpath and run the java server directly
     # instead.
     try:
-      proc = subprocess.Popen(cmd, cwd=str(common.installPath))
+      proc = subprocess.Popen(cmd, cwd=str(dataPath.parent))
       proc.wait()
     except KeyboardInterrupt:
       proc.send_signal(signal.CTRL_C_EVENT)
