@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   public void onTrimMemory(int level) {
+    log.warning("onTrimMemory(level=%d)", level);
     if (level == TRIM_MEMORY_UI_HIDDEN) {
       MemoryTrimmer.trimMemory();
     }

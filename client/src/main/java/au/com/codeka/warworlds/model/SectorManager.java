@@ -81,7 +81,7 @@ public class SectorManager extends BaseManager {
     synchronized (this) {
       for (Pair<Long, Long> coord : coords) {
         Sector s = sectors.get(coord);
-        if ((s == null  ||force) && !pendingSectors.contains(coord)) {
+        if ((s == null || force) && !pendingSectors.contains(coord)) {
           pendingSectors.add(coord);
           missingSectors.add(coord);
         }

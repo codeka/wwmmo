@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +30,10 @@ public class SchemaUpdater {
   }
 
   private void applyVersionUpgrade(int version) throws SchemaException {
-    String fileName = new File(Configuration.i.getDataDirectory(),
-        String.format("schema/schema-%03d.sql", version)).getAbsolutePath();
+    String fileName =
+        new File(
+            Configuration.i.getDataDirectory(),
+            String.format(Locale.ENGLISH, "schema/schema-%03d.sql", version)).getAbsolutePath();
     ScriptReader reader = null;
     try {
       reader = new ScriptReader(new BufferedReader(new FileReader(fileName)));

@@ -93,6 +93,11 @@ public class SceneObject {
   }
 
   public void removeChild(SceneObject child) {
+    if (child.parent == null) {
+      // TODO: already removed? I think there's some race conditions here...
+      return;
+    }
+
     Preconditions.checkState(child.parent == this, "%s != %s", child.parent, this);
     if (children != null) {
       children.remove(child);
