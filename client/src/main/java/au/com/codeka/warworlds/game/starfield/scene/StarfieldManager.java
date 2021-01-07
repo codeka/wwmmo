@@ -307,13 +307,14 @@ public class StarfieldManager {
         coords.add(new Pair<>(sx, sy));
       }
     }
-    SectorManager.i.refreshSectors(coords, false);
 
     sectorTop = top;
     sectorLeft = left;
     sectorBottom = bottom;
     sectorRight = right;
     sectorsEmpty = false;
+
+    SectorManager.i.refreshSectors(coords, false);
   }
 
   /**
@@ -588,7 +589,7 @@ public class StarfieldManager {
   private void detachNonMovingFleet(Fleet fleet, SceneObject sceneObject) {
     // If you had it selected, we'll need to un-select it.
     if (selectedFleet != null && selectedFleet.getID() == fleet.getID()) {
-//      App.i.getTaskRunner().runTask(() -> setSelectedFleet(null, null), Threads.UI);
+      App.i.getTaskRunner().runTask(() -> setSelectedFleet(null, null), Threads.UI);
     }
 
     synchronized (scene.lock) {
@@ -643,10 +644,10 @@ public class StarfieldManager {
         }
       }
 
-//      App.i.getTaskRunner().runTask(
-//          updateMovingFleetsRunnable,
-//          Threads.UI,
-//          UPDATE_MOVING_FLEETS_TIME_MS);
+      App.i.getTaskRunner().runTask(
+          updateMovingFleetsRunnable,
+          Threads.UI,
+          UPDATE_MOVING_FLEETS_TIME_MS);
     }
   };
 
@@ -777,6 +778,11 @@ public class StarfieldManager {
     @EventHandler
     public void onSectorListChanged(SectorManager.SectorListChangedEvent sectorListChangedEvent) {
       for (Star star : SectorManager.i.getAllVisibleStars()) {
+        if (star.getSectorX() < sectorLeft || star.getSectorX() > sectorRight
+            || star.getSectorY() < sectorTop || star.getSectorY() > sectorBottom) {
+          continue;
+        }
+
         updateStar(star);
       }
     }

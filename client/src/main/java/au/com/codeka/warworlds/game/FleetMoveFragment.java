@@ -131,11 +131,12 @@ public class FleetMoveFragment extends BaseFragment {
     // We're done!
     starfieldManager.warpTo(srcStar);
     fleet = (Fleet) srcStar.getFleet(args.getFleetID());
-    fleetMoveIndicatorSceneObject =
-        new FleetMoveIndicatorSceneObject(starfieldManager, fleet);
+    fleetMoveIndicatorSceneObject = new FleetMoveIndicatorSceneObject(starfieldManager, fleet);
     SceneObject sceneObject = starfieldManager.getStarSceneObject(srcStar.getID());
     if (sceneObject != null) {
       sceneObject.addChild(fleetMoveIndicatorSceneObject);
+    } else {
+      log.info("sceneObject is null.");
     }
     // Start off hidden, until you select a star.
     refreshSelection();
@@ -202,23 +203,6 @@ public class FleetMoveFragment extends BaseFragment {
     }
 
     /*
-        @EventHandler
-        public void onStarSelected(final StarfieldSceneManager.StarSelectedEvent event) {
-          if (event.star == null) {
-            destStar = null;
-            refreshSelection();
-            return;
-          }
-
-          if (srcStar != null && event.star.getKey().equals(srcStar.getKey())) {
-            // if src & dest are the same, just forget about it
-            destStar = null;
-          } else {
-            destStar = event.star;
-          }
-
-          refreshSelection();
-        }
 
         @EventHandler
         public void onSpaceTap(final StarfieldSceneManager.SpaceTapEvent event) {
@@ -265,17 +249,21 @@ public class FleetMoveFragment extends BaseFragment {
 
   private void refreshSelection() {
     if (srcStar == null) {
+      log.info("Can't refresh selection, source star not loaded yet.");
       return;
     }
 
     Vector2 srcPoint = starfieldManager.calculatePosition(srcStar);
     if (destStar == null) {
+      log.info("Deselected star, nowhere to move.");
       instructionsView.setVisibility(View.VISIBLE);
       starDetailsView.setVisibility(View.GONE);
       moveBtn.setEnabled(false);
 
       fleetMoveIndicatorSceneObject.reset(srcPoint, null);
     } else {
+      log.info("Selected %d [%s]", destStar.getID(), destStar.getName());
+
       instructionsView.setVisibility(View.GONE);
       starDetailsView.setVisibility(View.VISIBLE);
       moveBtn.setEnabled(true);
