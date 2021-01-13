@@ -23,6 +23,10 @@ public class StorageBuildingEffect extends BuildingEffect {
   @Override
   public void apply(BaseStar star, BaseColony baseColony, BaseBuilding building) {
     Colony colony = (Colony) baseColony;
+    if (colony.getEmpireID() == null) {
+      return;
+    }
+
     for (BaseEmpirePresence baseEmpirePresence : star.getEmpirePresences()) {
       EmpirePresence empirePresence = (EmpirePresence) baseEmpirePresence;
       if (empirePresence == null || colony.getEmpireID() == null) {

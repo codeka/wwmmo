@@ -398,7 +398,6 @@ public class FleetMoveFragment extends BaseFragment {
   };
 
   private class FleetMoveIndicatorSceneObject extends SceneObject {
-    private final StarfieldManager starfieldManager;
     private final Sprite sprite;
     private final Vector2 pos;
 
@@ -409,7 +408,6 @@ public class FleetMoveFragment extends BaseFragment {
 
     public FleetMoveIndicatorSceneObject(StarfieldManager starfieldManager, Fleet fleet) {
       super(starfieldManager.getScene().getDimensionResolver());
-      this.starfieldManager = starfieldManager;
       this.sprite = starfieldManager.createFleetSprite(fleet);
       addChild(sprite);
       this.pos = new Vector2();
