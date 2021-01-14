@@ -8,10 +8,7 @@ import java.util.Locale;
 
 import au.com.codeka.common.Log;
 import au.com.codeka.common.model.BaseFleet;
-import au.com.codeka.common.model.BaseStar;
 import au.com.codeka.common.model.Simulation;
-import au.com.codeka.common.protobuf.Messages;
-import au.com.codeka.warworlds.server.Configuration;
 import au.com.codeka.warworlds.server.Event;
 import au.com.codeka.warworlds.server.RequestContext;
 import au.com.codeka.warworlds.server.RequestException;
@@ -19,15 +16,12 @@ import au.com.codeka.warworlds.server.ctrl.BattleRankController;
 import au.com.codeka.warworlds.server.ctrl.ColonyController;
 import au.com.codeka.warworlds.server.ctrl.EmpireController;
 import au.com.codeka.warworlds.server.ctrl.FleetController;
-import au.com.codeka.warworlds.server.ctrl.SituationReportController;
 import au.com.codeka.warworlds.server.ctrl.StarController;
 import au.com.codeka.warworlds.server.data.DB;
 import au.com.codeka.warworlds.server.data.SqlResult;
 import au.com.codeka.warworlds.server.data.SqlStmt;
 import au.com.codeka.warworlds.server.model.Colony;
-import au.com.codeka.warworlds.server.model.CombatReport;
 import au.com.codeka.warworlds.server.model.Fleet;
-import au.com.codeka.warworlds.server.model.ScoutReport;
 import au.com.codeka.warworlds.server.model.Star;
 
 public class PropagandizingCompleteEvent extends Event {
