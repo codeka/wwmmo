@@ -44,7 +44,8 @@ public class UpdateRanksCronJob extends AbstractCronJob {
       }
     }
 
-    sql = "SELECT empire_id, COUNT(*) FROM buildings GROUP BY empire_id";
+    sql = "SELECT empire_id, COUNT(*) " +
+        "FROM buildings GROUP BY empire_id WHERE empire_id IS NOT NULL";
     try (SqlStmt stmt = DB.prepare(sql)) {
       SqlResult res = stmt.select();
       while (res.next()) {
