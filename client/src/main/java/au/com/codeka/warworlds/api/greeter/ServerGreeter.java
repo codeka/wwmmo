@@ -227,16 +227,20 @@ public class ServerGreeter {
 
     App.i.getTaskRunner().runTask(() -> greetingWatcher.onConnecting(), Threads.UI);
 
-    String safetyNetAttestationJwsResult;
+    // TODO: better SafetyNet support (don't block logging in while waiting for SafetyNet)
+    String safetyNetAttestationJwsResult = "";
+/*
     try {
+      long startTime = System.currentTimeMillis();
       SafetyNetApi.AttestationResponse safetyNetAttestation = Tasks.await(safetyNetTask);
-      log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
+      log.info("SafetyNet attestation complete after %dms", System.currentTimeMillis() - startTime);
       safetyNetAttestationJwsResult = safetyNetAttestation.getJwsResult();
     } catch (Exception e) {
       // TODO: retry?
       log.error("SafetyNet attestation error.", e);
       safetyNetAttestationJwsResult = "ERROR:" + e.toString();
     }
+*/
 
     // say hello to the server
     int memoryClass = ((ActivityManager) activity.getSystemService(Activity.ACTIVITY_SERVICE))
