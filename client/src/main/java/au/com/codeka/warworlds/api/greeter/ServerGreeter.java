@@ -1,18 +1,12 @@
 package au.com.codeka.warworlds.api.greeter;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.os.Debug;
-import android.os.Environment;
-import android.os.StrictMode;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.preference.PreferenceManager;
 
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
@@ -21,24 +15,17 @@ import com.google.android.gms.safetynet.SafetyNet;
 import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.android.gms.safetynet.SafetyNetClient;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.protobuf.ByteString;
 
-import java.io.File;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import au.com.codeka.ErrorReporter;
 import au.com.codeka.common.Log;
 import au.com.codeka.common.safetynet.NonceBuilder;
 import au.com.codeka.common.protobuf.Messages;
 import au.com.codeka.warworlds.AccessibilityServiceReporter;
 import au.com.codeka.warworlds.App;
-import au.com.codeka.warworlds.BackgroundDetector;
 import au.com.codeka.warworlds.DeviceRegistrar;
 import au.com.codeka.warworlds.EmpireResetFragmentArgs;
 import au.com.codeka.warworlds.FeatureFlags;
@@ -53,11 +40,9 @@ import au.com.codeka.warworlds.api.RequestManager;
 import au.com.codeka.warworlds.concurrency.TaskRunner;
 import au.com.codeka.warworlds.concurrency.Threads;
 import au.com.codeka.warworlds.model.BuildManager;
-import au.com.codeka.warworlds.model.ChatManager;
 import au.com.codeka.warworlds.model.EmpireManager;
 import au.com.codeka.warworlds.model.MyEmpire;
 import au.com.codeka.warworlds.model.Realm;
-import au.com.codeka.warworlds.model.RealmManager;
 
 /**
  * This class is used to make sure we're said "Hello" to the server and that we've got our
