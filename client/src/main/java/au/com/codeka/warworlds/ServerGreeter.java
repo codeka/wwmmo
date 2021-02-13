@@ -254,7 +254,9 @@ public class ServerGreeter {
           }
         });
 
-        String safetyNetAttestationJwsResult;
+        String safetyNetAttestationJwsResult = "";
+        // TODO: re-enable this when we don't block logging in on it. It can be slow.
+        /*
         try {
           SafetyNetApi.AttestationResponse safetyNetAttestation = Tasks.await(task);
           log.info("SafetyNet attestation: %s", safetyNetAttestation.getJwsResult());
@@ -264,6 +266,7 @@ public class ServerGreeter {
           log.error("SafetyNet attestation error.", e);
           safetyNetAttestationJwsResult = "ERROR:" + e.toString();
         }
+        */
 
         // say hello to the server
         String message;
