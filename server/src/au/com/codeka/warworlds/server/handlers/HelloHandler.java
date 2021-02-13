@@ -93,7 +93,8 @@ public class HelloHandler extends RequestHandler {
     }
 
     SafetyNetAttestationStatement attestationStatement = null;
-    if (hello_request_pb.hasSafetynetJwsResult()) {
+    Configuration.SafetyNetConfig config = Configuration.i.getSafetyNet();
+    if (config != null && config.isEnabled() && hello_request_pb.hasSafetynetJwsResult()) {
       try {
         attestationStatement = validateSafetyNetJws(hello_request_pb);
       } catch (ValidationFailureException e) {
@@ -238,8 +239,15 @@ public class HelloHandler extends RequestHandler {
    * the contents of the attestation (that's what
    * {@link #ensureSafetyNetAttestation(int, SafetyNetAttestationStatement)} is for).
    */
+  @Nullable
   private SafetyNetAttestationStatement validateSafetyNetJws(
       Messages.HelloRequest helloRequest) throws ValidationFailureException {
+    Configuration.SafetyNetConfig config = Configuration.i.getSafetyNet();
+    if (config == null || !config.isEnabled()) {
+      log.debug("SafetyNet is disabled, not checking.");
+      return null;
+    }
+
     if (!helloRequest.hasSafetynetJwsResult()) {
       throw new ValidationFailureException(ValidationFailureReason.JSW_MISSING);
     }
