@@ -251,6 +251,10 @@ public class HelloHandler extends RequestHandler {
           ValidationFailureReason.JSW_MISSING, helloRequest.getSafetynetJwsResult());
     }
 
+    if (helloRequest.getSafetynetJwsResult().isEmpty()) {
+      return null;
+    }
+
     JsonWebSignature jws;
     try {
       jws = JsonWebSignature.parser(GsonFactory.getDefaultInstance())

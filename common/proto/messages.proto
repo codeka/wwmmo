@@ -1589,3 +1589,39 @@ message MetricsHistory {
   // one after that is 10 minutes and so on.
   repeated MetricsSnapshot snapshot = 1;
 }
+
+// Timing information for a single ApiRequest.
+message ApiRequestTiming {
+  // The time, in milliseconds since epoch, this request was made.
+  optional int64 time = 1;
+
+  // The URL that we were requesting.
+  optional string url = 2;
+
+  // The method (PUT, POST, GET, etc)
+  optional string method = 3;
+
+  // The response code we got back from the server.
+  optional int32 response_code = 4;
+
+  // The size of the request, in bytes.
+  optional int32 request_size = 5;
+
+  // The size of the response, in bytes.
+  optional int32 response_size = 6;
+
+  // The time the request was queued on the client.
+  optional int64 request_queue_time_ms = 7;
+
+  // The time, in milliseconds, that the server took to respond.
+  optional int64 response_time_ms = 8;
+}
+
+// Metrics that are gathered on the client. The client will periodically report this to the server
+// so we can collate them and get an idea of how things are going on the client.
+message ClientMetrics {
+  optional int32 empire_id = 1;
+
+  repeated ApiRequestTiming api_timings = 2;
+}
+

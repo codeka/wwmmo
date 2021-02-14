@@ -50,13 +50,19 @@ public class ApiRequest {
   @Nullable private MediaType responseContentType;
   @Nullable private Messages.GenericError error;
   @Nullable private Throwable exception;
+  private boolean recordMetrics;
+
+  private int requestSize = -1;
+  private int responseCode = -1;
+  private long responseSize = -1;
+
   private boolean skipCache;
   private boolean dontLogExceptions;
 
   private ApiRequest(String url, String method, @Nullable Message requestBody,
       boolean skipCache, @Nullable CompleteCallback completeCallback,
       @Nullable ErrorCallback errorCallback, boolean completeOnAnyThread,
-      boolean dontLogExceptions) {
+      boolean dontLogExceptions, boolean recordMetrics) {
     this.timing = new Timing();
     this.url = url;
     this.method = method;
@@ -66,6 +72,7 @@ public class ApiRequest {
     this.errorCallback = errorCallback;
     this.completeOnAnyThread = completeOnAnyThread;
     this.dontLogExceptions = dontLogExceptions;
+    this.recordMetrics = recordMetrics;
   }
 
   /** Builds the OkHttp request for this request. */
@@ -89,6 +96,7 @@ public class ApiRequest {
       builder.addHeader("Cookie", realm.getAuthenticator().getAuthCookie());
     }
     builder.tag(this);
+
     return builder.build();
   }
 
@@ -103,11 +111,7 @@ public class ApiRequest {
       try {
         Method m = responseClass.getDeclaredMethod("parseFrom", byte[].class);
         responseProto = (Message) m.invoke(null, new Object[] {responseBytes});
-      } catch (NoSuchMethodException e) {
-        log.error("Unexpected error parsing response.", e);
-      } catch (InvocationTargetException e) { // These must be split out to support < KITKAT
-        log.error("Unexpected error parsing response.", e);
-      } catch (IllegalAccessException e) { // These must be split out to support < KITKAT
+      } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
         log.error("Unexpected error parsing response.", e);
       }
     } else if (responseProto == null) {
@@ -117,8 +121,24 @@ public class ApiRequest {
     return (T) responseProto;
   }
 
+  public String method() {
+    return method;
+  }
+
   public String url() {
     return url;
+  }
+
+  public int requestSize() {
+    return requestSize;
+  }
+
+  public int responseSize() {
+    return (int) responseSize;
+  }
+
+  public int responseCode() {
+    return responseCode;
   }
 
   /**
@@ -150,23 +170,30 @@ public class ApiRequest {
   }
 
   void handleResponse(Response response) {
+    responseCode = response.code();
     if (response.code() > 399) {
+      responseSize = 0;
       handleError(response, null);
     } else {
       try {
         ResponseBody body = response.body();
         if (body != null) {
+          responseSize = body.contentLength();
           responseContentType = body.contentType();
           if (responseContentType != null) {
             if (responseContentType.type().equals("text")) {
               responseString = body.string();
+              responseSize = responseString.length();
             } else if (responseContentType.type().equals("image")) {
               responseBitmap = BitmapFactory.decodeStream(body.byteStream());
+
             } else {
               responseBytes = body.bytes();
             }
             body.close();
           }
+        } else {
+          responseSize = 0;
         }
       } catch (IOException e) {
         log.error("Unexpected error decoding body.", e);
@@ -197,6 +224,8 @@ public class ApiRequest {
   }
 
   void handleError(@Nullable Response response, Throwable e) {
+    responseCode = -1;
+
     if (response != null && response.body() != null) {
       try {
         responseBytes = response.body().bytes();
@@ -238,6 +267,8 @@ public class ApiRequest {
 
   private RequestBody convertRequestBody() {
     if (requestBody == null) {
+      requestSize = 0;
+
       if (HttpMethod.requiresRequestBody(method)) {
         // A POST request must have a body, so we'll just give it an empty one.
         return RequestBody.create(BYTES, new byte[0]);
@@ -245,7 +276,11 @@ public class ApiRequest {
         return null;
       }
     }
-    return RequestBody.create(PROTOBUF, requestBody.toByteArray());
+
+    byte[] bytes = requestBody.toByteArray();
+    requestSize = bytes.length;
+
+    return RequestBody.create(bytes, PROTOBUF);
   }
 
   @Override
@@ -270,10 +305,12 @@ public class ApiRequest {
     @Nullable private ErrorCallback errorCallback;
     private boolean completeOnAnyThread;
     private boolean dontLogExceptions;
+    private boolean recordMetrics;
 
     public Builder(String url, String method) {
       this.url = url;
       this.method = method;
+      recordMetrics = true;
     }
 
     public Builder(Uri uri, String method) {
@@ -296,6 +333,14 @@ public class ApiRequest {
      */
     public Builder dontLogExceptions(boolean dontLog) {
       this.dontLogExceptions = dontLog;
+      return this;
+    }
+
+    /**
+     * Call to indicate that we don't want to record the metrics of this request.
+     */
+    public Builder dontRecordMetrics() {
+      this.recordMetrics = false;
       return this;
     }
 
@@ -329,7 +374,7 @@ public class ApiRequest {
 
     public ApiRequest build() {
       return new ApiRequest(url, method, requestBody, skipCache, completeCallback, errorCallback,
-          completeOnAnyThread, dontLogExceptions);
+          completeOnAnyThread, dontLogExceptions, recordMetrics);
     }
   }
 
@@ -354,6 +399,10 @@ public class ApiRequest {
 
     public long getQueueTime() {
       return requestSentTime - startTime;
+    }
+
+    public long getResponseTime() {
+      return responseReceivedTime - requestSentTime;
     }
 
     @Override

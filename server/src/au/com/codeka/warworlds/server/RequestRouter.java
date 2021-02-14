@@ -106,6 +106,7 @@ public class RequestRouter extends InstrumentedHandler {
     sRoutes.add(new Route("notifications", NotificationHandler.class));
     sRoutes.add(new Route("error-reports", ErrorReportsHandler.class));
     sRoutes.add(new Route("anon-associate", AnonUserAssociateHandler.class));
+    sRoutes.add(new Route("client-metrics", ClientMetricsHandler.class));
 
     sRoutes.add(new Route("admin/login", AdminLoginHandler.class));
     sRoutes.add(new Route(

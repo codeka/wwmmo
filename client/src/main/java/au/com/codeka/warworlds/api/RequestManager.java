@@ -15,6 +15,7 @@ import javax.annotation.Nullable;
 import au.com.codeka.common.Log;
 import au.com.codeka.warworlds.eventbus.EventBus;
 
+import au.com.codeka.warworlds.metrics.MetricsManager;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -106,8 +107,8 @@ public class RequestManager {
     if (!response.isSuccessful()) {
       handleFailure(request, response, null);
     } else {
-      requestComplete(request, response);
       request.handleResponse(response);
+      requestComplete(request, response);
     }
   }
 
@@ -117,6 +118,8 @@ public class RequestManager {
    */
   private void handleFailure(ApiRequest request, @Nullable Response response,
       @Nullable IOException e) {
+    request.handleError(response, e);
+
     if (e != null) {
       log.error("Error in request: %s", request, e);
       requestComplete(request, response);
@@ -145,8 +148,6 @@ public class RequestManager {
     } else {
       throw new IllegalStateException("One of response or e should be non-null.");
     }
-
-    request.handleError(response, e);
   }
 
   /** Removes the given request from the in-flight collection and potentially enqueues another. */
@@ -165,6 +166,8 @@ public class RequestManager {
       }
       updateState();
     }
+
+    MetricsManager.i.onApiRequestComplete(request);
   }
 
   void enqueueRequest(ApiRequest apiRequest) {
