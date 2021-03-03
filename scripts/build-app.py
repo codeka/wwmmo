@@ -15,6 +15,9 @@ if args.apk:
 
   destPath = pathlib.Path(common.rootPath, "../deploy/client/wwmmo-1.0.SNAPSHOT.apk")
   shutil.copyfile(common.apkPath, destPath)
+
+  print("Install with:")
+  print("adb install -r " + str(destPath))
 else:
   # Do the build
   os.system("cd " + str(common.rootPath) + " && " + common.gradleCmd + " --daemon :client:bundleRelease")

@@ -3,8 +3,8 @@
   package="au.com.codeka.warworlds"
   android:installLocation="auto"
   android:largeHeap="@bool/largeHeap"
-  android:versionCode="1050"
-  android:versionName="1.0.1050">
+  android:versionCode="1060"
+  android:versionName="1.0.1060">
 
   <!-- We use OpenGL ES 2.0 -->
   <uses-feature
@@ -63,7 +63,6 @@
     </activity>
 
     <activity android:name="au.com.codeka.warworlds.AccountsActivity" />
-    <activity android:name="au.com.codeka.warworlds.WarmWelcomeFragment" />
     <activity android:name="au.com.codeka.warworlds.EmpireSetupActivity" />
     <activity android:name="au.com.codeka.warworlds.EmpireResetActivity" />
     <activity android:name="au.com.codeka.warworlds.BlitzResetActivity" android:exported="true" />

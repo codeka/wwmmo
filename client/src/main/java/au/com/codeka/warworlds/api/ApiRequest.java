@@ -210,6 +210,7 @@ public class ApiRequest {
         new Handler(Looper.getMainLooper()).post(this::runCompleteCallback);
       }
     }
+    response.close();
   }
 
   private void runCompleteCallback() {

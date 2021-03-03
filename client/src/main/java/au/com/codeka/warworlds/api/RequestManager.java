@@ -21,7 +21,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Connection;
 import okhttp3.ConnectionPool;
-import okhttp3.Dispatcher;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -41,7 +40,7 @@ public class RequestManager {
 
   private static final int MAX_INFLIGHT_REQUESTS = 8;
   private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
-  private static final int MAX_IDLE_CONNECTIONS = 8;
+  private static final int MAX_IDLE_CONNECTIONS = 10;
   private static final long CONNECTION_POOL_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(30);
 
   private OkHttpClient httpClient;
@@ -72,6 +71,8 @@ public class RequestManager {
         .connectionPool(
             new ConnectionPool(
                 MAX_IDLE_CONNECTIONS, CONNECTION_POOL_TIMEOUT_MS, TimeUnit.MILLISECONDS))
+        // Add this to re-enable detailed connection logs.
+        //.eventListenerFactory(new LoggingEventListener.Factory())
         .build();
   }
 
@@ -164,8 +165,8 @@ public class RequestManager {
           response == null ? "<network-error>" : response.message(), request.getTiming());
       inFlightRequests.remove(request);
       if (!waitingRequests.isEmpty()) {
-        ApiRequest nextRequest = waitingRequests.pop();
         if (inFlightRequests.size() < MAX_INFLIGHT_REQUESTS) {
+          ApiRequest nextRequest = waitingRequests.pop();
           inFlightRequests.add(nextRequest);
           enqueueRequest(nextRequest);
         }
@@ -183,7 +184,7 @@ public class RequestManager {
     updateState();
   }
 
-  private Callback responseCallback = new Callback() {
+  private final Callback responseCallback = new Callback() {
     @Override
     public void onFailure(Call call, IOException e) {
       handleFailure((ApiRequest) call.request().tag(), null, e);
@@ -243,12 +244,13 @@ public class RequestManager {
 
       ResponseBody responseBody = response.body();
       long contentLength = responseBody.contentLength();
-      log.info("<-- %d %s %s (%d ms, %d bytes)",
+      log.info("<-- %d %s %s (%d ms, %d bytes) %s",
           response.code(),
           (response.message().isEmpty() ? "" : ' ' + response.message()),
           response.request().url(),
           tookMs,
-          contentLength != -1 ? contentLength : 0);
+          contentLength != -1 ? contentLength : 0,
+          response.header("Connection"));
       return response;
     }
   }
