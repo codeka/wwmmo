@@ -118,7 +118,7 @@ public class ApiClient {
     ApiRequest request = new ApiRequest.Builder(url, method).body(pb).build();
     Response resp = RequestManager.i.sendRequestSync(request);
     if (resp == null || !resp.isSuccessful()) {
-      throw new ApiException();
+      throw new ApiException(request.exception());
     }
 
     return request.body(protoBuffFactory);

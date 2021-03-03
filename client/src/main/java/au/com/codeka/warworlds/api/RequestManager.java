@@ -20,6 +20,7 @@ import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Connection;
+import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -40,6 +41,8 @@ public class RequestManager {
 
   private static final int MAX_INFLIGHT_REQUESTS = 8;
   private static final int MAX_CACHE_SIZE = 50 * 1024 * 1024; // 50MB
+  private static final int MAX_IDLE_CONNECTIONS = 8;
+  private static final long CONNECTION_POOL_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(30);
 
   private OkHttpClient httpClient;
   private final Set<ApiRequest> inFlightRequests = new HashSet<>();
@@ -48,7 +51,7 @@ public class RequestManager {
   // going to be in response to the most recent UI interaction).
   private final Stack<ApiRequest> waitingRequests = new Stack<>();
 
-  private Handler handler = new Handler();
+  private final Handler handler = new Handler();
 
   private final Object lock = new Object();
 
@@ -66,6 +69,9 @@ public class RequestManager {
         .addInterceptor(new LoggingInterceptor())
         .connectTimeout(5, TimeUnit.SECONDS)
         .cache(new Cache(cacheDir, MAX_CACHE_SIZE))
+        .connectionPool(
+            new ConnectionPool(
+                MAX_IDLE_CONNECTIONS, CONNECTION_POOL_TIMEOUT_MS, TimeUnit.MILLISECONDS))
         .build();
   }
 

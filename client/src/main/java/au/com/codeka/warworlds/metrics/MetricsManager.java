@@ -46,6 +46,7 @@ public class MetricsManager {
           .setRequestQueueTimeMs(request.getTiming().getQueueTime())
           .setResponseTimeMs(request.getTiming().getResponseTime())
           .build();
+      log.info("ApiRequestTiming %s", timing.toString());
       metricsBuilder.addApiTimings(timing);
     }
 
