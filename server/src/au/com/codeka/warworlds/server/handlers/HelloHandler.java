@@ -224,6 +224,18 @@ public class HelloHandler extends RequestHandler {
     if (!session.getClientId().equals(Configuration.PROD_CLIENT_ID)) {
       String clientId = session.getClientId();
       if (clientId.equals(Configuration.DEV_CLIENT_ID)) {
+        int[] allowedEmpires = Configuration.i.getDevClientEmpires();
+        if (allowedEmpires != null) {
+          for (int allowedEmpire : allowedEmpires) {
+            if (session.getEmpireID() == allowedEmpire) {
+              log.info(
+                  "Allowing connection from dev client for whitelisted empire #%d",
+                  allowedEmpire);
+              return;
+            }
+          }
+        }
+
         clientId = "DEV";
       }
       log.warning("Connection from non-prod client (%s), rejecting.", clientId);

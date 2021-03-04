@@ -58,6 +58,7 @@ public class Configuration {
   @Expose private PatreonConfig patreon;
   @Expose private String requestStatsDirectory;
   @Expose private boolean allowNonProdClientLogins;
+  @Expose private int[] devClientEmpires;
   @Expose private ClickerConfig[] clickers;
   @Expose private SafetyNetConfig safetyNet;
   @Expose private boolean anonymousUsersCanChat;
@@ -114,6 +115,11 @@ public class Configuration {
   /** If true, we'll allow non-prod clients to log in. Default is false. */
   public boolean getAllowNonProdClientLogins() {
     return allowNonProdClientLogins;
+  }
+
+  /** These empires are allowed to connect from the dev client. Useful for my own debugging. */
+  public int[] getDevClientEmpires() {
+    return devClientEmpires;
   }
 
   public ClickerConfig[] getClickers() {

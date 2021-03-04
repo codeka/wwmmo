@@ -18,6 +18,10 @@
   // Play Store) is allowed to log in.
   "allowNonProdClientLogins": false,
 
+  // These empires are allowed to connect from a developer client as well as  the prod client. Used
+  // so I can log in from test clients.
+  "devClientEmpires": [2],
+
   // If true, anonymous users are allowed to chat. If false (the default) they're not allowed.
   "anonymousUsersCanChat": false,
 
