@@ -18,6 +18,7 @@ keystore.jks
 server/data/config-debug.json
 client/signing.properties
 client/src/main/assets/warworlds.properties
+server/data/export.csv
 
 # Android Studio/gradle files and directories
 .gradle
