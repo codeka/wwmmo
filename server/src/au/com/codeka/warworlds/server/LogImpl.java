@@ -36,7 +36,7 @@ public class LogImpl {
 
     @Override
     public void write(String tag, int level, String msg) {
-      log.log(LevelMap[level], tag + ": " + msg);
+      log.log(LevelMap[level], (tag + " : " + msg).replace("%", "%%"));
     }
   }
 
