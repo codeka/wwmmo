@@ -19,7 +19,6 @@ var Metrics = (function($) {
 
   var TYPES = {
     "timer": function(data) {
-
       var dataTable = new google.visualization.DataTable();
       dataTable.addColumn("datetime", "Date");
       dataTable.addColumn("number", "QPS");
@@ -84,9 +83,17 @@ var Metrics = (function($) {
   }
 
   function refresh() {
+    var names = [];
+    for (var i = 0; i < metrics.length; i++) {
+      names.push(metrics[i].name);
+    }
+
     $.ajax({
       "method": "GET",
       "url": "/realms/" + window.realm + "/admin/metrics",
+      "data": {
+        "subset": names
+      },
       "dataType": "json",
       "success": function(data) {
         for (var i = 0; i < metrics.length; i++) {

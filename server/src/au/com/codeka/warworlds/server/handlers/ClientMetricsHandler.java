@@ -20,11 +20,13 @@ public class ClientMetricsHandler extends RequestHandler {
     // Make sure it has the correct empire ID set.
     clientMetrics.setEmpireId(getSession().getEmpireID());
 
-    log.info("Got metrics from empire: %d", clientMetrics.getEmpireId());
-    for (Messages.ApiRequestTiming timing : clientMetrics.getApiTimingsList()) {
-      log.info("  [%s] %d : queue-time=%d response-time=%d request-size=%d response-size=%d",
-          timing.getUrl(), timing.getResponseCode(), timing.getRequestQueueTimeMs(),
-          timing.getResponseTimeMs(), timing.getRequestSize(), timing.getResponseSize());
+    if (log.isDebugEnabled()) {
+      log.debug("Got metrics from empire: %d", clientMetrics.getEmpireId());
+      for (Messages.ApiRequestTiming timing : clientMetrics.getApiTimingsList()) {
+        log.debug("  [%s] %d : queue-time=%d response-time=%d request-size=%d response-size=%d",
+            timing.getUrl(), timing.getResponseCode(), timing.getRequestQueueTimeMs(),
+            timing.getResponseTimeMs(), timing.getRequestSize(), timing.getResponseSize());
+      }
     }
 
     ClientMetricsManager.i.recordClientMetrics(clientMetrics.build());
