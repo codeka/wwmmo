@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.handlers.admin;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -36,6 +37,19 @@ public class AdminMetricsHandler extends AdminHandler {
       }
 
       setResponseBody(filteredHistory.build());
+    } else if (params.containsKey("names-only")) {
+      HashSet<String> names = new HashSet<>();
+      for (Messages.MetricsSnapshot snapshot : metricsHistory.getSnapshotList()) {
+        for (Messages.MetricsSnapshot.Metric metric : snapshot.getMetricList()) {
+          names.add(metric.getName());
+        }
+      }
+
+      JsonArray json = new JsonArray();
+      for (String name : names) {
+        json.add(name);
+      }
+      setResponseJson(json);
     } else {
       setResponseBody(metricsHistory);
     }

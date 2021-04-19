@@ -82,6 +82,20 @@ var Metrics = (function($) {
     });
   }
 
+  function initNames() {
+    $.ajax({
+      "method": "GET",
+      "url": "/realms/" + window.realm + "/admin/metrics",
+      "data": {
+        "names-only": "1"
+      },
+      "dataTypes": "json",
+      "success": function(data) {
+        $("#metricNames").text(JSON.stringify(data));
+      }
+    });
+  }
+
   function refresh() {
     var names = [];
     for (var i = 0; i < metrics.length; i++) {
@@ -112,6 +126,7 @@ var Metrics = (function($) {
       google.load("visualization", "1", {packages:["corechart"]});
       google.setOnLoadCallback(refresh);
       initGraphs();
+      initNames();
     }
   };
 })(jQuery);

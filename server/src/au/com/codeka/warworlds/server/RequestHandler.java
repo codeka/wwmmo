@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server;
 import com.google.common.base.Strings;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
@@ -203,7 +204,7 @@ public class RequestHandler {
     }
   }
 
-  protected void setResponseJson(JsonObject json) {
+  protected void setResponseJson(JsonElement json) {
     response.setContentType("application/json");
     response.setCharacterEncoding("utf-8");
     try {
