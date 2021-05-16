@@ -1,8 +1,13 @@
 buildscript {
   repositories {
-    jcenter()
-  }
+    mavenCentral()
 
+    // This is for org.ajoberstar.grgit
+    maven {
+      name = 'ajoberstar-backup'
+      url = 'https://ajoberstar.org/bintray-backup/'
+    }
+  }
   dependencies {
     classpath 'org.ajoberstar.grgit:grgit-core:3.1.1'
   }
@@ -16,7 +21,7 @@ apply plugin: 'application'
 
 dependencies {
   implementation fileTree(dir: 'libs', include: '*.jar')
-  implementation 'au.com.codeka:carrot:2.4.4'
+  implementation 'au.com.codeka:carrot:2.4.5'
   implementation 'com.google.firebase:firebase-admin:7.0.1'
   implementation 'com.google.auth:google-auth-library-oauth2-http:0.20.0'
   implementation 'com.google.oauth-client:google-oauth-client:1.31.0'
