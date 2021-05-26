@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -156,7 +158,8 @@ public class NotificationController {
 
     Map<String, String> devices = new TreeMap<>();
     String sql = "SELECT fcm_token, devices.user_email, empires.id AS empire_id"
-        + " FROM devices" + " INNER JOIN empires ON devices.user_email = empires.user_email"
+        + " FROM devices"
+        + " INNER JOIN empires ON devices.user_email = empires.user_email"
         + " WHERE empires.id IN " + BaseDataBase.buildInClause(participants)
         + " AND fcm_token IS NOT NULL";
     try (SqlStmt stmt = DB.prepare(sql)) {
@@ -178,9 +181,22 @@ public class NotificationController {
             break;
           }
         }
+        if (participant == null) {
+          // If there's no participant, it's probably the server listening in. Just make a fake one
+          // to simplify the logic below.
+          participant = new ChatConversationParticipant(-1, false);
+        }
 
-        log.info("participant=%s fcmToken=%s email=%s", participant, fcmToken, email);
-        if ((participant == null || !participant.isMuted()) && fcmToken != null && email != null) {
+        String simpleEmail = email;
+        if (simpleEmail == null) {
+          simpleEmail = "<null>";
+        } else if (simpleEmail.endsWith("@anon.war-worlds.com")) {
+          simpleEmail = "...@anon.war-worlds.com";
+        }
+        log.info(
+            "participant=[empire=%d muted=%s] email=%s %s",
+            participant.getEmpireID(), participant.isMuted(), simpleEmail, notification);
+        if (!participant.isMuted() && fcmToken != null && email != null) {
           devices.put(fcmToken, email);
         }
       }
@@ -217,14 +233,14 @@ public class NotificationController {
    * to re-send notification if the client disconnects briefly.
    */
   private static class RecentNotificationCache {
-    private Map<Integer, List<Notification>> cache;
+    private final Map<Integer, List<Notification>> cache;
     private DateTime lastTrimTime;
 
     // don't keep notifications for more than this
     private static final int MAX_MINUTES = 15;
 
     public RecentNotificationCache() {
-      cache = new TreeMap<Integer, List<Notification>>();
+      cache = new TreeMap<>();
       lastTrimTime = DateTime.now();
     }
 
@@ -232,7 +248,7 @@ public class NotificationController {
       synchronized (cache) {
         List<Notification> notifications = cache.get(empireID);
         if (notifications == null) {
-          notifications = new ArrayList<Notification>();
+          notifications = new ArrayList<>();
           cache.put(empireID, notifications);
         }
         notifications.add(notification);
@@ -254,7 +270,7 @@ public class NotificationController {
           return notifications;
         }
       }
-      return new ArrayList<Notification>();
+      return new ArrayList<>();
     }
 
     /** Call this every now & them to trim the cache. */
@@ -280,7 +296,7 @@ public class NotificationController {
 
   /** Holds the collection of {@link NotficationHandler} instances for all connected empires. */
   private static class NotificationHandlerCache {
-    private HashMap<Integer, List<NotificationHandler>> handlers;
+    private final HashMap<Integer, List<NotificationHandler>> handlers;
 
     public NotificationHandlerCache() {
       handlers = new HashMap<>();
@@ -399,6 +415,25 @@ public class NotificationController {
         return true;
       }
       return false;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("[notification date=");
+      sb.append(creation);
+      for (String key : values.keySet()) {
+        sb.append(" ");
+        sb.append(key);
+        sb.append("=");
+        String value = values.get(key);
+        if (value.length() > 50) {
+          value = value.substring(0, 47) + "...";
+        }
+        sb.append(value);
+      }
+      sb.append("]");
+      return sb.toString();
     }
   }
 }
