@@ -23,7 +23,7 @@ public class ControlField {
     public ControlField(PointCloud pointCloud, Voronoi voronoi) {
         mPointCloud = pointCloud;
         mVoronoi = voronoi;
-        mOwnedPoints = new ArrayList<Vector2>();
+        mOwnedPoints = new ArrayList<>();
     }
 
     /**
