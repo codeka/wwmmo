@@ -33,7 +33,6 @@ dependencies {
   implementation 'com.squareup.okhttp3:okhttp:4.6.0'
   implementation 'joda-time:joda-time:2.9.9'
   implementation project(':common')
-  implementation project(':control-field')
   implementation project(':planet-render')
 }
 

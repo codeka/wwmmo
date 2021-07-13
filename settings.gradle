@@ -1,6 +1,4 @@
 include ':common'
-include ':control-field'
-include ':control-field-test'
 include ':planet-render'
 include ':planet-render-test'
 include ':client'
