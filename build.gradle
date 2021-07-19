@@ -1,14 +1,13 @@
 buildscript {
-  ext.kotlin_version = '1.4.21'
+  ext.kotlin_version = '1.5.21'
 
   repositories {
     mavenCentral()
-    jcenter()
-      google()
+    google()
   }
   dependencies {
-    classpath 'com.android.tools.build:gradle:4.2.0-beta02'
-    classpath 'com.google.gms:google-services:4.3.4'
+    classpath 'com.android.tools.build:gradle:4.2.2'
+    classpath 'com.google.gms:google-services:4.3.8'
     classpath 'com.squareup.wire:wire-gradle-plugin:3.5.0'
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
   }
@@ -17,7 +16,6 @@ buildscript {
 allprojects {
   repositories {
     mavenCentral()
-    jcenter()
     maven {
       url 'https://maven.fabric.io/public'
     }

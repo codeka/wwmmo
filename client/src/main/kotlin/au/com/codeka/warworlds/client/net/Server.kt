@@ -15,8 +15,7 @@ import au.com.codeka.warworlds.common.net.PacketEncoder
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.LoginResponse.LoginStatus
 import au.com.codeka.warworlds.common.sim.DesignDefinitions
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.messaging.FirebaseMessaging
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -31,20 +30,6 @@ class Server {
     private val log = Log("Server")
     private const val DEFAULT_RECONNECT_TIME_MS = 1000
     private const val MAX_RECONNECT_TIME_MS = 30000
-
-    private fun populateDeviceInfo(instanceIdResult: InstanceIdResult): DeviceInfo {
-      return DeviceInfo.Builder()
-          .device_build(Build.ID)
-          .device_id(GameSettings.getString(GameSettings.Key.INSTANCE_ID))
-          .device_manufacturer(Build.MANUFACTURER)
-          .device_model(Build.MODEL)
-          .device_version(Build.VERSION.RELEASE)
-          .fcm_device_info(FcmDeviceInfo.Builder()
-              .token(instanceIdResult.token)
-              .device_id(instanceIdResult.id)
-              .build())
-          .build()
-    }
   }
 
   var currState = ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED, null)
@@ -117,11 +102,24 @@ class Server {
     login(cookie)
   }
 
+  private fun populateDeviceInfo(fcmToken: String): DeviceInfo {
+    return DeviceInfo.Builder()
+      .device_build(Build.ID)
+      .device_id(GameSettings.getString(GameSettings.Key.INSTANCE_ID))
+      .device_manufacturer(Build.MANUFACTURER)
+      .device_model(Build.MODEL)
+      .device_version(Build.VERSION.RELEASE)
+      .fcm_device_info(FcmDeviceInfo.Builder()
+        .token(fcmToken)
+        .build())
+      .build()
+  }
+
   private fun login(cookie: String) {
     log.info("Fetching firebase instance ID...")
-    App.taskRunner.runTask(FirebaseInstanceId.getInstance().instanceId)
-        .then(object : RunnableTask.RunnableP<InstanceIdResult> {
-          override fun run(instanceIdResult: InstanceIdResult) {
+    App.taskRunner.runTask(FirebaseMessaging.getInstance().token)
+        .then(object : RunnableTask.RunnableP<String> {
+          override fun run(token: String) {
             // Make sure we have the GoogleSignInAccount (if you've signed in) before sending it
             // to the server.
             val googleAccount = App.auth.futureAccount().get()
@@ -132,7 +130,7 @@ class Server {
                 .method(HttpRequest.Method.POST)
                 .body(LoginRequest.Builder()
                     .cookie(cookie)
-                    .device_info(populateDeviceInfo(instanceIdResult))
+                    .device_info(populateDeviceInfo(token))
                     .id_token(googleAccount?.idToken)
                     .build().encode())
                 .build()
