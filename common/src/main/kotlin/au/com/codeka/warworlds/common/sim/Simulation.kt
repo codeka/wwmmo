@@ -924,6 +924,11 @@ class Simulation constructor(
       val fleet = star.fleets[i].newBuilder()
       val design = getDesign(fleet.design_type)
       val neededFuelTotal = design.fuel_size.toFloat() * fleet.num_ships
+      // TODO: this shouldn't happen, is it just because we have some fleets from before we added
+      // fuel?
+      if (fleet.fuel_amount == null) {
+        fleet.fuel_amount(0.0f)
+      }
       if (fleet.fuel_amount < neededFuelTotal) {
         val storageIndex = getStoreIndex(star, fleet.empire_id)
         if (storageIndex < 0) {
