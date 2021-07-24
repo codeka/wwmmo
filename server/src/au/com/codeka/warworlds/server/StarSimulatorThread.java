@@ -139,8 +139,9 @@ public class StarSimulatorThread {
   }
 
   private int simulateOneStar() {
+    int starID = 0;
     try (Transaction t = DB.beginTransaction()) {
-      int starID = manager.getNextStar();
+      starID = manager.getNextStar();
       if (starID == 0) {
         return WAIT_TIME_NO_STARS;
       }
@@ -182,7 +183,7 @@ public class StarSimulatorThread {
       t.commit();
       return WAIT_TIME_NORMAL;
     } catch (Throwable e) {
-      log.error("Exception caught simulating star!", e);
+      log.error("Exception caught simulating star: %d %s", starID, e);
       // TODO: if there are errors, it'll just keep reporting over and over... probably a good thing
       // because we'll definitely need to fix it!
       return WAIT_TIME_ERROR;
