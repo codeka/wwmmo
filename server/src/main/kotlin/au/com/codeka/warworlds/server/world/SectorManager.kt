@@ -80,8 +80,8 @@ class SectorManager {
       }
 
       // If it was emptied < 3 days ago, it's not eligible.
-      if (star.time_emptied != null
-          && System.currentTimeMillis() - star.time_emptied < 3 * Time.DAY) {
+      val timeEmptied = star.time_emptied
+      if (timeEmptied != null && System.currentTimeMillis() - timeEmptied < 3 * Time.DAY) {
         continue
       }
 
@@ -102,18 +102,20 @@ class SectorManager {
   }
 
   private inner class StarWatcher(private val coord: SectorCoord) : WatchableObject.Watcher<Star> {
-
     override fun onUpdate(obj: WatchableObject<Star>) {
-      val sector = sectors[coord] ?: return
-      val newSector = sector.get().newBuilder()
-      for (i in newSector.stars.indices) {
-        if (newSector.stars[i].id == obj.get().id) {
-          newSector.stars.removeAt(i)
-          break
+      val watchableSector = sectors[coord] ?: return
+      synchronized(watchableSector.lock) {
+        val sector = watchableSector.get()
+        val sectorStars = ArrayList<Star>()
+        for (star in sector.stars) {
+          if (star.id != obj.get().id) {
+            sectorStars.add(star)
+            break
+          }
         }
+        sectorStars.add(obj.get())
+        watchableSector.set(sector.copy(stars = sectorStars))
       }
-      newSector.stars.add(obj.get())
-      sector.set(newSector.build())
     }
   }
 

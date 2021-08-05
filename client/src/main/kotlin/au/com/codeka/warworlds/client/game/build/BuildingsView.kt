@@ -15,11 +15,13 @@ import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.BuildHelper
 import au.com.codeka.warworlds.common.sim.DesignHelper
 import java.util.*
+import kotlin.math.roundToInt
 
 class BuildingsView(
     context: Context?, private var star: Star, private var colony: Colony,
     buildLayout: BuildLayout)
   : ListView(context), TabContentView {
+
   companion object {
     private const val HEADING_TYPE = 0
     private const val EXISTING_BUILDING_TYPE = 1
@@ -28,9 +30,9 @@ class BuildingsView(
 
   private val adapter: BuildingListAdapter
 
-  override fun refresh(star: Star?, colony: Colony?) {
-    this.star = star!!
-    this.colony = colony!!
+  override fun refresh(star: Star, colony: Colony) {
+    this.star = star
+    this.colony = colony
     adapter.refresh(star, colony)
   }
 
@@ -38,13 +40,10 @@ class BuildingsView(
   private inner class BuildingListAdapter : BaseAdapter() {
     private var entries: ArrayList<ItemEntry>? = null
 
-    fun refresh(star: Star, colony: Colony?) {
+    fun refresh(star: Star, colony: Colony) {
       checkOnThread(Threads.UI)
       entries = ArrayList()
-      var buildings = colony!!.buildings
-      if (buildings == null) {
-        buildings = ArrayList()
-      }
+      var buildings = colony.buildings
       val existingBuildingEntries = ArrayList<ItemEntry>()
       for (b in buildings) {
         val entry = ItemEntry()
@@ -66,16 +65,19 @@ class BuildingsView(
           existingBuildingEntries.add(entry)
         }
       }
-      existingBuildingEntries.sortWith(Comparator { lhs: ItemEntry, rhs: ItemEntry ->
-        val a = if (lhs.building != null) lhs.building!!.design_type else lhs.buildRequest!!.design_type
-        val b = if (rhs.building != null) rhs.building!!.design_type else rhs.buildRequest!!.design_type
+      existingBuildingEntries.sortWith { lhs: ItemEntry, rhs: ItemEntry ->
+        val leftBuilding = lhs.building
+        val rightBuilding = rhs.building
+        val a = leftBuilding?.design_type ?: lhs.buildRequest!!.design_type
+        val b = rightBuilding?.design_type ?: rhs.buildRequest!!.design_type
         a.compareTo(b)
-      })
+      }
       var title = ItemEntry()
       title.title = "New Buildings"
       entries!!.add(title)
       for (design in DesignHelper.getDesigns(Design.DesignKind.BUILDING)) {
-        if (design.max_per_colony != null && design.max_per_colony > 0) {
+        val maxPerColony = design.max_per_colony
+        if (maxPerColony != null && maxPerColony > 0) {
           var numExisting = 0
           for (e in existingBuildingEntries) {
             if (e.building != null) {
@@ -88,7 +90,7 @@ class BuildingsView(
               }
             }
           }
-          if (numExisting >= design.max_per_colony) {
+          if (numExisting >= maxPerColony) {
             continue
           }
         }
@@ -158,15 +160,15 @@ class BuildingsView(
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-      val view = convertView ?: {
+      val view = convertView ?: run {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val viewType = getItemViewType(position)
-        if (viewType == Companion.HEADING_TYPE) {
+        if (viewType == HEADING_TYPE) {
           TextView(context)
         } else {
           inflater.inflate(R.layout.ctrl_build_design, parent, false)
         }
-      }()
+      }
       val entry = entries!![position]
       if (entry.title != null) {
         val tv = view as TextView
@@ -185,7 +187,8 @@ class BuildingsView(
         val building = entry.building
         val buildRequest = entry.buildRequest
         val design = DesignHelper.getDesign(
-            if (building != null) building.design_type else buildRequest!!.design_type)
+          building?.design_type ?: buildRequest!!.design_type
+        )
         BuildViewHelper.setDesignIcon(design, icon)
         val numUpgrades = design.upgrades.size
         if (numUpgrades == 0 || building == null) {
@@ -201,11 +204,11 @@ class BuildingsView(
           val verb = if (building == null) "Building" else "Upgrading"
           row2.text = Html.fromHtml(String.format(Locale.ENGLISH,
               "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
-              verb, Math.round(buildRequest.progress * 100.0f),
+              verb, (buildRequest.progress!! * 100.0f).roundToInt(),
               BuildHelper.formatTimeRemaining(buildRequest)))
           row3.visibility = View.GONE
           progress.visibility = View.VISIBLE
-          progress.progress = Math.round(buildRequest.progress * 100.0f)
+          progress.progress = (buildRequest.progress!! * 100.0f).roundToInt()
         } else  /*if (building != null)*/ {
           if (numUpgrades < building!!.level) {
             row2.text = context.getString(R.string.no_more_upgrades)
@@ -260,7 +263,7 @@ class BuildingsView(
     adapter = BuildingListAdapter()
     adapter.refresh(star, colony)
     setAdapter(adapter)
-    onItemClickListener = OnItemClickListener { parent: AdapterView<*>?, v: View?, position: Int, id: Long ->
+    onItemClickListener = OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
       val entry = adapter.getItem(position) as ItemEntry
       if (entry.building == null && entry.buildRequest == null) {
         buildLayout.showBuildSheet(entry.design)

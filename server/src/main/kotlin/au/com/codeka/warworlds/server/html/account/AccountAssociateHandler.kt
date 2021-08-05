@@ -29,8 +29,6 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
       throw RequestException(400, "Invalid email address")
     }
 
-    val resp = AccountAssociateResponse.Builder()
-
     val acc =
       if (req.cookie == "") {
         // If there's no cookie, that's OK: they probably haven't created any account yet and are
@@ -42,8 +40,9 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
     if (acc == null) {
       log.warning("Could not sign in/associate account, no account for email=%s cookie=%s",
           req.email_addr, req.cookie)
-      resp.status(AccountAssociateResponse.AccountAssociateStatus.NO_EMPIRE_FOR_ACCOUNT)
-      writeProtobuf(resp.build())
+      writeProtobuf(
+        AccountAssociateResponse(
+          status = AccountAssociateResponse.AccountAssociateStatus.NO_EMPIRE_FOR_ACCOUNT))
       return
     }
 
@@ -59,13 +58,15 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
       // See if there's already one associated with this email address.
       val existingAccount = DataStore.i.accounts().getByVerifiedEmailAddr(emailAddr)
       if (existingAccount != null && existingAccount.email != emailAddr) {
-        if (req.force != null && req.force) {
+        val force = req.force
+        if (force != null && force) {
           log.info("We're forcing this association (empire: #%d email=%s)...",
               existingAccount.empire_id, existingAccount.email)
         } else {
           log.info("Returning EMAIL_ALREADY_ASSOCIATED")
-          resp.status(AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED)
-          writeProtobuf(resp.build())
+          writeProtobuf(
+            AccountAssociateResponse(
+              status = AccountAssociateResponse.AccountAssociateStatus.EMAIL_ALREADY_ASSOCIATED))
           return
         }
       }
@@ -73,14 +74,16 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
 
     // If this account already has an email address
     if (account.get().email != null && account.get().email != emailAddr) {
-      if (req.force != null && req.force) {
+      val force = req.force
+      if (force != null && force) {
         log.info("Removing old email address from this account (%s) to add new one (%s)",
             account.get().email, emailAddr)
       } else {
         if (account.get().email_status == Account.EmailStatus.VERIFIED) {
           log.info("Returning ACCOUNT_ALREADY_ASSOCIATED")
-          resp.status(AccountAssociateResponse.AccountAssociateStatus.ACCOUNT_ALREADY_ASSOCIATED)
-          writeProtobuf(resp.build())
+          writeProtobuf(
+            AccountAssociateResponse(
+              status = AccountAssociateResponse.AccountAssociateStatus.ACCOUNT_ALREADY_ASSOCIATED))
           return
         } else {
           // it's not verified, so just overwrite it.
@@ -89,24 +92,24 @@ class AccountAssociateHandler : ProtobufRequestHandler() {
       }
     }
 
+    var cookie = req.cookie
     if (req.cookie == "") {
       // If they didn't have the cookie, they must be signing in from a new device. We'll give them
       // a cookie now. This will invalidate any cookies they may have on other devices.
-      val cookie = CookieHelper.generateCookie()
+      cookie = CookieHelper.generateCookie()
       log.info("Generating new cookie: $cookie")
       AccountManager.i.updateCookie(account, cookie)
-      resp.cookie(cookie)
     } else {
       log.info("Request had a cookie, not changing.", req.cookie)
     }
 
     log.info("Updating account with email address.")
-    account.set(account.get().newBuilder()
-        .email(emailAddr)
-        .email_status(Account.EmailStatus.VERIFIED)
-        .build())
-    resp.status(AccountAssociateResponse.AccountAssociateStatus.SUCCESS)
+    account.set(account.get().copy(
+        email = emailAddr,
+        email_status = Account.EmailStatus.VERIFIED))
 
-    writeProtobuf(resp.build())
+    writeProtobuf(AccountAssociateResponse(
+      cookie = cookie,
+      status = AccountAssociateResponse.AccountAssociateStatus.SUCCESS))
   }
 }

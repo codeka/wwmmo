@@ -1,7 +1,7 @@
 package au.com.codeka.warworlds.client.game.starfield
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
 import android.text.Html
 import android.text.SpannableStringBuilder
 import android.view.View
@@ -25,6 +25,7 @@ import java.util.*
 /**
  * Bottom pane for when you have a fleet selected.
  */
+@SuppressLint("ViewConstructor") // Must be constructed in code.
 class FleetSelectedBottomPane(
     context: Context,
     private val star: Star,
@@ -40,12 +41,16 @@ class FleetSelectedBottomPane(
     }
     val progressBar = findViewById<ProgressBar>(R.id.progress_bar)
     val progressText = findViewById<TextView>(R.id.progress_text)
-    val destStar = StarManager.getStar(fleet.destination_star_id)
+    val destStar = when (fleet.destination_star_id) {
+      null -> null
+      else -> StarManager.getStar(fleet.destination_star_id!!)
+    }
     if (destStar != null) {
       val distanceInParsecs = StarHelper.distanceBetween(star, destStar)
-      val startTime = fleet.state_start_time
-      val eta = fleet.eta
-      val fractionRemaining = 1.0f - (System.currentTimeMillis() - startTime).toFloat() / (eta - startTime).toFloat()
+      val startTime = fleet.state_start_time!!
+      val eta = fleet.eta!!
+      val fractionRemaining =
+        1.0f - (System.currentTimeMillis() - startTime).toFloat() / (eta - startTime).toFloat()
       progressBar.max = 1000
       progressBar.progress = 1000 - (fractionRemaining * 1000.0f).toInt()
       val msg = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",

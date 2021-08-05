@@ -11,12 +11,15 @@ import androidx.transition.TransitionManager
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView
 import au.com.codeka.warworlds.client.game.world.EmpireManager
+import au.com.codeka.warworlds.common.proto.Colony
 import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.Planet
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.ColonyHelper
 import com.squareup.wire.get
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * The summary view of a planet that shows up in the bottom-left of the solarsystem screen.
@@ -38,7 +41,8 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
 
   fun setPlanet(star: Star, planet: Planet) {
     TransitionManager.beginDelayedTransition(this)
-    if (planet.colony == null) {
+    val colony = planet.colony
+    if (colony == null) {
       emptyViewButton.visibility = View.VISIBLE
       colonyDetailsContainer.visibility = View.GONE
       enemyColonyDetailsContainer.visibility = View.GONE
@@ -47,19 +51,19 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
       emptyViewButton.visibility = View.GONE
       colonyDetailsContainer.visibility = View.GONE
       enemyColonyDetailsContainer.visibility = View.GONE
-      if (planet.colony.empire_id == null) {
+      if (colony.empire_id == null) {
         enemyColonyDetailsContainer.visibility = View.VISIBLE
-        refreshNativeColonyDetails(planet)
+        refreshNativeColonyDetails(planet, colony)
       } else {
-        val colonyEmpire = EmpireManager.getEmpire(planet.colony.empire_id)
+        val colonyEmpire = EmpireManager.getEmpire(colony.empire_id)
         if (colonyEmpire != null) {
           val myEmpire = EmpireManager.getMyEmpire()
           if (myEmpire.id == colonyEmpire.id) {
             colonyDetailsContainer.visibility = View.VISIBLE
-            refreshColonyDetails(star, planet)
+            refreshColonyDetails(star, planet, colony)
           } else {
             enemyColonyDetailsContainer.visibility = View.VISIBLE
-            refreshEnemyColonyDetails(colonyEmpire, planet)
+            refreshEnemyColonyDetails(colonyEmpire, planet, colony)
           }
         } else {
           // TODO: wait for the empire to come in.
@@ -72,22 +76,24 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
     populationCountTextView.text = context.getString(R.string.uncolonized)
   }
 
-  private fun refreshColonyDetails(star: Star, planet: Planet) {
+  private fun refreshColonyDetails(star: Star, planet: Planet, colony: Colony) {
     val pop = ("Pop: "
-        + Math.round(planet.colony.population)
+        + colony.population.roundToInt()
         + " <small>"
         + String.format(Locale.US, "(%s%d / hr)",
-        if (get(planet.colony.delta_population, 0.0f) < 0) "-" else "+",
-        Math.abs(Math.round(get(planet.colony.delta_population, 0.0f)))) + "</small> / "
+        if (get(colony.delta_population, 0.0f) < 0) "-" else "+",
+        abs(get(colony.delta_population, 0.0f).roundToInt())
+    ) + "</small> / "
         + ColonyHelper.getMaxPopulation(planet))
     populationCountTextView.text = Html.fromHtml(pop)
     colonyFocusView.visibility = View.VISIBLE
-    colonyFocusView.refresh(star, planet.colony)
+    colonyFocusView.refresh(star, colony)
   }
 
-  private fun refreshEnemyColonyDetails(empire: Empire, planet: Planet) {
+  private fun refreshEnemyColonyDetails(empire: Empire, planet: Planet, colony: Colony) {
     populationCountTextView.text = String.format(Locale.US, "Population: %d",
-        Math.round(planet.colony.population))
+      colony.population.roundToInt()
+    )
 
 /*    ImageView enemyIcon = (ImageView) mView.findViewById(R.id.enemy_empire_icon);
     TextView enemyName = (TextView) mView.findViewById(R.id.enemy_empire_name);
@@ -103,9 +109,8 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
   */
   }
 
-  private fun refreshNativeColonyDetails(planet: Planet) {
-    val pop = ("Pop: "
-        + Math.round(planet.colony.population))
+  private fun refreshNativeColonyDetails(planet: Planet, colony: Colony) {
+    val pop = ("Pop: " + colony.population.roundToInt())
     populationCountTextView.text = Html.fromHtml(pop)
     colonyFocusView.visibility = View.GONE
   }

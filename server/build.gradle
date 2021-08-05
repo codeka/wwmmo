@@ -27,7 +27,7 @@ dependencies {
   implementation 'com.google.firebase:firebase-admin:7.0.1'
   implementation 'com.google.guava:guava:24.1-jre'
   implementation 'com.squareup.wire:wire-runtime:3.5.0'
-  implementation 'com.squareup.wire:wire-gson-support:3.1.0'
+  implementation 'com.squareup.wire:wire-gson-support:3.5.0'
   implementation 'org.simplejavamail:simple-java-mail:4.2.1'
   implementation 'org.eclipse.jetty:jetty-server:9.4.27.v20200227'
   implementation 'org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208'
@@ -45,7 +45,7 @@ wire {
     srcDir 'src/main/proto'
   }
 
-  java {
+  kotlin {
   }
 }
 

@@ -53,7 +53,7 @@ object FleetHelper {
   }
 
   fun hasEffect(fleet: Fleet, effectType: Design.EffectType): Boolean {
-    val design = getDesign(fleet.design_type)
+    val design = getDesign(fleet.design_type!!)
     for (effect in design.effect) {
       if (effect.type == effectType) {
         return true

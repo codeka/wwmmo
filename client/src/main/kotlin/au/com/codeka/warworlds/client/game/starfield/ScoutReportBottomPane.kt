@@ -28,24 +28,6 @@ class ScoutReportBottomPane(
   private val starKind: TextView
   private val starIcon: ImageView
   private val reportDate: TextView
-  fun refresh() {
-    if (star!!.scout_reports.size != 1) {
-      // This is an error!
-      return
-    }
-    val scoutReport = star.scout_reports[0]
-    fleetList.setStar(star, scoutReport.fleets)
-    planetList.setStar(star, scoutReport.planets, scoutReport.fleets)
-    reportDate.text = TimeFormatter.create()
-        .withTimeInPast(true)
-        .format(scoutReport.report_time - System.currentTimeMillis())
-    starName.text = star.name
-    starKind.text = String.format(Locale.ENGLISH, "%s %s", star.classification,
-        StarHelper.getCoordinateString(star))
-    Picasso.get()
-        .load(ImageHelper.getStarImageUrl(context, star, 40, 40))
-        .into(starIcon)
-  }
 
   init {
     View.inflate(context, R.layout.starfield_bottom_pane_scout_report, this)
@@ -59,5 +41,24 @@ class ScoutReportBottomPane(
     if (!isInEditMode) {
       refresh()
     }
+  }
+
+  fun refresh() {
+    if (star!!.scout_reports.size != 1) {
+      // This is an error!
+      return
+    }
+    val scoutReport = star.scout_reports[0]
+    fleetList.setStar(star, scoutReport.fleets)
+    planetList.setStar(star, scoutReport.planets, scoutReport.fleets)
+    reportDate.text = TimeFormatter.create()
+        .withTimeInPast(true)
+        .format(scoutReport.report_time!! - System.currentTimeMillis())
+    starName.text = star.name
+    starKind.text = String.format(Locale.ENGLISH, "%s %s", star.classification,
+        StarHelper.getCoordinateString(star))
+    Picasso.get()
+        .load(ImageHelper.getStarImageUrl(context, star, 40, 40))
+        .into(starIcon)
   }
 }

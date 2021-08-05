@@ -66,10 +66,11 @@ class ColonyPagerAdapter(
     return view === `object`
   }
 
-  override fun getPageTitle(position: Int): CharSequence? {
+  override fun getPageTitle(position: Int): CharSequence {
     var planetIndex = 0
     for (planet in star.planets) {
-      if (planet.colony != null && planet.colony.id == colonies[position].id) {
+      val colony = planet.colony ?: continue
+      if (colony.id == colonies[position].id) {
         planetIndex = planet.index
       }
     }
@@ -79,5 +80,4 @@ class ColonyPagerAdapter(
   companion object {
     private val log = Log("ColonyPagerAdapter")
   }
-
 }

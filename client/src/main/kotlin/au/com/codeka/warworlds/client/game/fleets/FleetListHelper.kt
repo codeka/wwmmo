@@ -21,6 +21,7 @@ import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.DesignHelper
 import com.google.common.base.CaseFormat
 import java.util.*
+import kotlin.math.roundToInt
 
 object FleetListHelper {
   fun populateFleetRow(row: ViewGroup?, fleet: Fleet, design: Design) {
@@ -43,7 +44,7 @@ object FleetListHelper {
     val fuelLevelText = row.findViewById<TextView>(R.id.fuel_level_text)
     val fuelLevel = row.findViewById<ProgressBar>(R.id.fuel_level)
     if (fuelLevel != null && fuelLevelText != null && fuelLevelIcon != null) {
-      if (fleet.fuel_amount >= design.fuel_size * fleet.num_ships) {
+      if (fleet.fuel_amount!! >= design.fuel_size!! * fleet.num_ships) {
         fuelLevel.visibility = View.GONE
         fuelLevelText.visibility = View.GONE
         fuelLevelIcon.visibility = View.GONE
@@ -51,11 +52,11 @@ object FleetListHelper {
         fuelLevel.visibility = View.VISIBLE
         fuelLevelText.visibility = View.VISIBLE
         fuelLevelIcon.visibility = View.VISIBLE
-        val fuelPercent = 100 * fleet.fuel_amount / (design.fuel_size * fleet.num_ships)
-        fuelLevel.progress = Math.round(fuelPercent)
+        val fuelPercent = 100 * fleet.fuel_amount!! / (design.fuel_size!! * fleet.num_ships)
+        fuelLevel.progress = fuelPercent.roundToInt()
         fuelLevelText.text = String.format(
             Locale.ENGLISH, "%.0f / %.0f", fleet.fuel_amount,
-            design.fuel_size * fleet.num_ships)
+            design.fuel_size!! * fleet.num_ships)
       }
     }
   }
@@ -78,7 +79,7 @@ object FleetListHelper {
    * @param design The ship's [Design].
    */
   fun getFleetName(buildRequest: BuildRequest?, design: Design): CharSequence {
-    return getFleetName(if (buildRequest == null) 1 else buildRequest.count, design)
+    return getFleetName(if (buildRequest == null) 1 else buildRequest.count!!, design)
   }
 
   /**
@@ -117,7 +118,7 @@ object FleetListHelper {
     if (fleet.destination_star_id == null) {
       return null
     }
-    val destStar = StarManager.getStar(fleet.destination_star_id)
+    val destStar = StarManager.getStar(fleet.destination_star_id!!)
     return destStar?.let { getFleetDestination(context, fleet, it, includeEta, needRedrawCallback) }
   }
 
@@ -125,7 +126,7 @@ object FleetListHelper {
       context: Context, fleet: Fleet, dest: Star, includeEta: Boolean,
       needRedrawCallback: Callback<SpannableStringBuilder>): CharSequence {
     val ssb = SpannableStringBuilder()
-    val eta = TimeFormatter.create().format(fleet.eta - System.currentTimeMillis())
+    val eta = TimeFormatter.create().format(fleet.eta!! - System.currentTimeMillis())
 
 //    float marginHorz = 0;
 //    float marginVert = 0;

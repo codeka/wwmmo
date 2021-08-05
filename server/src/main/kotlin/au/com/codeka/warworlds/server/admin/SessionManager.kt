@@ -21,10 +21,9 @@ class SessionManager {
     val user: AdminUser?
     if (DataStore.i.adminUsers().count() == 0) {
       // If you don't have any users, then everybody who authenticates is in all roles.
-      user = AdminUser.Builder()
-          .email_addr(emailAddr)
-          .roles(Lists.newArrayList(*AdminRole.values()))
-          .build()
+      user = AdminUser(
+          email_addr = emailAddr,
+          roles = Lists.newArrayList(*AdminRole.values()))
     } else {
       user = DataStore.i.adminUsers()[emailAddr]
       if (user == null) {
@@ -43,7 +42,7 @@ class SessionManager {
 
   /** Generates a cookie, which is basically just a long-ish string of random bytes. */
   private fun generateCookie(): String {
-    // generate a random string for the session cookie
+    // Generate a random string for the session cookie.
     val rand = SecureRandom()
     val cookie = StringBuilder()
     for (i in 0 until COOKIE_LENGTH) {

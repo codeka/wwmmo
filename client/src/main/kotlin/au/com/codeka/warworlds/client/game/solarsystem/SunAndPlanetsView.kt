@@ -15,12 +15,10 @@ import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.client.game.world.ImageHelper
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator.OnDrawHandler
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator.setBackground
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.Vector2
 import au.com.codeka.warworlds.common.proto.Building
 import au.com.codeka.warworlds.common.proto.Planet
 import au.com.codeka.warworlds.common.proto.Star
-import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.common.sim.DesignHelper
 import com.squareup.picasso.Picasso
 import java.util.*
@@ -30,10 +28,6 @@ import java.util.*
  * them. You can only select one planet at a time.
  */
 class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayout(context, attrs) {
-  companion object {
-    private val log = Log("SunAndPlanetsView")
-  }
-
   interface PlanetSelectedHandler {
     fun onPlanetSelected(planet: Planet?)
   }
@@ -60,12 +54,12 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
     planetSelectedHandler = handler
   }
 
-  fun getPlanetCentre(planet: Planet): Vector2? {
+  fun getPlanetCentre(planet: Planet): Vector2 {
     return planetInfos[planet.index].centre
   }
 
   /** Gets the [ImageView] that displays the given planet's icon.  */
-  fun getPlanetView(planetIndex: Int): ImageView? {
+  fun getPlanetView(planetIndex: Int): ImageView {
     return planetInfos[planetIndex].imageView
   }
 
@@ -101,11 +95,6 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
     selectedPlanet = planetInfos[planetIndex].planet
     updateSelection()
   }
-
-  val selectedPlanetIndex: Int
-    get() = if (selectedPlanet == null) {
-      -1
-    } else star!!.planets.indexOf(selectedPlanet)
 
   private fun getDistanceFromSun(planetIndex: Int): Float {
     var width = width
@@ -150,18 +139,19 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
       Picasso.get()
           .load(ImageHelper.getPlanetImageUrl(context, star!!, i, 64, 64))
           .into(planetInfo.imageView)
-      if (planetInfo.planet.colony != null) {
-        for (building in planetInfo.planet.colony.buildings) {
+      val colony = planetInfo.planet.colony
+      if (colony != null) {
+        for (building in colony.buildings) {
           val design = DesignHelper.getDesign(building.design_type)
-          if (design.show_in_solar_system) {
+          if (design.show_in_solar_system!!) {
             planetInfo.buildings.add(building)
           }
         }
 
         if (planetInfo.buildings.isNotEmpty()) {
-          planetInfo.buildings.sortWith(Comparator {
-            lhs: Building, rhs: Building -> lhs.design_type.compareTo(rhs.design_type)
-          })
+          planetInfo.buildings.sortWith { lhs: Building, rhs: Building ->
+            lhs.design_type.compareTo(rhs.design_type)
+          }
 
           val angleOffset = (Math.PI / 8.0).toFloat() * (planetInfo.buildings.size - 1) / 2.0f
           for (buildingIndex in planetInfo.buildings.indices) {
@@ -197,7 +187,7 @@ class SunAndPlanetsView(context: Context?, attrs: AttributeSet?) : RelativeLayou
         planetInfo.colonyImageView = colonyImageView
         colonyImageView.layoutParams = lpColony
         ImageHelper.bindEmpireShield(
-            colonyImageView, EmpireManager.getEmpire(planetInfo.planet.colony.empire_id))
+            colonyImageView, EmpireManager.getEmpire(colony.empire_id))
         addView(colonyImageView)
       }
     }

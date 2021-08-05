@@ -30,9 +30,9 @@ class DashboardHandler : AdminHandler() {
       val day = dt.year().get() * 10000 + dt.monthOfYear().get() * 100 + dt.dayOfMonth().get()
       var stat = dailyStats[day]
       if (stat == null) {
-        stat = DailyStat.Builder().day(day).oneda(0).sevenda(0).signups(0).build()
+        stat = DailyStat(day = day, oneda = 0, sevenda = 0, signups = 0)
       }
-      graph.add(stat!!)
+      graph.add(stat)
       dt = dt.plusDays(1)
     }
     data["graph"] = graph

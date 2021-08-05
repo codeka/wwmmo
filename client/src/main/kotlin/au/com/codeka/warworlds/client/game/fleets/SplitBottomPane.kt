@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.fleets
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
@@ -15,14 +16,16 @@ import au.com.codeka.warworlds.common.proto.Fleet
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.proto.StarModification
 import au.com.codeka.warworlds.common.sim.DesignHelper
-import com.google.common.base.Preconditions
 import java.util.*
+import kotlin.math.floor
 
 /**
  * Bottom pane of the fleets view that contains the "split" function.
  */
-class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeLayout(context, null) {
-  private val cancelCallback: () -> Unit
+@SuppressLint("ViewConstructor") // Must be constructed in code.
+class SplitBottomPane(
+    context: Context?,
+    private val cancelCallback: () -> Unit) : RelativeLayout(context, null) {
   private val fleetDetails: ViewGroup
   private val splitLeft: EditText
   private val splitRight: EditText
@@ -36,6 +39,28 @@ class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeL
 
   /** The star of the fleet we're splitting.  */
   var star: Star? = null
+
+  init {
+    View.inflate(context, R.layout.ctrl_fleet_split_bottom_pane, this)
+    fleetDetails = findViewById(R.id.fleet)
+    splitLeft = findViewById(R.id.split_left)
+    splitRight = findViewById(R.id.split_right)
+    splitRatio = findViewById(R.id.split_ratio)
+    findViewById<View>(R.id.split_btn).setOnClickListener { view: View -> onSplitClick() }
+    findViewById<View>(R.id.cancel_btn).setOnClickListener { view: View -> onCancelClick() }
+    splitLeft.addTextChangedListener(SplitTextWatcher(true))
+    splitRight.addTextChangedListener(SplitTextWatcher(false))
+    splitRatio.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+      override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+        if (fromUser && !ignoreEdits && fleet != null) {
+          update(progress, floor(fleet!!.num_ships.toDouble()).toInt() - progress)
+        }
+      }
+
+      override fun onStartTrackingTouch(seekBar: SeekBar) {}
+      override fun onStopTrackingTouch(seekBar: SeekBar) {}
+    })
+  }
 
   /** Set the fleet we're displaying to the one with the given ID on the given star.  */
   fun setFleet(star: Star, fleetId: Long) {
@@ -51,8 +76,8 @@ class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeL
     this.fleet = fleet
     FleetListHelper.populateFleetRow(
         fleetDetails, fleet, DesignHelper.getDesign(fleet.design_type))
-    val leftCount = Math.floor(fleet.num_ships.toDouble()).toInt() / 2
-    val rightCount = Math.floor(fleet.num_ships.toDouble()).toInt() - leftCount
+    val leftCount = floor(fleet.num_ships.toDouble()).toInt() / 2
+    val rightCount = floor(fleet.num_ships.toDouble()).toInt() - leftCount
     update(leftCount, rightCount)
   }
 
@@ -65,22 +90,22 @@ class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeL
     ignoreEdits = false
   }
 
-  private fun onSplitClick(view: View) {
+  private fun onSplitClick() {
     if (star == null || fleet == null) {
       return
     }
-    StarManager.updateStar(star!!, StarModification.Builder()
-        .type(StarModification.MODIFICATION_TYPE.SPLIT_FLEET)
-        .fleet_id(fleet!!.id)
-        .count(splitRatio.max - splitRatio.progress))
+    StarManager.updateStar(star!!, StarModification(
+        type = StarModification.MODIFICATION_TYPE.SPLIT_FLEET,
+        fleet_id = fleet!!.id,
+        count = splitRatio.max - splitRatio.progress))
     cancelCallback()
   }
 
-  private fun onCancelClick(view: View) {
+  private fun onCancelClick() {
     cancelCallback()
   }
 
-  private inner class SplitTextWatcher internal constructor(private val isLeft: Boolean) : TextWatcher {
+  private inner class SplitTextWatcher(private val isLeft: Boolean) : TextWatcher {
     override fun afterTextChanged(editable: Editable) {
       if (fleet == null || ignoreEdits) {
         return
@@ -89,8 +114,7 @@ class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeL
         // You've deleted the whole text. No biggie.
         return
       }
-      val n: Int
-      n = try {
+      val n: Int = try {
         editable.toString().toInt()
       } catch (e: NumberFormatException) {
         // Invalid number format, just ignore for now.
@@ -100,39 +124,15 @@ class SplitBottomPane(context: Context?, cancelCallback: () -> Unit) : RelativeL
       val rightCount: Int
       if (isLeft) {
         leftCount = n
-        rightCount = Math.floor(fleet!!.num_ships.toDouble()).toInt() - leftCount
+        rightCount = floor(fleet!!.num_ships.toDouble()).toInt() - leftCount
       } else {
         rightCount = n
-        leftCount = Math.floor(fleet!!.num_ships.toDouble()).toInt() - rightCount
+        leftCount = floor(fleet!!.num_ships.toDouble()).toInt() - rightCount
       }
       update(leftCount, rightCount)
     }
 
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
     override fun onTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-  }
-
-  init {
-    this.cancelCallback = Preconditions.checkNotNull(cancelCallback)
-    View.inflate(context, R.layout.ctrl_fleet_split_bottom_pane, this)
-    fleetDetails = findViewById(R.id.fleet)
-    splitLeft = findViewById(R.id.split_left)
-    splitRight = findViewById(R.id.split_right)
-    splitRatio = findViewById(R.id.split_ratio)
-    findViewById<View>(R.id.split_btn).setOnClickListener { view: View -> onSplitClick(view) }
-    findViewById<View>(R.id.cancel_btn).setOnClickListener { view: View -> onCancelClick(view) }
-    splitLeft.addTextChangedListener(SplitTextWatcher(true))
-    splitRight.addTextChangedListener(SplitTextWatcher(false))
-    splitRatio.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-      override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        if (fromUser && !ignoreEdits && fleet != null) {
-          update(progress, Math.floor(fleet!!.num_ships.toDouble()).toInt() - progress)
-        }
-      }
-
-      override fun onStartTrackingTouch(seekBar: SeekBar) {}
-      override fun onStopTrackingTouch(seekBar: SeekBar) {}
-    })
   }
 }

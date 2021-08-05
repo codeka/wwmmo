@@ -17,6 +17,8 @@ import au.com.codeka.warworlds.common.proto.Star
 import com.google.common.base.Preconditions
 import com.squareup.picasso.Picasso
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /**
  * A list adapter for showing a list of stars.
@@ -123,28 +125,27 @@ internal class StarSearchListAdapter(private val inflater: LayoutInflater) : Bas
         starMineralsDelta.text = ""
         starMineralsTotal.text = ""
       } else {
+        val deltaGoodsPerHour = storage.goods_delta_per_hour!!
+        val deltaMineralsPerHour = storage.minerals_delta_per_hour!!
         starGoodsDelta.text = String.format(Locale.ENGLISH, "%s%d/hr",
-            if (storage.goods_delta_per_hour < 0) "-" else "+",
-            Math.abs(Math.round(storage.goods_delta_per_hour)))
-        if (storage.goods_delta_per_hour < 0) {
+            if (deltaGoodsPerHour < 0) "-" else "+", abs(deltaGoodsPerHour.roundToInt()))
+        if (deltaGoodsPerHour < 0) {
           starGoodsDelta.setTextColor(Color.RED)
         } else {
           starGoodsDelta.setTextColor(Color.GREEN)
         }
         starGoodsTotal.text = String.format(Locale.ENGLISH, "%d / %d",
-            Math.round(storage.total_goods),
-            Math.round(storage.max_goods))
+          storage.total_goods!!.roundToInt(), storage.max_goods!!.roundToInt())
         starMineralsDelta.text = String.format(Locale.ENGLISH, "%s%d/hr",
-            if (storage.minerals_delta_per_hour < 0) "-" else "+",
-            Math.abs(Math.round(storage.minerals_delta_per_hour)))
-        if (storage.minerals_delta_per_hour < 0) {
+            if (deltaMineralsPerHour < 0) "-" else "+", abs(deltaMineralsPerHour.roundToInt())
+        )
+        if (deltaMineralsPerHour < 0) {
           starMineralsDelta.setTextColor(Color.RED)
         } else {
           starMineralsDelta.setTextColor(Color.GREEN)
         }
         starMineralsTotal.text = String.format(Locale.ENGLISH, "%d / %d",
-            Math.round(storage.total_minerals),
-            Math.round(storage.max_minerals))
+          storage.total_minerals!!.roundToInt(), storage.max_minerals!!.roundToInt())
       }
     }
     return view

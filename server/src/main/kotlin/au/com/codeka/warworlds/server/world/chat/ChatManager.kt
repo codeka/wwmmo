@@ -26,10 +26,9 @@ class ChatManager {
     }
 
     // TODO: validate the action, message_en, etc etc.
-    msg = msg.newBuilder()
-        .date_posted(System.currentTimeMillis())
-        .id(DataStore.Companion.i.seq().nextIdentifier())
-        .build()
+    msg = msg.copy(
+        date_posted = System.currentTimeMillis(),
+        id = DataStore.i.seq().nextIdentifier())
     room.send(msg)
   }
 
@@ -104,6 +103,6 @@ class ChatManager {
   }
 
   init {
-    globalRoom = Room(ChatRoom.Builder().name("Global").build())
+    globalRoom = Room(ChatRoom(name = "Global"))
   }
 }

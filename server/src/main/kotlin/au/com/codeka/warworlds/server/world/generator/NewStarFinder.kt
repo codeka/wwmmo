@@ -169,8 +169,9 @@ class NewStarFinder {
 
   private fun isColonized(star: Star): Boolean {
     for (planet in star.planets) {
+      val colony = planet.colony
       // It's counted as colonized only if it's colonized by a non-native empire.
-      if (planet.colony != null && planet.colony.empire_id != null) {
+      if (colony?.empire_id != null) {
         return true
       }
     }

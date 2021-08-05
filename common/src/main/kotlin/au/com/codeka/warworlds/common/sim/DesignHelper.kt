@@ -59,17 +59,17 @@ object DesignHelper {
         }
         var isMet = false
         for (building in colony.buildings) {
-          if (building.design_type == dep.type && building.level >= dep.level) {
+          if (building.design_type == dep.type && building.level!! >= dep.level!!) {
             isMet = true
             break
           }
         }
-        val dependentDesign: Design = getDesign(dep.type)
+        val dependentDesign: Design = getDesign(dep.type!!)
         required.append("<font color=\"")
         required.append(if (isMet) "green" else "red")
         required.append("\">")
         required.append(dependentDesign.display_name)
-        if (dep.level > 1) {
+        if (dep.level!! > 1) {
           required.append(" lvl ")
           required.append(dep.level)
         }

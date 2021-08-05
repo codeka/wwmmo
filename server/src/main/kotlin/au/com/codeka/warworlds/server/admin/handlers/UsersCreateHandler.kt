@@ -30,10 +30,9 @@ class UsersCreateHandler : AdminHandler() {
           .build())
       return
     }
-    DataStore.i.adminUsers().put(emailAddr, AdminUser.Builder()
-        .email_addr(emailAddr)
-        .roles(roles)
-        .build())
+    DataStore.i.adminUsers().put(emailAddr, AdminUser(
+        email_addr = emailAddr,
+        roles = roles))
     redirect("/admin/users")
   }
 }

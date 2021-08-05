@@ -280,7 +280,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    */
   fun onConnected() {
     // Shouldn't be null after we're connected to the server.
-    warpTo(EmpireManager.getMyEmpire().home_star)
+    warpTo(EmpireManager.getMyEmpire().home_star!!)
   }
 
   /**
@@ -351,15 +351,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
-    App.taskRunner.runTask(Runnable {
-      App.server.send(Packet.Builder()
-          .watch_sectors(WatchSectorsPacket.Builder()
-              .top(top).left(left).bottom(bottom).right(right).build())
-          .build())
+    App.taskRunner.runTask({
+      App.server.send(Packet(
+          watch_sectors = WatchSectorsPacket(
+              top = top, left = left, bottom = bottom, right = right)))
     }, Threads.BACKGROUND)
 
     // We'll wait at least one second before attempting to update the sector bounds again.
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask({
       sectorsUpdating = false
       if (pendingSectorBottom != null) {
         val left = pendingSectorLeft!! ; pendingSectorLeft = null
@@ -535,15 +534,16 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private fun attachEmpireFleetIcons(container: SceneObject, star: Star) {
     val empires: MutableMap<Long, EmpireIconInfo> = TreeMap()
     for (planet in star.planets) {
-      if (planet.colony == null || planet.colony.empire_id == null) {
+      val colony = planet.colony ?: continue
+      if (colony.empire_id == null) {
         continue
       }
-      val empire = EmpireManager.getEmpire(planet.colony.empire_id)
+      val empire = EmpireManager.getEmpire(colony.empire_id)
       if (empire != null) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
           iconInfo = EmpireIconInfo(empire)
-          empires[empire.id] = iconInfo
+          empires[empire.id!!] = iconInfo
         }
         iconInfo.numColonies += 1
       }
@@ -558,7 +558,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
           iconInfo = EmpireIconInfo(empire)
-          empires[empire.id] = iconInfo
+          empires[empire.id!!] = iconInfo
         }
         if (fleet.design_type == DesignType.FIGHTER) {
           iconInfo.numFighterShips += Math.ceil(fleet.num_ships.toDouble()).toInt()
@@ -610,7 +610,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   private fun attachMovingFleet(star: Star, fleet: Fleet) {
-    val destStar = StarManager.getStar(fleet.destination_star_id)
+    val destStar = StarManager.getStar(fleet.destination_star_id!!)
     if (destStar == null) {
       log.warning("Cannot attach moving fleet, destination star is null.")
       return
@@ -705,8 +705,8 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val dest = Vector2(
         ((destStar!!.sector_x - centerSectorX) * 1024.0f + (destStar.offset_x - 512.0f)).toDouble(),
         ((destStar.sector_y - centerSectorY) * 1024.0f + (destStar.offset_y - 512.0f)).toDouble())
-    val totalTime = fleet!!.eta - fleet.state_start_time
-    val elapsedTime = System.currentTimeMillis() - fleet.state_start_time
+    val totalTime = fleet?.eta!! - fleet.state_start_time!!
+    val elapsedTime = System.currentTimeMillis() - fleet.state_start_time!!
     val timeFraction: Double = elapsedTime.toFloat() / totalTime.toDouble()
 
     // Subtract 100, we'll add 50 after because we want the fleet to start offset from the star and
@@ -924,12 +924,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private val cameraUpdateListener: CameraUpdateListener = object : CameraUpdateListener {
     override fun onCameraTranslate(x: Float, y: Float, dx: Float, dy: Float) {
       App.taskRunner.runTask(
-          Runnable { onCameraTranslate(x, y) },
+          { onCameraTranslate(x, y) },
           Threads.BACKGROUND)
     }
   }
 
-  private class EmpireIconInfo internal constructor(val empire: Empire) {
+  private class EmpireIconInfo constructor(val empire: Empire) {
     var numColonies = 0
     var numFighterShips = 0
     var numNonFighterShips = 0
@@ -941,13 +941,13 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val fleet: Fleet?
     val destStar: Star?
 
-    internal constructor(star: Star) {
+    constructor(star: Star) {
       this.star = star
       fleet = null
       destStar = null
     }
 
-    internal constructor(star: Star, fleet: Fleet?, destStar: Star?) {
+    constructor(star: Star, fleet: Fleet?, destStar: Star?) {
       this.star = star
       this.fleet = fleet
       this.destStar = destStar

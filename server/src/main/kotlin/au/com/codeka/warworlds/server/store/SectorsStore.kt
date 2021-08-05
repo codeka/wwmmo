@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.server.store
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Sector
 import au.com.codeka.warworlds.common.proto.SectorCoord
+import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import java.util.*
 import kotlin.collections.ArrayList
@@ -53,29 +54,32 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
    * don't have one created yet.
    */
   fun getSector(x: Long, y: Long): Sector {
-    val sectorBuilder = Sector.Builder()
+    var state: SectorState
     newReader()
         .stmt("SELECT state FROM sectors WHERE x = ? AND y = ?")
         .param(0, x)
         .param(1, y)
         .query().use { res ->
           if (res.next()) {
-            val state = SectorState.fromValue(res.getInt(0))
+            state = SectorState.fromValue(res.getInt(0))
             log.info("Got sector state: %d", state.value)
-            sectorBuilder.state(state.value)
           } else {
             // No sector yet.
             log.info("No sector at (%d, %d)", x, y)
-            sectorBuilder.state(SectorState.New.value)
+            state = SectorState.New
           }
         }
-    if (sectorBuilder.state != SectorState.New.value) {
-      sectorBuilder.stars(DataStore.i.stars().getStarsForSector(x, y))
-    }
-    return sectorBuilder
-        .x(x)
-        .y(y)
-        .build()
+    val stars: List<Star>? =
+      if (state != SectorState.New)
+        DataStore.i.stars().getStarsForSector(x, y)
+      else
+        null
+    return Sector(
+        x = x,
+        y = y,
+        state = state.value,
+        stars = stars ?: ArrayList(),
+        num_colonies = 0)
   }
 
   /**
@@ -107,7 +111,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
         .query().use { res ->
           val coords = ArrayList<SectorCoord>(count)
           while (res.next() && coords.size < count) {
-            coords.add(SectorCoord.Builder().x(res.getLong(0)).y(res.getLong(1)).build())
+            coords.add(SectorCoord(x = res.getLong(0), y = res.getLong(1)))
           }
           return coords
         }
@@ -171,7 +175,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
             }
         for (x in minX..maxX) {
           if (!xs.contains(x)) {
-            missing.add(SectorCoord.Builder().x(x).y(y).build())
+            missing.add(SectorCoord(x = x, y = y))
           }
         }
       }
@@ -179,12 +183,12 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
       // If there's no (or not many) gaps, expand the universe by one and add all of those instead.
       if (missing.size < 10) {
         for (x in minX - 1..maxX + 1) {
-          missing.add(SectorCoord.Builder().x(x).y(minY - 1).build())
-          missing.add(SectorCoord.Builder().x(x).y(maxY + 1).build())
+          missing.add(SectorCoord(x = x, y = minY - 1))
+          missing.add(SectorCoord(x = x, y = maxY + 1))
         }
         for (y in minY..maxY) {
-          missing.add(SectorCoord.Builder().x(minX - 1).y(y).build())
-          missing.add(SectorCoord.Builder().x(maxX + 1).y(y).build())
+          missing.add(SectorCoord(x = minX - 1, y = y))
+          missing.add(SectorCoord(x = maxX + 1, y = y))
         }
       }
 
@@ -243,7 +247,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
     while (res.next()) {
       val sectorX = res.getLong(0)
       val sectorY = res.getLong(1)
-      sectorsToReset.add(SectorCoord.Builder().x(sectorX).y(sectorY).build())
+      sectorsToReset.add(SectorCoord(x = sectorX, y = sectorY))
     }
     for (coord in sectorsToReset) {
       resetSector(coord)

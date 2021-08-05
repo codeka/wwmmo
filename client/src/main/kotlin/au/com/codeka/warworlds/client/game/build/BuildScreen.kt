@@ -15,6 +15,7 @@ import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Colony
 import au.com.codeka.warworlds.common.proto.Star
+import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -25,11 +26,11 @@ import kotlin.collections.ArrayList
 class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
   private var context: ScreenContext? = null
   private var colonies: MutableList<Colony> = ArrayList()
-  private lateinit var currColony: Colony
+  private var currColony: Colony
   private lateinit var layout: BuildLayout
 
   init {
-    extractColonies(star, planetIndex)
+    currColony = extractColonies(star, planetIndex)
   }
 
   override fun onCreate(context: ScreenContext, parent: ViewGroup) {
@@ -40,7 +41,7 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
     App.eventBus.register(eventHandler)
   }
 
-  override fun onShow(): ShowInfo? {
+  override fun onShow(): ShowInfo {
     // Refresh immediately on show
     layout.post(refreshRunnable)
     return builder().view(layout).build()
@@ -59,7 +60,7 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
     get() {
       val ssb = SpannableStringBuilder()
       ssb.append("○ ")
-      ssb.append(star!!.name)
+      ssb.append(star.name)
       ssb.append(" • Build")
       ImageHelper.bindStarIcon(
           ssb, 0, 1, context!!.activity, star, 24, object : Callback<SpannableStringBuilder> {
@@ -73,7 +74,7 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
   private val eventHandler: Any = object : Any() {
     @EventHandler
     fun onStarUpdated(s: Star) {
-      if (star != null && star!!.id == s.id) {
+      if (star.id == s.id) {
         updateStar(s)
       }
     }
@@ -83,28 +84,32 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
     log.info("Updating star %d [%s]...", s.id, s.name)
     val oldColony = currColony
     star = s
-    extractColonies(star, -1)
-    if (oldColony != null) {
-      for (colony in colonies) {
-        if (colony!!.id == oldColony.id) {
-          currColony = colony
-        }
+    currColony = extractColonies(star, -1)
+    for (colony in colonies) {
+      if (colony.id == oldColony.id) {
+        currColony = colony
       }
     }
     layout.refresh(star, colonies)
   }
 
-  private fun extractColonies(star: Star?, planetIndex: Int) {
+  private fun extractColonies(star: Star, planetIndex: Int): Colony {
     val myEmpire = EmpireManager.getMyEmpire()
+    var selectedColony: Colony? = null
     colonies.clear()
-    for (planet in star!!.planets) {
-      if (planet.colony != null && planet.colony.empire_id != null && planet.colony.empire_id == myEmpire.id) {
-        colonies.add(planet.colony)
+    for (planet in star.planets) {
+      val colony = planet.colony ?: continue
+      if (colony.empire_id != null && colony.empire_id == myEmpire.id) {
+        colonies.add(colony)
         if (planet.index == planetIndex) {
-          currColony = planet.colony
+          selectedColony = colony
         }
       }
     }
+    if (selectedColony == null) {
+      throw IllegalStateException("Given planet doesn't have a colony.")
+    }
+    return selectedColony
   }
 
   private val refreshRunnable: Runnable = object : Runnable {
@@ -113,7 +118,7 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
       refreshCount++
       if (refreshCount % 10 == 0) {
         // Every tenth refresh, we'll re-simulate the star
-        StarManager.queueSimulateStar(star!!)
+        StarManager.queueSimulateStar(star)
       } else {
         layout.refresh(star, colonies)
       }

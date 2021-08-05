@@ -7,16 +7,16 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
 import "au\\com\\codeka\\warworlds\\common\\proto\\account.proto";
 
 message LoginEvent {
-  optional int64 timestamp = 1;
-  optional int32 day = 2;
-  optional int64 empire_id = 3;
+  required int64 timestamp = 1;
+  required int32 day = 2;
+  required int64 empire_id = 3;
   optional string email_addr = 4;
-  optional au.com.codeka.warworlds.common.proto.DeviceInfo device_info = 5;
+  required au.com.codeka.warworlds.common.proto.DeviceInfo device_info = 5;
 }
 
 message DailyStat {
-  optional int32 day = 1;
-  optional int32 oneda = 2;
-  optional int32 sevenda = 3;
-  optional int32 signups = 4;
+  required int32 day = 1;
+  required int32 oneda = 2;
+  required int32 sevenda = 3;
+  required int32 signups = 4;
 }

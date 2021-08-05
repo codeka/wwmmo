@@ -29,7 +29,7 @@ class DebugMovingFleetsHandler : AdminHandler() {
     // Make sure the destination stars are in the list as well (they won't necessarily be there)
     for (fleet in fleets) {
       if (!stars.containsKey(fleet.destination_star_id)) {
-        val dest = DataStore.i.stars()[fleet.destination_star_id]
+        val dest = DataStore.i.stars()[fleet.destination_star_id!!]
         if (dest != null) {
           stars[dest.id] = dest
         }

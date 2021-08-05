@@ -14,22 +14,22 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\fleet.proto";
 message Sector {
   // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
   // (1,1) is one sector up and to the right, and so on.
-  optional int64 x = 1;
-  optional int64 y = 2;
+  required int64 x = 1;
+  required int64 y = 2;
 
   // number of colonies in this sector
-  optional int32 num_colonies = 5;
+  required int32 num_colonies = 5;
 
   // the collection of stars in this sector.
   repeated Star stars = 3;
 
   // the state of this sector, see SectorsStore.SectorState for possible values.
-  optional int32 state = 4;
+  required int32 state = 4;
 }
 
 message SectorCoord {
-  optional int64 x = 1;
-  optional int64 y = 2;
+  required int64 x = 1;
+  required int64 y = 2;
 }
 
 // An array of (x,y) coordinates. This is used to store the list of empty sectors, as well
@@ -44,14 +44,14 @@ message SectorCoordArray {
 //
 message Star {
   // the identifier of the star, unique throughout the universe.
-  optional int64 id = 1;
+  required int64 id = 1;
 
   // the sector this star is contained within
-  optional int64 sector_x = 11;
-  optional int64 sector_y = 12;
+  required int64 sector_x = 11;
+  required int64 sector_y = 12;
 
   // the name of the star
-  optional string name = 2;
+  required string name = 2;
 
   // the classification of this star. The order of these enum values
   // must correspond to the order of the StarTypes defined in sector.py
@@ -66,16 +66,16 @@ message Star {
     MARKER = 7;
     WORMHOLE = 8;
   }
-  optional CLASSIFICATION classification = 3;
+  required CLASSIFICATION classification = 3;
 
   // the apparent "size" of the star (which is really just a display thing)
-  optional int32 size = 5;
+  required int32 size = 5;
 
   // the offset from the left edge of the sector, in pixels
-  optional int32 offset_x = 6;
+  required int32 offset_x = 6;
 
   // the offset from the bottom edge of the sector, in pixels
-  optional int32 offset_y = 7;
+  required int32 offset_y = 7;
 
   // the collection of planets orbiting this star (may be empty, for example in the list
   // of stars in a sector)
@@ -154,7 +154,7 @@ message ScoutReport {
 message Planet {
   // The "index" of the planet represents how far it is from the sun. Planets are always
   // in monotonically increasing order of distance (0, 1, 2, 3, etc)
-  optional int32 index = 2;
+  required int32 index = 2;
 
   // The various different "kinds" of planets. Planets are spawned in increasing order
   // of probability (so "terran" is most likely, "gas giant" least likely).
@@ -169,19 +169,19 @@ message Planet {
     SWAMP = 8;
     TERRAN = 9;
   }
-  optional PLANET_TYPE planet_type = 3;
+  required PLANET_TYPE planet_type = 3;
 
   // How "congenial" is this planet to supporting population
-  optional int32 population_congeniality = 4;
+  required int32 population_congeniality = 4;
 
   // How "congenial" is this planet to supporting farming
-  optional int32 farming_congeniality = 5;
+  required int32 farming_congeniality = 5;
 
   // How "congenial" is this planet to supporting mining
-  optional int32 mining_congeniality = 6;
+  required int32 mining_congeniality = 6;
 
   // How "congenial" is this planet to the production of energy?
-  optional int32 energy_congeniality = 7;
+  required int32 energy_congeniality = 7;
 
   // Colony on this planet (if there is one).
   optional Colony colony = 8;

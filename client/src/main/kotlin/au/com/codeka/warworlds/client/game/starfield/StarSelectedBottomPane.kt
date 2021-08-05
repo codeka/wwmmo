@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.starfield
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.widget.Button
@@ -27,6 +28,7 @@ import java.util.*
 /**
  * The bottom pane when you have a star selected.
  */
+@SuppressLint("ViewConstructor") // Must be constructed in code.
 class StarSelectedBottomPane(context: Context, private var star: Star, callback: Callback)
   : FrameLayout(context, null) {
 
@@ -101,10 +103,11 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
     var numMyEmpire = 0
     var numOtherEmpire = 0
     for (planet in star.planets) {
-      if (planet.colony == null || planet.colony.empire_id == null) {
+      val colony = planet.colony ?: continue
+      if (colony.empire_id == null) {
         continue
       }
-      if (planet.colony.empire_id == myEmpire.id) {
+      if (colony.empire_id == myEmpire.id) {
         numMyEmpire++
       } else {
         numOtherEmpire++

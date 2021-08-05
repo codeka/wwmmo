@@ -10,9 +10,9 @@ object ColonyHelper {
     if (planet.colony == null) {
       return 0
     }
-    var population: Int = planet.population_congeniality
+    var population: Int = planet.population_congeniality!!
     for (effect in findEffects(planet, Design.EffectType.POPULATION_BOOST)) {
-      val extraPopulation = effect.minimum.toFloat().coerceAtLeast(population * effect.bonus)
+      val extraPopulation = effect.minimum!!.toFloat().coerceAtLeast(population * effect.bonus!!)
       population += extraPopulation.toInt()
     }
     return population
@@ -23,9 +23,9 @@ object ColonyHelper {
    * it for FARMING_BOOST buildings.
    */
   fun getFarmingCongeniality(planet: Planet): Int {
-    var congeniality = planet.farming_congeniality
+    var congeniality = planet.farming_congeniality!!
     for (effect in findEffects(planet, Design.EffectType.FARMING_BOOST)) {
-      val extraCongeniality = effect.minimum.coerceAtLeast((congeniality * effect.bonus).toInt())
+      val extraCongeniality = effect.minimum!!.coerceAtLeast((congeniality * effect.bonus!!).toInt())
       congeniality += extraCongeniality
     }
     return congeniality
@@ -36,9 +36,9 @@ object ColonyHelper {
    * it for MINING_BOOST buildings.
    */
   fun getMiningCongeniality(planet: Planet): Int {
-    var congeniality = planet.mining_congeniality
+    var congeniality = planet.mining_congeniality!!
     for (effect in findEffects(planet, Design.EffectType.MINING_BOOST)) {
-      val extraCongeniality = effect.minimum.coerceAtLeast((congeniality * effect.bonus).toInt())
+      val extraCongeniality = effect.minimum!!.coerceAtLeast((congeniality * effect.bonus!!).toInt())
       congeniality += extraCongeniality
     }
     return congeniality
@@ -49,9 +49,9 @@ object ColonyHelper {
    * it for ENERGY_BOOST buildings.
    */
   fun getEnergyCongeniality(planet: Planet): Int {
-    var congeniality = planet.energy_congeniality
+    var congeniality = planet.energy_congeniality!!
     for (effect in findEffects(planet, Design.EffectType.ENERGY_BOOST)) {
-      val extraCongeniality = effect.minimum.coerceAtLeast((congeniality * effect.bonus).toInt())
+      val extraCongeniality = effect.minimum!!.coerceAtLeast((congeniality * effect.bonus!!).toInt())
       congeniality += extraCongeniality
     }
     return congeniality
@@ -61,8 +61,8 @@ object ColonyHelper {
     val effects = ArrayList<Design.Effect>()
     if (planet.colony?.buildings != null) {
       for (building in planet.colony.buildings) {
-        val design = DesignHelper.getDesign(building.design_type)
-        val designEffects = if (building.level > 1) {
+        val design = DesignHelper.getDesign(building.design_type!!)
+        val designEffects = if (building.level!! > 1) {
           design.upgrades[building.level - 2].effects
         } else {
           design.effect
@@ -82,10 +82,10 @@ object ColonyHelper {
    * by active build requests).
    */
   fun getDeltaMineralsPerHour(colony: Colony, now: Long): Float {
-    var delta: Float = colony.delta_minerals
+    var delta: Float = colony.delta_minerals!!
     for (br in colony.build_requests) {
-      if (br.start_time < now && br.end_time > now) {
-        delta += br.delta_minerals_per_hour
+      if (br.start_time!! < now && br.end_time!! > now) {
+        delta += br.delta_minerals_per_hour!!
       }
     }
     return delta

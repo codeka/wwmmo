@@ -69,12 +69,11 @@ class SuspiciousEventManager {
     for (pair in exceptions) {
       val timestamp = pair.one
       val e = pair.two
-      events.add(SuspiciousEvent.Builder()
-          .timestamp(timestamp)
-          .star_id(e.starId)
-          .modification(e.modification)
-          .message(e.message)
-          .build())
+      events.add(SuspiciousEvent(
+          timestamp = timestamp,
+          star_id = e.starId,
+          modification = e.modification,
+          message = e.message))
     }
     DataStore.i.suspiciousEvents().add(events)
   }

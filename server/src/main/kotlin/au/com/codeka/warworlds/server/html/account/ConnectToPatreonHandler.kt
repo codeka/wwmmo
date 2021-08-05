@@ -26,14 +26,13 @@ class ConnectToPatreonHandler : ProtobufRequestHandler() {
     val req = PatreonBeginRequest.ADAPTER.decode(BaseEncoding.base64().decode(state))
 
     // Set up an empty PatreonInfo, that we'll then populate.
-    val patreonInfo: PatreonInfo = PatreonInfo.Builder()
-        .empire_id(req.empire_id)
-        .access_token(tokens.accessToken)
-        .refresh_token(tokens.refreshToken)
-        .token_expiry_time(tokens.expiresIn.toLong())
-        .token_type(tokens.tokenType)
-        .token_scope(tokens.scope)
-        .build()
+    val patreonInfo = PatreonInfo(
+        empire_id = req.empire_id,
+        access_token = tokens.accessToken,
+        refresh_token = tokens.refreshToken,
+        token_expiry_time = tokens.expiresIn.toLong(),
+        token_type = tokens.tokenType,
+        token_scope = tokens.scope)
     DataStore.i.empires().savePatreonInfo(req.empire_id, patreonInfo)
     val empire = EmpireManager.i.getEmpire(req.empire_id)
     EmpireManager.i.refreshPatreonInfo(empire, patreonInfo)

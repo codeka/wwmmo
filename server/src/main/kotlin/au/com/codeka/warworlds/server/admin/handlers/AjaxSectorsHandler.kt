@@ -37,7 +37,7 @@ class AjaxSectorsHandler : AjaxHandler() {
     resp.empireName = name
     var coord: SectorCoord? = null
     if (xs != null && ys != null) {
-      coord = SectorCoord.Builder().x(xs.toLong()).y(ys.toLong()).build()
+      coord = SectorCoord(x = xs.toLong(), y = ys.toLong())
       resp.sectorX = coord.x
       resp.sectorY = coord.y
     }

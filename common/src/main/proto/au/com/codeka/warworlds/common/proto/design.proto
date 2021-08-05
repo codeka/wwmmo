@@ -29,27 +29,27 @@ message Design {
     MINING_DRILL = 110;
     REFINERY = 111;
   }
-  optional DesignType type = 1;
+  required DesignType type = 1;
 
   // The name of this design that we'll present to the user.
-  optional string display_name = 2;
+  required string display_name = 2;
 
   // The longer description of the design.
-  optional string description = 3;
+  required string description = 3;
 
   // The details of the cost of this build.
   message BuildCost {
     // The number of minerals this design takes to build one instance.
-    optional float minerals = 1;
+    required float minerals = 1;
     // The population need to build one instance of this design.
-    optional float population = 2;
+    required float population = 2;
     // The maximum number of instances of this design you can build at once.
-    optional int32 max_count = 3;
+    required int32 max_count = 3;
   }
-  optional BuildCost build_cost = 4;
+  required BuildCost build_cost = 4;
 
   // The URL of the image/icon for this design.
-  optional string image_url = 5;
+  required string image_url = 5;
 
   // The kind of this design: ship or building.
   enum DesignKind {
@@ -57,7 +57,7 @@ message Design {
     BUILDING = 1;
     SHIP = 2;
   }
-  optional DesignKind design_kind = 6;
+  required DesignKind design_kind = 6;
 
   // The details of the dependency you need before you can build this design.
   message Dependency {
@@ -94,17 +94,17 @@ message Design {
     optional EffectType type = 1;
 
     // The range of the effect, useful for RADAR_SCAN, WORMHOLE_DISRUPT, RADAR_ALERT.
-    optional float range = 2;
+    required float range = 2;
 
     // The goods this effect adds/requires/etc. Useful for STORAGE.
-    optional int32 goods = 3;
+    required int32 goods = 3;
     // The minerals this effect adds/requires/etc. Useful for STORAGE.
-    optional int32 minerals = 4;
+    required int32 minerals = 4;
     // The energy this effect adds/requires/etc. Useful for STORAGE.
-    optional int32 energy = 5;
+    required int32 energy = 5;
 
-    optional float bonus = 6;
-    optional int32 minimum = 7;
+    required float bonus = 6;
+    required int32 minimum = 7;
   }
   repeated Effect effect = 8;
 
@@ -125,11 +125,11 @@ message Design {
   }
 
   message Upgrade {
-    optional UpgradeType type = 1;
-    optional string display_name = 2;
-    optional string description = 3;
-    optional BuildCost build_cost = 4;
-    optional string image_url = 5;
+    required UpgradeType type = 1;
+    required string display_name = 2;
+    required string description = 3;
+    required BuildCost build_cost = 4;
+    required string image_url = 5;
     repeated Dependency dependencies = 6;
     repeated Effect effects = 7;
   }

@@ -68,31 +68,19 @@ class PlanetListSimple : LinearLayout {
     val myEmpire = EmpireManager.getMyEmpire()
     val empires = HashSet<Long>()
     for (fleet in fleets!!) {
-      if (fleet.empire_id == null) {
+      val empireId = fleet.empire_id ?: continue
+      if (empireId == myEmpire.id) {
         continue
       }
-      if (fleet.empire_id == myEmpire.id) {
-        continue
-      }
-      if (empires.contains(fleet.empire_id)) {
-        continue
-      }
-      empires.add(fleet.empire_id)
+      empires.add(empireId)
     }
     for (planet in planets!!) {
-      if (planet.colony == null) {
+      val colony = planet.colony ?: continue
+      val empireId = colony.empire_id ?: continue
+      if (empireId == myEmpire.id) {
         continue
       }
-      if (planet.colony.empire_id == null) {
-        continue
-      }
-      if (planet.colony.empire_id == myEmpire.id) {
-        continue
-      }
-      if (empires.contains(planet.colony.empire_id)) {
-        continue
-      }
-      empires.add(planet.colony.empire_id)
+      empires.add(empireId)
     }
     for (empireID in empires) {
       val rowView = getEmpireRowView(inflater, empireID)

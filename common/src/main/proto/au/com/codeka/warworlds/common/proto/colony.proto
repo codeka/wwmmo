@@ -9,16 +9,16 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\design.proto";
 // Represents a colony that's on a planet.
 message Colony {
   // The ID of this colony, so that it can be referred to by other entities.
-  optional int64 id = 1;
+  required int64 id = 1;
 
   // The ID of the empire that owns this colony.
   optional int64 empire_id = 2;
 
   // The population of the colony.
-  optional float population = 3;
+  required float population = 3;
 
   // The "focus" of this colony.
-  optional ColonyFocus focus = 4;
+  required ColonyFocus focus = 4;
 
   // After simulating, these will contain the delta values (i.e. how much do the goods or whatever
   // changed in this colony) per hour.
@@ -44,10 +44,10 @@ message Colony {
 
 // The "focus" of the colony. The values here should all add up to 1.0.
 message ColonyFocus {
-  optional float farming = 1;
-  optional float mining = 2;
-  optional float construction = 3;
-  optional float energy = 4;
+  required float farming = 1;
+  required float mining = 2;
+  required float construction = 3;
+  required float energy = 4;
 }
 
 // Represents a completed building in a colony.
@@ -56,10 +56,10 @@ message Building {
   optional int64 id = 4;
 
   // The type of the design of this building
-  optional Design.DesignType design_type = 1;
+  required Design.DesignType design_type = 1;
 
   // The level of this building
-  optional int32 level = 2;
+  required int32 level = 2;
 
   // Not as useful for buildings (compared to fleets, say), but notes the player can attach.
   optional string notes = 3;
@@ -70,7 +70,7 @@ message BuildRequest {
   optional int64 id = 1;
 
   // The type of the design being created.
-  optional Design.DesignType design_type = 2;
+  required Design.DesignType design_type = 2;
 
   // If we're upgrading a building, the building we're upgrading.
   optional int64 building_id = 11;

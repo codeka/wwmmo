@@ -44,15 +44,12 @@ class SitReportScreen : Screen() {
     layout.refresh(sitReports)
   }
 
-  override fun onShow(): ShowInfo? {
-    App.taskRunner.runTask(Runnable {
-      val resp = App.server.sendRpc(RpcPacket.Builder()
-          .sit_report_request(RpcPacket.SitReportRequest.Builder()
-              .build())
-          .build())
+  override fun onShow(): ShowInfo {
+    App.taskRunner.runTask({
+      val resp = App.server.sendRpc(RpcPacket(sit_report_request = RpcPacket.SitReportRequest()))
 
-      App.taskRunner.runTask(Runnable {
-        refresh(resp.sit_report_response.sit_reports)
+      App.taskRunner.runTask({
+        refresh(resp.sit_report_response!!.sit_reports)
       }, Threads.UI)
     }, Threads.BACKGROUND)
 

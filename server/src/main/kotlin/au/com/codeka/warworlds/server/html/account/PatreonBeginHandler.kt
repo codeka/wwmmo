@@ -18,10 +18,9 @@ class PatreonBeginHandler : AuthenticatedRequestHandler() {
     // We currently don't save this as a "begun" patreon request.. don't really care.
     val config: PatreonConfig = Configuration.i.patreon
         ?: throw RequestException(500, "Patreon not configured.")
-    writeProtobuf(PatreonBeginResponse.Builder()
-        .client_id(config.clientId)
-        .redirect_uri(config.redirectUri)
-        .state(BaseEncoding.base64().encode(req.encode()))
-        .build())
+    writeProtobuf(PatreonBeginResponse(
+        client_id = config.clientId!!,
+        redirect_uri = config.redirectUri!!,
+        state = BaseEncoding.base64().encode(req.encode())))
   }
 }

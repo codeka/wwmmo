@@ -23,10 +23,11 @@ object ChatHelper {
    * @param autoTranslate Whether to show the auto-translated or not.
    * @return An HTML-formatted message.
    */
-  fun formatPlain(msg: ChatMessage?, autoTranslate: Boolean): String {
-    var text = msg!!.message
-    if (msg.message_en != null && autoTranslate) {
-      text = msg.message_en
+  private fun formatPlain(msg: ChatMessage, autoTranslate: Boolean): String {
+    var text = msg.message ?: return ""
+    val messageEn = msg.message_en
+    if (messageEn != null && autoTranslate) {
+      text = messageEn
     }
 
 //    int filterLevel = new GlobalOptions().chatProfanityFilterLevel().getValue();
@@ -46,12 +47,12 @@ object ChatHelper {
    * @return An HTML-formatted version of the message.
    */
   fun format(
-      msg: ChatMessage?,
+      msg: ChatMessage,
       isPublic: Boolean,
       messageOnly: Boolean,
       autoTranslate: Boolean): String {
     var text = formatPlain(msg, autoTranslate)
-    if (msg!!.message_en != null && autoTranslate) {
+    if (msg.message_en != null && autoTranslate) {
       text = "<i>‹" + msg.message_en + "›</i>"
     }
     var isEnemy = false
@@ -76,7 +77,7 @@ object ChatHelper {
       }
     }
     if (msg.date_posted != null && !messageOnly) {
-      text = CHAT_DATE_FORMAT.format(Date(msg.date_posted)) + " : " + text
+      text = CHAT_DATE_FORMAT.format(Date(msg.date_posted!!)) + " : " + text
     }
     if (isPublic) {
       if (isServer) {

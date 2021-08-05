@@ -29,7 +29,7 @@ class NotificationManager {
   private fun sendNotification(device: DeviceInfo, notificationBase64: String) {
     val msg = Message.builder()
         .putData("notification", notificationBase64)
-        .setToken(device.fcm_device_info.token)
+        .setToken(device.fcm_device_info!!.token)
         .build()
     try {
       val resp = FirebaseMessaging.getInstance().send(msg)

@@ -22,7 +22,6 @@ import au.com.codeka.warworlds.common.proto.ChatMessage
 import au.com.codeka.warworlds.common.proto.ChatMessage.MessageAction
 import au.com.codeka.warworlds.common.proto.ChatRoom
 import au.com.codeka.warworlds.common.proto.Empire
-import com.google.common.base.Preconditions
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,8 +51,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
     val now = System.currentTimeMillis()
     val allMessages = ChatManager.i.getMessages(room, now, BATCH_SIZE)
     for (i in allMessages.indices) {
-      if (i == 0 || allMessages[i].date_posted > newestMessageTime) {
-        newestMessageTime = allMessages[i].date_posted
+      val datePosted = allMessages[i].date_posted
+      if (i == 0 || datePosted > newestMessageTime) {
+        newestMessageTime = datePosted
       }
     }
     chatAdapter.setMessages(allMessages)
@@ -66,8 +66,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
   private fun updateMessages() {
     val newerMessages = ChatManager.i.getMessagesAfter(room, newestMessageTime)
     for (i in newerMessages.indices) {
-      if (newerMessages[i].date_posted > newestMessageTime) {
-        newestMessageTime = newerMessages[i].date_posted
+      val datePosted = newerMessages[i].date_posted
+      if (datePosted > newestMessageTime) {
+        newestMessageTime = datePosted
       }
     }
     chatAdapter.appendMessages(newerMessages)
@@ -196,11 +197,12 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
       val entry = entries[position]
       var action = MessageAction.Normal
       if (entry.message != null && entry.message!!.action != null) {
-        action = entry.message!!.action
+        action = entry.message?.action!!
       }
-      var view = convertView ?: {
-        val inflater = Preconditions.checkNotNull(context.getSystemService(
-            Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+      var view = convertView ?: run {
+        val inflater = context.getSystemService(
+          Context.LAYOUT_INFLATER_SERVICE
+        ) as LayoutInflater
         if (entry.date == null && entry.message == null) {
           inflater.inflate(R.layout.chat_row_loading, parent, false)
         } else if (entry.date != null || action != MessageAction.Normal) {
@@ -208,7 +210,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         } else {
           inflater.inflate(R.layout.chat_row, parent, false)
         }
-      }()
+      }
       if (entry.date == null && entry.message == null) {
         // this implies we're at the end of the list, fetch the next bunch
         post { fetchChatItems() }
@@ -251,9 +253,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         empireName.text = ""
         empireIcon.setImageBitmap(null)
         msgTime.text = TIME_FORMAT.format(Date(entry.message!!.date_posted))
-        val html = ChatHelper.format(entry.message, true, true, false)
+        val html = ChatHelper.format(entry.message!!, true, true, false)
         message.text = Html.fromHtml("<font color=\"#00ffff\"><b>[SERVER]</b></font> $html")
-        if (html!!.contains("<a ")) { // only if there's actually a link...
+        if (html.contains("<a ")) { // only if there's actually a link...
           message.movementMethod = LinkMovementMethod.getInstance()
         }
       } else {
@@ -270,7 +272,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
           empireName.text = ""
         }
         msgTime.text = TIME_FORMAT.format(Date(entry.message!!.date_posted))
-        val html = ChatHelper.format(entry.message, room.id == null, true, autoTranslate)
+        val html = ChatHelper.format(entry.message!!, room.id == null, true, autoTranslate)
         message.text = Html.fromHtml(html)
         if (html!!.contains("<a ")) { // only if there's actually a link...
           message.movementMethod = LinkMovementMethod.getInstance()

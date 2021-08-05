@@ -25,7 +25,7 @@ message Packet {
 message HelloPacket {
   // The ID of the empire you're connecting as. You should already know this from the response to
   // the login request.
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 
   // The most recent "last_simulation" time we have for any of our stars. The server will send us
   // an update on all of our stars with a last_simulation newer than this value. This does mean
@@ -57,7 +57,7 @@ message StarUpdatedPacket {
 // Send from the client to the server when it wants to modify a star. The server will modify the
 // star then send StarUpdatedPackets to everybody who is interested in this star.
 message ModifyStarPacket {
-  optional int64 star_id = 1;
+  required int64 star_id = 1;
   repeated StarModification modification = 2;
 }
 

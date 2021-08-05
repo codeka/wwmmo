@@ -10,13 +10,13 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\design.proto";
 // move is completed, a build is completed, a colony is attacked and so on.
 message SituationReport {
   // The ID of the empire this report is for.
-  optional int64 empire_id = 2;
+  required int64 empire_id = 2;
 
   // The time, in milliseconds from Unix epoch, this report was generated.
-  optional int64 report_time = 3;
+  required int64 report_time = 3;
 
   // The ID of the start this report was generated for.
-  optional int64 star_id = 4;
+  required int64 star_id = 4;
 
   // The index of the planet this report was generated, if applicable.
   optional int32 planet_index = 5;
@@ -24,40 +24,40 @@ message SituationReport {
   // This record is used when a building has finished being built.
   message BuildCompleteRecord {
     // The design type of the design that was just built.
-    optional Design.DesignType design_type = 1;
+    required Design.DesignType design_type = 1;
 
     // The number of things that were built. Always 1 for a building
-    optional int32 count = 2;
+    required int32 count = 2;
 
     // True if this was an upgrade of a building, false if it's a brand new building.
-    optional bool upgrade = 3;
+    required bool upgrade = 3;
   }
   optional BuildCompleteRecord build_complete_record = 6;
 
   // This record is used when a fleet has completed a move to a star.
   message MoveCompleteRecord {
     // The ID of the fleet that completed the move.
-    optional int64 fleet_id = 1;
+    required int64 fleet_id = 1;
 
     // The design type of the fleet that was moved.
-    optional Design.DesignType design_type = 3;
+    required Design.DesignType design_type = 3;
 
     // The number of ships in this fleet, before any combat may have reduced them.
-    optional float num_ships = 4;
+    required float num_ships = 4;
 
     // The amount of fuel the fleet has left now that it's finished it's move.
-    optional float fuel_amount = 5;
+    required float fuel_amount = 5;
 
     // If true, this fleet was destroyed in the ensuing combat.
-    optional bool was_destroyed = 6;
+    required bool was_destroyed = 6;
   }
   optional MoveCompleteRecord move_complete_record = 7;
 
   // A record that's added when one or more of your fleets have been destroyed, or when they have
   // destroyed another empire's fleet.
   message FleetRecord {
-    optional Design.DesignType design_type = 1;
-    optional float num_ships = 2;
+    required Design.DesignType design_type = 1;
+    required float num_ships = 2;
   }
 
   // There can be more than one of these if multiple fleets are destroyed/victorious. We don't keep
@@ -67,20 +67,20 @@ message SituationReport {
   repeated FleetRecord fleet_victorious_record = 9;
 
   message ColonyDestroyedRecord {
-    optional string colony_key = 1;
-    optional string enemy_empire_key = 2;
+    required int64 colony_id = 1;
+    required int64 enemy_empire_id = 2;
   }
   optional ColonyDestroyedRecord colony_destroyed_record = 10;
 
   message ColonyAttackedRecord {
-    optional string colony_key = 1;
-    optional string enemy_empire_key = 2;
-    optional float num_ships = 3;
+    required int64 colony_id = 1;
+    required int64 enemy_empire_id = 2;
+    required float num_ships = 3;
   }
   optional ColonyAttackedRecord colony_attacked_record = 11;
 
   message StarRunOutOfGoodsRecord {
-    optional string colony_key = 1;
+    required int64 colony_id = 1;
   }
   optional StarRunOutOfGoodsRecord star_ran_out_of_goods_record = 12;
 }

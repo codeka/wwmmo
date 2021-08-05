@@ -107,6 +107,7 @@ object Program {
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(WireTypeAdapterFactory())
         .create()
-    return gson.fromJson(json, Designs::class.java)
+    val adapter = gson.getAdapter(Designs::class.java)
+    return adapter.fromJson(json)
   }
 }

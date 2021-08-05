@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.solarsystem
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.widget.*
@@ -13,11 +14,19 @@ import au.com.codeka.warworlds.client.util.NumberFormatter
 import au.com.codeka.warworlds.client.util.ViewBackgroundGenerator.setBackground
 import au.com.codeka.warworlds.common.proto.*
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * Layout for [PlanetDetailsScreen].
  */
-class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbacks: Callbacks) : RelativeLayout(context) {
+@SuppressLint("ViewConstructor") // Must be constructed in code.
+class PlanetDetailsLayout(
+    context: Context?,
+    star: Star,
+    planet: Planet,
+    callbacks: Callbacks)
+  : RelativeLayout(context) {
+
   interface Callbacks {
     fun onSaveFocusClick(
         farmingFocus: Float, miningFocus: Float, energyFocus: Float, constructionFocus: Float)
@@ -45,72 +54,80 @@ class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbac
   private val fleetList: FleetListSimple
   private val attackBtn: Button
   private val colonizeBtn: Button
+
   private fun refresh() {
     var empire: Empire? = null
-    if (planet.colony != null && planet.colony.empire_id != null) {
-      empire = EmpireManager.getEmpire(planet.colony.empire_id)
+    val colony = planet.colony
+    if (colony?.empire_id != null) {
+      empire = EmpireManager.getEmpire(colony.empire_id)
     }
     ImageHelper.bindPlanetIcon(planetIcon, star, planet)
     ImageHelper.bindEmpireShield(empireIcon, empire)
-    if (empire != null) {
-      empireName.text = empire.display_name
-    } else if (planet.colony != null) {
-      empireName.setText(R.string.native_colony)
-    } else {
-      empireName.setText(R.string.uncolonized)
+    when {
+      empire != null -> {
+        empireName.text = empire.display_name
+      }
+      planet.colony != null -> {
+        empireName.setText(R.string.native_colony)
+      }
+      else -> {
+        empireName.setText(R.string.uncolonized)
+      }
     }
     congeniality.setPlanet(planet)
-    if (planet.colony != null) {
+    if (colony != null) {
       empireDefence.text = String.format(
           Locale.ENGLISH,
           "Defence: %.0f",
-          planet.colony.defence_bonus * planet.colony.population)
+          colony.defence_bonus!! * colony.population)
     }
-    if (EmpireManager.isMyEmpire(empire)) {
-      // It's our colony.
-      focusContainer.visibility = View.VISIBLE
-      attackBtn.visibility = View.GONE
-      colonizeBtn.visibility = View.GONE
-      note.setText(R.string.focus_hint)
-      focusValues[FARMING_INDEX] = planet.colony.focus.farming
-      focusValues[MINING_INDEX] = planet.colony.focus.mining
-      focusValues[ENERGY_INDEX] = planet.colony.focus.energy
-      focusValues[CONSTRUCTION_INDEX] = planet.colony.focus.construction
-      refreshFocus()
-    } else if (planet.colony != null) {
-      // It's an enemy colony (could be native or another player).
-      focusContainer.visibility = View.GONE
-      attackBtn.visibility = View.VISIBLE
-      colonizeBtn.visibility = View.GONE
-      fleetList.setStar(star, object : FleetFilter {
-        override fun showFleet(fleet: Fleet?): Boolean {
-          return fleet?.design_type == Design.DesignType.TROOP_CARRIER
-        }
-      })
-      note.setText(
+    when {
+      EmpireManager.isMyEmpire(empire) -> {
+        // It's our colony.
+        focusContainer.visibility = View.VISIBLE
+        attackBtn.visibility = View.GONE
+        colonizeBtn.visibility = View.GONE
+        note.setText(R.string.focus_hint)
+        focusValues[FARMING_INDEX] = colony?.focus?.farming ?: 0.25f
+        focusValues[MINING_INDEX] = colony?.focus?.mining ?: 0.25f
+        focusValues[ENERGY_INDEX] = colony?.focus?.energy ?: 0.25f
+        focusValues[CONSTRUCTION_INDEX] = colony?.focus?.construction ?: 0.25f
+        refreshFocus()
+      }
+      planet.colony != null -> {
+        // It's an enemy colony (could be native or another player).
+        focusContainer.visibility = View.GONE
+        attackBtn.visibility = View.VISIBLE
+        colonizeBtn.visibility = View.GONE
+        fleetList.setStar(star, object : FleetFilter {
+          override fun showFleet(fleet: Fleet?): Boolean {
+            return fleet?.design_type == Design.DesignType.TROOP_CARRIER
+          }
+        })
+        note.setText(
           if (fleetList.numFleets > 0) R.string.attack_hint else R.string.attack_hint_no_ships)
-      attackBtn.isEnabled = fleetList.numFleets > 0
-    } else {
-      // It's uncolonized.
-      focusContainer.visibility = View.GONE
-      attackBtn.visibility = View.GONE
-      colonizeBtn.visibility = View.VISIBLE
-      fleetList.setStar(star, object: FleetFilter {
-        override fun showFleet(fleet: Fleet?): Boolean {
-          return fleet?.design_type == Design.DesignType.COLONY_SHIP
-        }
-      })
-      note.setText(
+        attackBtn.isEnabled = fleetList.numFleets > 0
+      }
+      else -> {
+        // It's uncolonized.
+        focusContainer.visibility = View.GONE
+        attackBtn.visibility = View.GONE
+        colonizeBtn.visibility = View.VISIBLE
+        fleetList.setStar(star, object: FleetFilter {
+          override fun showFleet(fleet: Fleet?): Boolean {
+            return fleet?.design_type == Design.DesignType.COLONY_SHIP
+          }
+        })
+        note.setText(
           if (fleetList.numFleets > 0) R.string.colonize_hint else R.string.colonize_hint_no_ships)
-      colonizeBtn.isEnabled = fleetList.numFleets > 0
+        colonizeBtn.isEnabled = fleetList.numFleets > 0
+      }
     }
   }
 
   private fun refreshFocus() {
-    if (planet.colony == null) {
-      return
-    }
-    val focus = planet.colony.focus
+    val colony = planet.colony ?: return
+    val focus = colony.focus
     for (i in 0..3) {
       focusLockButtons[i].setImageResource(
           if (focusLocks[i]) R.drawable.lock_closed else R.drawable.lock_opened)
@@ -119,7 +136,7 @@ class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbac
     }
   }
 
-  fun onFocusLockClick(view: View) {
+  private fun onFocusLockClick(view: View) {
     for (i in 0..3) {
       if (focusLockButtons[i] === view) {
         focusLocks[i] = !focusLocks[i]
@@ -128,11 +145,11 @@ class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbac
     refreshFocus()
   }
 
-  fun onFocusPlusClick(view: View) {
+  private fun onFocusPlusClick(view: View) {
     for (i in 0..3) {
       if (view === focusPlusButtons[i]) {
-        val newValue = Math.max(0.0f, focusValues[i] + 0.01f)
-        focusSeekBars[i].progress = Math.round(newValue * focusSeekBars[i].max)
+        val newValue = 0.0f.coerceAtLeast(focusValues[i] + 0.01f)
+        focusSeekBars[i].progress = (newValue * focusSeekBars[i].max).roundToInt()
         redistribute(i, newValue)
         break
       }
@@ -140,7 +157,7 @@ class PlanetDetailsLayout(context: Context?, star: Star, planet: Planet, callbac
     refreshFocus()
   }
 
-  fun onFocusMinusClick(view: View) {
+  private fun onFocusMinusClick(view: View) {
     for (i in 0..3) {
       if (view === focusMinusButtons[i]) {
         val newValue = Math.max(0.0f, focusValues[i] - 0.01f)

@@ -10,14 +10,14 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\star.proto";
 // It could be an early indication of attempted cheating, or bugs in the client or something else.
 message SuspiciousEvent {
   // The time this event happened.
-  optional int64 timestamp = 1;
+  required int64 timestamp = 1;
 
   // The ID of the star that was being attempted to modify.
-  optional int64 star_id = 2;
+  required int64 star_id = 2;
 
   // The modification that we deemed to be suspicious.
-  optional au.com.codeka.warworlds.common.proto.StarModification modification = 3;
+  required au.com.codeka.warworlds.common.proto.StarModification modification = 3;
 
-  // A message describining what we thought was supicious.
+  // A message describing what we thought was suspicious.
   optional string message = 4;
 }

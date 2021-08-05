@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.store
 
 import au.com.codeka.warworlds.common.proto.Star
+import au.com.codeka.warworlds.common.sim.MutableStar
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import java.util.*
 
@@ -19,17 +20,18 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
     return null
   }
 
-  fun put(id: Long, star: Star?) {
+  fun put(id: Long, star: Star) {
     val empireIds: MutableSet<Long> = HashSet()
-    for (fleet in star!!.fleets) {
-      if (fleet.empire_id != null) {
-        empireIds.add(fleet.empire_id)
+    for (fleet in star.fleets) {
+      val empireId = fleet.empire_id
+      if (empireId != null) {
+        empireIds.add(empireId)
       }
     }
     for (planet in star.planets) {
-      if (planet.colony != null && planet.colony.empire_id != null) {
-        empireIds.add(planet.colony.empire_id)
-      }
+      val colony = planet.colony ?: continue
+      val empireId = colony.empire_id ?: continue
+      empireIds.add(empireId)
     }
     newTransaction().use { trans ->
       newWriter(trans)
@@ -107,22 +109,9 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
 
   /** Do some pre-processing on the star.  */
   private fun processStar(s: Star): Star {
-    // TODO: after we've loaded all the stars at least once, remove this logic.
-    val sb = s.newBuilder()
-    for (i in sb.planets.indices) {
-      if (sb.planets[i].colony != null) {
-        val cb = sb.planets[i].colony.newBuilder()
-        for (j in cb.buildings.indices) {
-          val bb = cb.buildings[j].newBuilder()
-          if (bb.id == null || bb.id == 0L) {
-            bb.id(DataStore.i.seq().nextIdentifier())
-            cb.buildings[j] = bb.build()
-          }
-        }
-        sb.planets[i] = sb.planets[i].newBuilder().colony(cb.build()).build()
-      }
-    }
-    return sb.build()
+    // There's nothing here right now, but we can add logic as needed if we need to re-process
+    // stuff.
+    return s
   }
 
   fun getStarsForEmpire(empireId: Long): ArrayList<Long> {

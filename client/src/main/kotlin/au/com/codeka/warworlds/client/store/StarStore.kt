@@ -157,10 +157,9 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
   companion object {
     private fun isMyStar(star: Star, myEmpire: Empire): Boolean {
       for (planet in star.planets) {
-        if (planet.colony != null && planet.colony.empire_id != null) {
-          if (planet.colony.empire_id == myEmpire.id) {
-            return true
-          }
+        val colony = planet.colony
+        if (colony?.empire_id != null && colony.empire_id == myEmpire.id) {
+          return true
         }
       }
       for (fleet in star.fleets) {

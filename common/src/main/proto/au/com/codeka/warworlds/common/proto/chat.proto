@@ -8,9 +8,9 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
 // A chat message, who it's from, the kind of message and whatnot.
 message ChatMessage {
   optional int64 id = 7;
-  optional string message = 1;
+  required string message = 1;
   optional int64 empire_id = 2;
-  optional int64 date_posted = 3;
+  required int64 date_posted = 3;
   optional int64 alliance_id = 4;
 
   // If the message was auto-translated to english, this will be the english translation.

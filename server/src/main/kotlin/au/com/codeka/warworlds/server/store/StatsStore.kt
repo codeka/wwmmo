@@ -36,13 +36,12 @@ class StatsStore internal constructor(fileName: String) : BaseStore(fileName) {
         .stmt("SELECT timestamp, day, empire_id, email_addr, device_info FROM login_events ORDER BY timestamp DESC")
         .query().use { res ->
           while (res.next()) {
-            loginEvents.add(LoginEvent.Builder()
-                .timestamp(res.getLong(0))
-                .day(res.getInt(1))
-                .empire_id(res.getLong(2))
-                .email_addr(res.getStringOrNull(3))
-                .device_info(DeviceInfo.ADAPTER.decode(res.getBytes(4)))
-                .build())
+            loginEvents.add(LoginEvent(
+                timestamp = res.getLong(0),
+                day = res.getInt(1),
+                empire_id = res.getLong(2),
+                email_addr = res.getStringOrNull(3),
+                device_info = DeviceInfo.ADAPTER.decode(res.getBytes(4))))
             if (loginEvents.size >= num) {
               break
             }
@@ -89,12 +88,11 @@ class StatsStore internal constructor(fileName: String) : BaseStore(fileName) {
       sevenda.addAll(lastEmpires[i])
       i++
     }
-    dailyStats[day] = DailyStat.Builder()
-        .day(day)
-        .oneda(lastEmpires[0].size)
-        .sevenda(sevenda.size)
-        .signups(0) // TODO: populate
-        .build()
+    dailyStats[day] = DailyStat(
+        day = day,
+        oneda = lastEmpires[0].size,
+        sevenda = sevenda.size,
+        signups = 0 /* TODO: populate */)
   }
 
   override fun onOpen(diskVersion: Int): Int {

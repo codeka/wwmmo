@@ -47,28 +47,23 @@ class CreateEmpireScreen : Screen() {
 
   private fun registerEmpire(empireName: String) {
     layout.showSpinner()
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask({
       val request = HttpRequest.Builder()
           .url(url + "accounts")
           .method(HttpRequest.Method.POST)
           .header("Content-Type", "application/x-protobuf")
-          .body(NewAccountRequest.Builder()
-              .empire_name(empireName)
-              .id_token(App.auth.account?.idToken)
-              .build().encode())
+          .body(NewAccountRequest(
+              empire_name = empireName, id_token = App.auth.account?.idToken).encode())
           .build()
       val resp = request.getBody(NewAccountResponse::class.java)
       if (resp == null) {
         // TODO: report the error to the server?
         log.error("Didn't get NewAccountResponse, as expected.", request.exception)
       } else if (resp.cookie == null) {
-        App.taskRunner.runTask(Runnable { layout.showError(resp.message) }, Threads.UI)
+        App.taskRunner.runTask({ layout.showError(resp.message) }, Threads.UI)
       } else {
-        log.info(
-            "New account response, cookie: %s, message: %s",
-            resp.cookie,
-            resp.message)
-        App.taskRunner.runTask(Runnable { onRegisterSuccess(resp) }, Threads.UI)
+        log.info("New account response, cookie: %s, message: %s", resp.cookie, resp.message)
+        App.taskRunner.runTask({ onRegisterSuccess(resp) }, Threads.UI)
       }
     }, Threads.BACKGROUND)
   }
@@ -76,7 +71,7 @@ class CreateEmpireScreen : Screen() {
   private fun onRegisterSuccess(resp: NewAccountResponse) {
     // Save the cookie.
     edit()
-        .setString(GameSettings.Key.COOKIE, resp.cookie)
+        .setString(GameSettings.Key.COOKIE, resp.cookie!!)
         .commit()
 
     context.home()

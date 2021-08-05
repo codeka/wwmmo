@@ -19,10 +19,6 @@ class SitReportRpcHandler : RpcHandler {
     val sitReports =
         DataStore.i.sitReports().getByEmpireId(empire.get().id, 100 /* TODO: handle limit+paging */)
 
-    return RpcPacket.Builder()
-        .sit_report_response(RpcPacket.SitReportResponse.Builder()
-            .sit_reports(sitReports)
-            .build())
-        .build()
+    return RpcPacket(sit_report_response = RpcPacket.SitReportResponse(sit_reports = sitReports))
   }
 }

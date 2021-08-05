@@ -77,7 +77,7 @@ class BackgroundSceneObject(private val scene: Scene, private val sectorX: Long,
     val sprite = scene.createSprite(
         SpriteTemplate.Builder()
             .shader(scene.spriteShader)
-            .texture(TacticalTexture.create(SectorCoord.Builder().x(sectorX).y(sectorY).build()))
+            .texture(TacticalTexture.create(SectorCoord(x = sectorX, y = sectorY)))
             .build(),
         "Tactical:$sectorX,$sectorY")
 

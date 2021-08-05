@@ -4,10 +4,7 @@ import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.debug.PacketDebug
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
-import au.com.codeka.warworlds.common.sim.EmpireHelper
-import au.com.codeka.warworlds.common.sim.FleetHelper
-import au.com.codeka.warworlds.common.sim.StarModifier
-import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
+import au.com.codeka.warworlds.common.sim.*
 import au.com.codeka.warworlds.server.concurrency.TaskRunner
 import au.com.codeka.warworlds.server.concurrency.Threads
 import au.com.codeka.warworlds.server.net.Connection
@@ -43,11 +40,11 @@ class Player(private val connection: Connection,
 
   fun onPacket(pkt: Packet) {
     when {
-      pkt.watch_sectors != null -> onWatchSectorsPacket(pkt.watch_sectors)
-      pkt.modify_star != null -> onModifyStar(pkt.modify_star)
-      pkt.request_empire != null -> onRequestEmpire(pkt.request_empire)
-      pkt.chat_msgs != null -> onChatMessages(pkt.chat_msgs)
-      pkt.rpc != null -> onRpc(pkt.rpc)
+      pkt.watch_sectors != null -> onWatchSectorsPacket(pkt.watch_sectors!!)
+      pkt.modify_star != null -> onModifyStar(pkt.modify_star!!)
+      pkt.request_empire != null -> onRequestEmpire(pkt.request_empire!!)
+      pkt.chat_msgs != null -> onChatMessages(pkt.chat_msgs!!)
+      pkt.rpc != null -> onRpc(pkt.rpc!!)
       else -> log.error("Unknown/unexpected packet. %s", PacketDebug.getPacketDebug(pkt))
     }
   }
@@ -68,7 +65,7 @@ class Player(private val connection: Connection,
     for (star in stars) {
       if (helloPacket.our_star_last_simulation == null
           || (star.get().last_simulation != null
-              && star.get().last_simulation > helloPacket.our_star_last_simulation)) {
+              && star.get().last_simulation!! > helloPacket.our_star_last_simulation!!)) {
         updatedStars.add(star.get())
       }
     }
@@ -80,7 +77,7 @@ class Player(private val connection: Connection,
     }
 
     // Register this player with the chat system so that we get notified of messages.
-    ChatManager.i.connectPlayer(empire.get().id, helloPacket.last_chat_time, chatCallback)
+    ChatManager.i.connectPlayer(empire.get().id, helloPacket.last_chat_time!!, chatCallback)
   }
 
   /**
@@ -100,9 +97,9 @@ class Player(private val connection: Connection,
     val stars: MutableList<Star> = ArrayList()
     synchronized(watchedSectors) {
       watchedSectors.clear()
-      for (sectorY in pkt.top..pkt.bottom) {
-        for (sectorX in pkt.left..pkt.right) {
-          val sector = SectorManager.i.getSector(SectorCoord.Builder().x(sectorX).y(sectorY).build())
+      for (sectorY in pkt.top!!..pkt.bottom!!) {
+        for (sectorX in pkt.left!!..pkt.right!!) {
+          val sector = SectorManager.i.getSector(SectorCoord(x = sectorX, y = sectorY))
           SectorManager.i.verifyNativeColonies(sector)
           watchedSectors.add(sector)
           stars.addAll(sector.get().stars)
@@ -126,22 +123,20 @@ class Player(private val connection: Connection,
 
   private fun onModifyStar(pkt: ModifyStarPacket) {
     val star = StarManager.i.getStarOrError(pkt.star_id)
-    for (i in 0 until pkt.modification.size) {
-      var modification = pkt.modification[i]
+    for (modification in pkt.modification) {
       if (modification.empire_id == null || modification.empire_id != empire.get().id) {
         // Update the modification's empire_id to be our own, since that's what'll be recorded
         // in the database and we don't want this suspicious event to be recorded against the
         // other person's empire.
         val otherEmpireId = modification.empire_id
-        modification = modification.newBuilder().empire_id(empire.get().id).build()
         SuspiciousEventManager.i.addSuspiciousEvent(SuspiciousModificationException(
-            pkt.star_id,
-            modification,
+            pkt.star_id!!,
+            modification.copy(empire_id = empire.get().id),
             "Modification empire_id does not equal our own empire. empire_id=%d",
             otherEmpireId))
         return
       }
-      if (modification.full_fuel != null && modification.full_fuel) {
+      if (modification.full_fuel != null && modification.full_fuel!!) {
         // Clients shouldn't be trying to create fleets at all, but they should also not be trying
         // fill them with fuel. That's suspicious.
         SuspiciousEventManager.i.addSuspiciousEvent(SuspiciousModificationException(
@@ -158,18 +153,14 @@ class Player(private val connection: Connection,
   }
 
   private fun onRequestEmpire(pkt: RequestEmpirePacket) {
-    val empires: MutableList<Empire?> = ArrayList()
+    val empires: MutableList<Empire> = ArrayList()
     for (id in pkt.empire_id) {
       val empire = EmpireManager.i.getEmpire(id)
       if (empire != null) {
         empires.add(empire.get())
       }
     }
-    connection.send(Packet.Builder()
-        .empire_details(EmpireDetailsPacket.Builder()
-            .empires(empires)
-            .build())
-        .build())
+    connection.send(Packet(empire_details = EmpireDetailsPacket(empires = empires)))
   }
 
   private fun onChatMessages(pkt: ChatMessagesPacket) {
@@ -178,12 +169,11 @@ class Player(private val connection: Connection,
       log.error("Didn't get the expected 1 chat message. Got %d.", pkt.messages.size)
       return
     }
-    ChatManager.i.send(null /* TODO */, pkt.messages[0].newBuilder()
-        .date_posted(System.currentTimeMillis())
-        .empire_id(empire.get().id)
-        .action(ChatMessage.MessageAction.Normal)
-        .room_id(null /* TODO */)
-        .build())
+    ChatManager.i.send(null /* TODO */, pkt.messages[0].copy(
+        date_posted = System.currentTimeMillis(),
+        empire_id = empire.get().id,
+        action = ChatMessage.MessageAction.Normal,
+        room_id = null /* TODO */))
   }
 
   private fun onRpc(pkt: RpcPacket) {
@@ -192,20 +182,12 @@ class Player(private val connection: Connection,
       else -> throw RuntimeException("Unexpected RPC: $pkt")
     }
 
-    connection.send(Packet.Builder()
-        .rpc(resp.newBuilder()
-            .id(pkt.id)
-            .build())
-        .build())
+    connection.send(Packet(rpc = resp.copy(id = pkt.id)))
   }
 
   private val chatCallback = object : OnlineCallback {
-    override fun onChatMessage(msgs: List<ChatMessage?>?) {
-      connection.send(Packet.Builder()
-          .chat_msgs(ChatMessagesPacket.Builder()
-              .messages(msgs)
-              .build())
-          .build())
+    override fun onChatMessage(msgs: List<ChatMessage>) {
+      connection.send(Packet(chat_msgs = ChatMessagesPacket(messages = msgs)))
     }
   }
 
@@ -220,11 +202,7 @@ class Player(private val connection: Connection,
     for (i in updatedStars.indices) {
       updatedStars[i] = sanitizeStar(updatedStars[i])
     }
-    connection.send(Packet.Builder()
-        .star_updated(StarUpdatedPacket.Builder()
-            .stars(updatedStars)
-            .build())
-        .build())
+    connection.send(Packet(star_updated = StarUpdatedPacket(stars = updatedStars)))
   }
 
   /**
@@ -246,7 +224,8 @@ class Player(private val connection: Connection,
     var needFullSanitization = true
     var needPartialSanitization = false
     for (planet in star.planets) {
-      if (planet.colony != null && planet.colony.empire_id != null && planet.colony.empire_id == myEmpireId) {
+      val colony = planet.colony
+      if (colony?.empire_id != null && colony.empire_id == myEmpireId) {
         // If we have a colony on here, then we get the full version of the star.
         needFullSanitization = false
         break
@@ -277,36 +256,34 @@ class Player(private val connection: Connection,
     }
 
     // OK, now we know we need to sanitize this star.
-    val starBuilder = star.newBuilder()
+    val mutableStar = MutableStar.from(star)
 
     // If need to do full sanitization, then do that.
     if (needFullSanitization) {
       run {
         var i = 0
-        while (i < starBuilder.fleets.size) {
+        while (i < mutableStar.fleets.size) {
 
           // Only remove if non-moving. TODO: also remove moving fleets if there's no radar nearby
-          if (starBuilder.fleets[i].state != Fleet.FLEET_STATE.MOVING) {
-            starBuilder.fleets.removeAt(i)
+          if (mutableStar.fleets[i].state != Fleet.FLEET_STATE.MOVING) {
+            mutableStar.fleets.removeAt(i)
             i--
           }
           i++
         }
       }
-      for (i in starBuilder.planets.indices) {
+      for (planet in mutableStar.planets) {
         // Sanitize colonies. We can see that they exist, but we only get certain details.
-        if (starBuilder.planets[i].colony != null) {
-          val colony = starBuilder.planets[i].colony.newBuilder()
-              .population(0f)
-              .build_requests(ArrayList())
-              .buildings(ArrayList())
-              .defence_bonus(0f)
-              .delta_energy(0f)
-              .delta_goods(0f)
-              .delta_minerals(0f)
-              .delta_population(0f)
-              .build()
-          starBuilder.planets[i] = starBuilder.planets[i].newBuilder().colony(colony).build()
+        val colony = planet.colony
+        if (colony != null) {
+          colony.population = 0f
+          colony.buildRequests = ArrayList()
+          colony.buildings = ArrayList()
+          colony.defenceBonus = 0f
+          colony.deltaEnergy = 0f
+          colony.deltaGoods = 0f
+          colony.deltaMinerals = 0f
+          colony.deltaPopulation = 0f
         }
       }
     } else {
@@ -315,19 +292,20 @@ class Player(private val connection: Connection,
       // TODO: implement me
     }
 
-    // Remove any scout reports that are not for us.
+    // Remove any scout reports that are not for us. We'll just take the most recent scout report
+    // from our last scout.
     var myScoutReport: ScoutReport? = null
-    for (i in starBuilder.scout_reports.indices) {
-      if (EmpireHelper.isSameEmpire(starBuilder.scout_reports[i].empire_id, myEmpireId)) {
-        myScoutReport = starBuilder.scout_reports[i]
+    for (scoutReport in mutableStar.scoutReports) {
+      if (EmpireHelper.isSameEmpire(scoutReport.empire_id, myEmpireId)) {
+        myScoutReport = scoutReport
         break
       }
     }
-    starBuilder.scout_reports.clear()
+    mutableStar.scoutReports.clear()
     if (myScoutReport != null) {
-      starBuilder.scout_reports.add(myScoutReport)
+      mutableStar.scoutReports.add(myScoutReport)
     }
-    return starBuilder.build()
+    return mutableStar.build()
   }
 
   private fun clearWatchedStars() {

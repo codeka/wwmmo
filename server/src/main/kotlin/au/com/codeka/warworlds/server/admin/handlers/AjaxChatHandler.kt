@@ -34,10 +34,10 @@ class AjaxChatHandler : AjaxHandler() {
   }
 
   private fun handleSendRequest(msg: String) {
-    ChatManager.i.send(null, ChatMessage.Builder()
-        .action(ChatMessage.MessageAction.Normal)
-        .message(msg)
-        .build())
+    ChatManager.i.send(null, ChatMessage(
+        action = ChatMessage.MessageAction.Normal,
+        message = msg,
+        date_posted = System.currentTimeMillis()))
   }
 
   private fun handleRecvRequest(roomId: Long?, lastMsgId: Long) {
@@ -45,8 +45,6 @@ class AjaxChatHandler : AjaxHandler() {
     if (messages.isEmpty()) {
       // TODO: wait for a message before returning...
     }
-    setResponseJson(ChatMessagesPacket.Builder()
-        .messages(messages)
-        .build())
+    setResponseJson(ChatMessagesPacket(messages = messages))
   }
 }
