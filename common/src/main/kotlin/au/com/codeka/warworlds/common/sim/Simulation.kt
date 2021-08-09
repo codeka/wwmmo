@@ -258,9 +258,9 @@ class Simulation constructor(
         }
         for (effect in effects) {
           if (effect.type == Design.EffectType.STORAGE) {
-            storage.maxGoods += effect.goods.toFloat()
-            storage.maxMinerals += effect.minerals.toFloat()
-            storage.maxEnergy += effect.energy.toFloat()
+            storage.maxGoods += effect.goods!!.toFloat()
+            storage.maxMinerals += effect.minerals!!.toFloat()
+            storage.maxEnergy += effect.energy!!.toFloat()
           }
         }
       }
@@ -464,7 +464,7 @@ class Simulation constructor(
           val endTime =
               now + (timeForMineralsHours.coerceAtLeast(timeForPopulationHours) * Time.HOUR)
           br.endTime = endTime.roundToLong()
-          log("     Finish time: %d (now=%d)", endTime, now)
+          log("     Finish time: %f (now=%d)", endTime, now)
           br.progress = br.progress + progressThisTurn
           br.progressPerStep = progressThisTurn
 

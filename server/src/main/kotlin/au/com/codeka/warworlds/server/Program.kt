@@ -5,6 +5,7 @@ import au.com.codeka.warworlds.common.proto.Designs
 import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.server.admin.AdminServlet
 import au.com.codeka.warworlds.server.html.HtmlServlet
+import au.com.codeka.warworlds.server.json.WireTypeAdapterFactory
 import au.com.codeka.warworlds.server.net.ServerSocketManager
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.util.SmtpHelper
@@ -13,7 +14,6 @@ import au.com.codeka.warworlds.server.world.StarSimulatorQueue
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.gson.GsonBuilder
-import com.squareup.wire.WireTypeAdapterFactory
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.servlet.ServletContextHandler

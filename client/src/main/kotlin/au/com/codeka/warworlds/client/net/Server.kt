@@ -144,8 +144,8 @@ class Server {
                   request.exception)
               disconnect()
             } else {
-              val loginResponse = request.getBody(LoginResponse::class.java)
-              if (loginResponse!!.status != LoginStatus.SUCCESS) {
+              val loginResponse = request.getBody(LoginResponse::class.java)!!
+              if (loginResponse.status != LoginStatus.SUCCESS) {
                 updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status)
                 log.error("Error logging in, got login status: %s", loginResponse.status)
                 disconnect()
