@@ -2,19 +2,16 @@ package au.com.codeka.warworlds.server.json
 
 import au.com.codeka.warworlds.common.Log
 import com.google.gson.stream.JsonReader
-import com.squareup.wire.WireField
 import java.lang.Exception
 import kotlin.jvm.internal.Reflection
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty
 import kotlin.reflect.KType
 import kotlin.reflect.full.*
-import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 
 class WireJsonDecoder {
-  private val log = Log("WireTypeAdapter")
+  private val log = Log("WireJsonDecoder")
 
   fun decode(reader: JsonReader, cls: Class<*>): Any {
     try {
@@ -123,20 +120,6 @@ class WireJsonDecoder {
     return values
   }
 
-  private fun findProperties(kClass: KClass<Any>): HashMap<String, KProperty<*>> {
-    val properties = HashMap<String, KProperty<*>>()
-    for (prop in kClass.memberProperties) {
-      val field = prop.javaField ?: continue
-      for (annotation in field.annotations) {
-        if (annotation is WireField) {
-          properties[prop.name] = prop
-          break
-        }
-      }
-    }
-
-    return properties
-  }
 
   @Suppress("UNCHECKED_CAST")
   private fun toKClass(type: KType): KClass<Any> {

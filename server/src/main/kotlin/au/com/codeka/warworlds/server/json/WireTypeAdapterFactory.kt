@@ -23,19 +23,23 @@ import kotlin.reflect.jvm.jvmErasure
 class WireTypeAdapterFactory : TypeAdapterFactory {
   private val log = Log("WireTypeAdapterFactory")
 
-  override fun <T : Any?> create(gson: Gson?, type: TypeToken<T>): TypeAdapter<T> {
+  override fun <T : Any> create(gson: Gson?, type: TypeToken<T>): TypeAdapter<T> {
     return WireTypeAdapter(gson, type)
   }
 
   class WireTypeAdapter<T>(
     private val gson: Gson?, private val type: TypeToken<T>) : TypeAdapter<T>() {
 
-    override fun write(out: JsonWriter?, value: T) {
-      //
+    override fun write(writer: JsonWriter, value: T) {
+      if (value == null) {
+        return
+      }
+
+      WireJsonEncoder().encode(writer, value)
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun read(reader: JsonReader): T? {
+    override fun read(reader: JsonReader): T {
       return WireJsonDecoder().decode(reader, type.rawType) as T
     }
   }
