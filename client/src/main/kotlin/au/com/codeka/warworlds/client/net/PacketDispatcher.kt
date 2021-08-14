@@ -10,6 +10,7 @@ import java.util.*
 /** Helper class for dispatching packets to the event bus. */
 class PacketDispatcher {
   private val pktFields: MutableCollection<Field>
+
   fun dispatch(pkt: Packet?) {
     for (field in pktFields) {
       try {
@@ -24,10 +25,6 @@ class PacketDispatcher {
     }
   }
 
-  companion object {
-    private val log = Log("PacketDispatcher")
-  }
-
   init {
     pktFields = ArrayList()
     for (field in Packet::class.java.fields) {
@@ -35,5 +32,9 @@ class PacketDispatcher {
         pktFields.add(field)
       }
     }
+  }
+
+  companion object {
+    private val log = Log("PacketDispatcher")
   }
 }

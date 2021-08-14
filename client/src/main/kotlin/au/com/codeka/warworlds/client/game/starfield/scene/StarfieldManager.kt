@@ -228,11 +228,8 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   fun setSelectedFleet(star: Star?, fleet: Fleet?) {
     checkOnThread(Threads.UI)
     log.debug("setSelectedFleet(%d %s, %d %sx%.1f)",
-        if (star == null) 0 else star.id,
-        if (star == null) "?" else star.name,
-        if (fleet == null) 0 else fleet.id,
-        if (fleet == null) "?" else fleet.design_type,
-        if (fleet == null) 0 else fleet.num_ships)
+      star?.id ?: 0, star?.name ?: "?", fleet?.id ?: 0, fleet?.design_type ?: "?",
+      fleet?.num_ships ?: 0)
     if (fleet != null) {
       selectionIndicatorSceneObject.setSize(60f, 60f)
       val sceneObject = sceneObjects[fleet.id]

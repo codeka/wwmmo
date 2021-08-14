@@ -286,6 +286,7 @@ class Server {
       log.debug(">> %s", packetDebug)
     }
   }
+
   private val packetDecodeHandler: PacketDecoder.PacketHandler =
       object : PacketDecoder.PacketHandler {
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
