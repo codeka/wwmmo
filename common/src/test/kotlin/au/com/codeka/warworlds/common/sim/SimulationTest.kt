@@ -51,22 +51,6 @@ class SimulationTest {
     }
   }
 
-  /**
-   * Helper for making a star proto with default options if we don't care about all the required
-   * fields. Only the ID is required here.
-   */
-  private fun makeStar(
-    id: Long, name: String = "Test star",
-    classification: Star.CLASSIFICATION = Star.CLASSIFICATION.BLUE, size: Int = 1,
-    offset_x: Int = 0, offset_y: Int = 0, sector_x: Long = 0L, sector_y: Long = 0L,
-    planets: List<Planet> = ArrayList<Planet>(),
-    empire_stores: List<EmpireStorage> = ArrayList<EmpireStorage>()): Star {
-    return Star(
-      id, name = name, classification = classification, size = size, offset_x = offset_x,
-      offset_y = offset_y, sector_x = sector_x, sector_y = sector_y, planets = planets,
-      empire_stores = empire_stores)
-  }
-
   /** Tests that a simulation on an idle star does nothing.  */
   @Test
   fun `do nothing`() {
@@ -685,6 +669,77 @@ class SimulationTest {
     getDeltaMineralsPerHour(star.planets[0].colony!!, now) should beCloseTo(2986.11f, 2)
   }
 
+  @Test
+  fun `refueling takes all the fuel, then slowly produces more`() {
+    initDesign()
+
+    var star = makeStar(
+        id = 1L,
+        name = "Stardust",
+        planets = Lists.newArrayList(
+            Planet(
+                index = 0,
+                energy_congeniality = 100,
+                farming_congeniality = 200,
+                mining_congeniality = 300,
+                population_congeniality = 1000,
+                planet_type = Planet.PLANET_TYPE.TERRAN,
+                colony = Colony(
+                    id = 1L,
+                    empire_id = 1L,
+                    focus = ColonyFocus(
+                        energy = 0.1f,
+                        farming = 0.8f,
+                        mining = 0.0f,
+                        construction = 0.0f),
+                    population = 1000f))),
+        fleets = Lists.newArrayList(
+            Fleet(
+                id = 1L,
+                empire_id = 1L,
+                design_type = Design.DesignType.SCOUT,
+                num_ships = 100f,
+                state = Fleet.FLEET_STATE.IDLE,
+                stance = Fleet.FLEET_STANCE.AGGRESSIVE,
+                fuel_amount = 0f)),
+        empire_stores = Lists.newArrayList(
+            EmpireStorage(
+                empire_id = 1L,
+                max_energy = 1000f,
+                max_goods = 1000f,
+                max_minerals = 1000f,
+                total_energy = 1000f,
+                total_goods = 100f,
+                total_minerals = 100f)))
+
+    // We should immediately take all of the stored fuel, plus what was generated in the last step.
+    star = Simulation(NOW_TIME, false, logHandler).simulate(star)
+    star.fleets[0].fuel_amount should beCloseTo(1166.67f, 2)
+    star.empire_stores[0].total_energy should beCloseTo(0.0f, 2)
+
+    // Simulate another step, and we should produce a little bit more fuel and put it all in
+    // the waiting fleet.
+    star = Simulation(NOW_TIME + Simulation.STEP_TIME, false, logHandler).simulate(star)
+    star.fleets[0].fuel_amount should beCloseTo(1333.33f, 2)
+    star.empire_stores[0].total_energy should beCloseTo(0.0f, 2)
+  }
+
+  /**
+   * Helper for making a star proto with default options if we don't care about all the required
+   * fields. Only the ID is required here.
+   */
+  private fun makeStar(
+      id: Long, name: String = "Test star",
+      classification: Star.CLASSIFICATION = Star.CLASSIFICATION.BLUE, size: Int = 1,
+      offset_x: Int = 0, offset_y: Int = 0, sector_x: Long = 0L, sector_y: Long = 0L,
+      planets: List<Planet> = ArrayList<Planet>(), fleets: List<Fleet> = ArrayList<Fleet>(),
+      empire_stores: List<EmpireStorage> = ArrayList<EmpireStorage>()): Star {
+    return Star(
+        id, name = name, classification = classification, size = size, offset_x = offset_x,
+        offset_y = offset_y, sector_x = sector_x, sector_y = sector_y, planets = planets,
+        fleets = fleets, empire_stores = empire_stores)
+  }
+
   /**
    * Initializes some designs.
    */
@@ -697,6 +752,7 @@ class SimulationTest {
                 display_name = "Colony ship",
                 description = "A colony ship",
                 image_url = "",
+                fuel_size = 800,
                 build_cost = Design.BuildCost(
                     minerals = 100f,
                     population = 120f)),
@@ -706,6 +762,7 @@ class SimulationTest {
                 display_name = "Scout ship",
                 description = "A scout ship",
                 image_url = "",
+                fuel_size = 100,
                 build_cost = Design.BuildCost(
                     minerals = 10f,
                     population = 12f)))))

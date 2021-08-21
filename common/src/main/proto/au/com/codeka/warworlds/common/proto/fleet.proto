@@ -70,7 +70,7 @@ message Fleet {
   optional string notes = 15;
 
   // The amount of the fuel in this fleet's tanks. The maximum amount is controlled by the design.
-  optional float fuel_amount = 16;
+  required float fuel_amount = 16;
 
   // a collection of upgrades to this fleet
 //  repeated FleetUpgrade upgrades = 16;
