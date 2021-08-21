@@ -55,9 +55,9 @@ class EmpireDetailsHandler : AdminHandler() {
   }
 
   private fun completeOverview(empire: Empire, data: HashMap<String, Any>) {
-    data["account"] = DataStore.i.accounts().getByEmpireId(empire.id!!)!!.two
+    data["account"] = DataStore.i.accounts().getByEmpireId(empire.id)!!.two
 
-    val patreonInfo: PatreonInfo? = DataStore.i.empires().getPatreonInfo(empire.id!!)
+    val patreonInfo: PatreonInfo? = DataStore.i.empires().getPatreonInfo(empire.id)
     if (patreonInfo != null) {
       data["patreon"] = patreonInfo
     }
@@ -67,7 +67,7 @@ class EmpireDetailsHandler : AdminHandler() {
 
   private fun completeStarsTab(empire: Empire, data: HashMap<String, Any>) {
     val stars = ArrayList<Star?>()
-    for (starId in DataStore.i.stars().getStarsForEmpire(empire.id!!)) {
+    for (starId in DataStore.i.stars().getStarsForEmpire(empire.id)) {
       val star: WatchableObject<Star>? = StarManager.i.getStar(starId)
       if (star != null) {
         stars.add(star.get())

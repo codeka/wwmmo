@@ -68,7 +68,7 @@ object BuildHelper {
 
   fun getEmpireStorage(star: Star, empireId: Long): EmpireStorage? {
     for (storage in star.empire_stores) {
-      if (storage.empire_id != null && storage.empire_id == empireId) {
+      if (storage.empire_id == empireId) {
         return storage
       }
     }

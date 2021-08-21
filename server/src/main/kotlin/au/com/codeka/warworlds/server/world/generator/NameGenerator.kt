@@ -35,7 +35,7 @@ class NameGenerator {
       try {
         val lines = Files.readLines(File(path, "blacklist"), Charset.defaultCharset())
         for (l in lines) {
-          val line = l.trim { it <= ' ' }.toLowerCase(Locale.ENGLISH)
+          val line = l.trim { it <= ' ' }.lowercase(Locale.ENGLISH)
           if (line.isEmpty()) {
             continue
           }
@@ -136,7 +136,7 @@ class NameGenerator {
     }
 
     // Make sure it's title case.
-    name = name!!.toLowerCase(Locale.ENGLISH)
+    name = name!!.lowercase(Locale.ENGLISH)
     return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name)
   }
 

@@ -18,7 +18,7 @@ open class AuthenticatedRequestHandler : ProtobufRequestHandler() {
    */
   @get:Throws(RequestException::class)
   protected val authenticatedEmpire: WatchableObject<Empire>?
-    protected get() {
+    get() {
       if (empire == null) {
         val cookie = request.getHeader("COOKIE")
             ?: throw RequestException(400, "No COOKIE header found.")

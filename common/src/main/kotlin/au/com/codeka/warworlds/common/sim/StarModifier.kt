@@ -199,7 +199,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     var fuelAmount: Float
     val design = getDesign(
         if (modification.fleet == null) modification.design_type!!
-        else modification.fleet.design_type!!)
+        else modification.fleet.design_type)
     val numShips =
         if (modification.fleet == null) modification.count!!.toFloat()
         else modification.fleet.num_ships
@@ -209,7 +209,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       // It'll be refueled when we simulate, if there's any energy on the star.
       fuelAmount = 0f
       if (modification.fleet != null) {
-        fuelAmount = modification.fleet.fuel_amount!!
+        fuelAmount = modification.fleet.fuel_amount
       }
     }
 
@@ -229,7 +229,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
 
       // If there's an existing fleet, and it has a SCOUT_SHIP effect, then generate a scout report.
       if (hasEffect(modification.fleet, Design.EffectType.SCOUT_SHIP)) {
-        generateScoutReport(star, modification, logHandler)
+        generateScoutReport(star, modification)
       }
     } else {
       val fleet = MutableFleet(Fleet(
@@ -245,9 +245,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
   }
 
-  private fun generateScoutReport(
-      star: MutableStar, modification: StarModification, logHandler: Simulation.LogHandler?) {
-
+  private fun generateScoutReport(star: MutableStar, modification: StarModification) {
     val fleets = ArrayList<Fleet>()
     val planets = ArrayList<Planet>()
     for (fleet in star.fleets) {

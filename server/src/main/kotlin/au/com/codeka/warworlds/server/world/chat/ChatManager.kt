@@ -14,11 +14,10 @@ import java.util.*
 class ChatManager {
   private val participants: MutableMap<Long, Participant> = HashMap()
   private val rooms: Map<Long, Room> = HashMap()
-  private val globalRoom: Room
+  private val globalRoom: Room = Room(ChatRoom(name = "Global"))
 
   /** "Send" the given message to the given room.  */
   fun send(roomId: Long?, msg: ChatMessage) {
-    var msg = msg
     val room = getRoom(roomId)
     if (room == null) {
       log.error("No room with id %d", roomId)
@@ -26,10 +25,9 @@ class ChatManager {
     }
 
     // TODO: validate the action, message_en, etc etc.
-    msg = msg.copy(
+    room.send(msg.copy(
         date_posted = System.currentTimeMillis(),
-        id = DataStore.i.seq().nextIdentifier())
-    room.send(msg)
+        id = DataStore.i.seq().nextIdentifier()))
   }
 
   /** Get the history of all messages in the given room, between the given start and end time.  */
@@ -102,7 +100,4 @@ class ChatManager {
     val i = ChatManager()
   }
 
-  init {
-    globalRoom = Room(ChatRoom(name = "Global"))
-  }
 }

@@ -15,7 +15,7 @@ object StarHelper {
    */
   fun getStorage(star: Star, empireId: Long): EmpireStorage? {
     for (empireStorage in star.empire_stores) {
-      if (empireStorage.empire_id != null && empireStorage.empire_id == empireId) {
+      if (empireStorage.empire_id == empireId) {
         return empireStorage
       }
     }
@@ -47,10 +47,9 @@ object StarHelper {
    */
   fun getStorageIndex(star: Star, empireId: Long?): Int {
     for (i in star.empire_stores.indices) {
-      if (star.empire_stores[i].empire_id != null
-          && star.empire_stores[i].empire_id == empireId) {
+      if (star.empire_stores[i].empire_id == empireId) {
         return i
-      } else if (star.empire_stores[i].empire_id == null && empireId == null) {
+      } else if (empireId == null) {
         return i
       }
     }

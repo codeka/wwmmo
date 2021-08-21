@@ -89,7 +89,7 @@ open class RendererHandler : RequestHandler() {
    */
   protected fun getTemplateFile(rand: Random, type: String, classification: String): File {
     val parentDirectory = File(String.format("data/renderer/%s/%s",
-        type.toLowerCase(Locale.ENGLISH), classification.toLowerCase(Locale.ENGLISH)))
+        type.lowercase(Locale.ENGLISH), classification.lowercase(Locale.ENGLISH)))
     if (!parentDirectory.exists()) {
       throw RequestException(
           500,

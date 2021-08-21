@@ -8,7 +8,7 @@ class MutableBuilding(private val building: Building) {
   val designType
     get() = building.design_type
 
-  var level = building.level ?: 0
+  var level = building.level
 
   fun build(): Building {
     return building.copy(
@@ -135,7 +135,7 @@ class MutableFleet(private val fleet: Fleet) {
   val empireId
     get() = fleet.empire_id
   val designType
-    get() = fleet.design_type!!
+    get() = fleet.design_type
 
   var id = fleet.id
 
@@ -144,7 +144,7 @@ class MutableFleet(private val fleet: Fleet) {
   var stance = fleet.stance
   var numShips = fleet.num_ships
   var isDestroyed = fleet.is_destroyed ?: false
-  var fuelAmount = fleet.fuel_amount ?: 0f
+  var fuelAmount = fleet.fuel_amount
   var destinationStarId = fleet.destination_star_id
   var eta = fleet.eta
 
@@ -166,13 +166,13 @@ class MutableEmpireStorage(private val empireStore: EmpireStorage) {
   val empireId: Long?
     get() = empireStore.empire_id
 
-  var maxEnergy = empireStore.max_energy ?: 0f
-  var maxGoods = empireStore.max_goods ?: 0f
-  var maxMinerals = empireStore.max_minerals ?: 0f
+  var maxEnergy = empireStore.max_energy
+  var maxGoods = empireStore.max_goods
+  var maxMinerals = empireStore.max_minerals
 
-  var totalEnergy = empireStore.total_energy ?: 0f
-  var totalGoods = empireStore.total_goods ?: 0f
-  var totalMinerals = empireStore.total_minerals ?: 0f
+  var totalEnergy = empireStore.total_energy
+  var totalGoods = empireStore.total_goods
+  var totalMinerals = empireStore.total_minerals
 
   var energyDeltaPerHour = empireStore.energy_delta_per_hour ?: 0f
   var goodsDeltaPerHour = empireStore.goods_delta_per_hour ?: 0f

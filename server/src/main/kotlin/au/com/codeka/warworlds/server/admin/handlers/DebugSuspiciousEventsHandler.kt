@@ -24,7 +24,7 @@ class DebugSuspiciousEventsHandler : AdminHandler() {
     data["events"] = events
     val empires = HashMap<Long, Empire?>()
     for (event in events) {
-      val empireId = event.modification?.empire_id ?: continue
+      val empireId = event.modification.empire_id ?: continue
       if (!empires.containsKey(empireId)) {
         val empire = EmpireManager.i.getEmpire(empireId)
         if (empire != null) {
@@ -35,7 +35,7 @@ class DebugSuspiciousEventsHandler : AdminHandler() {
     data["empires"] = empires
     val stars = HashMap<Long, Star?>()
     for (event in events) {
-      val starId = event.star_id ?: continue
+      val starId = event.star_id
       if (!empires.containsKey(starId)) {
         val star = StarManager.i.getStar(starId)
         if (star != null) {

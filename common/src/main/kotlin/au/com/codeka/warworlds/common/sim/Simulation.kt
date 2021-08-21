@@ -88,7 +88,7 @@ class Simulation constructor(
 
         // Also, this is the time to empty any tankers. They can be refilled if you have energy
         // production on this star.
-        simulateEnergyTransports(star, now)
+        simulateEnergyTransports(star)
 
         // We always predict at least one more step, so that we can put the deltas from the next
         // step in (since they'll take into account things like focus changes, new builds, etc that
@@ -826,7 +826,7 @@ class Simulation constructor(
    * into the prediction phase. If there's any energy transports on the star, transfer their energy
    * to non-energy transport fleets of the same empire.
    */
-  private fun simulateEnergyTransports(star: MutableStar, now: Long) {
+  private fun simulateEnergyTransports(star: MutableStar) {
     log("Refueling")
 
     // Find all the energy transport fleets. If there's none we'll try to avoid allocating any extra

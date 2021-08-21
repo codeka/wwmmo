@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client
 
 import android.app.Application
 import android.os.Handler
+import android.os.Looper
 import au.com.codeka.warworlds.client.concurrency.TaskRunner
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.ChatManager
@@ -31,7 +32,7 @@ class MyApp : Application() {
         Picasso.Builder(this)
             .loggingEnabled(true)
             .build())
-    Threads.UI.setThread(Thread.currentThread(), Handler())
+    Threads.UI.setThread(Thread.currentThread(), Handler(Looper.getMainLooper()))
     server.setup()
     dataStore.open(this)
     create()

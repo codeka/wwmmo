@@ -130,7 +130,7 @@ class Player(private val connection: Connection,
         // other person's empire.
         val otherEmpireId = modification.empire_id
         SuspiciousEventManager.i.addSuspiciousEvent(SuspiciousModificationException(
-            pkt.star_id!!,
+            pkt.star_id,
             modification.copy(empire_id = empire.get().id),
             "Modification empire_id does not equal our own empire. empire_id=%d",
             otherEmpireId))
@@ -236,9 +236,9 @@ class Player(private val connection: Connection,
         // If we have a fleet on here, then we also get the full version.
         needFullSanitization = false
       }
-      if (FleetHelper.hasUpgrade(fleet, Design.UpgradeType.CLOAK)) {
-        needPartialSanitization = true
-      }
+ //     if (FleetHelper.hasUpgrade(fleet, Design.UpgradeType.CLOAK)) {
+ //       needPartialSanitization = true
+ //     }
     }
 
     // If there's any non-us scout reports we'll need to do a partial sanitization.

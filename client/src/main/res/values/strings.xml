@@ -60,8 +60,8 @@
   <string name="build_complete">&lt;b>Build&lt;/b> complete on %s</string>
   <string name="fleet_move_complete">&lt;b>Move&lt;/b> to %s complete</string>
   <string name="attack_on_star">&lt;b>Attack&lt;/b> on %s</string>
-  <string name="fleet_details_not_destroyed">%.0f x %s</string>
-  <string name="fleet_details_destroyed">%.0f x %s, and was destroyed</string>
+  <string name="fleet_details_not_destroyed" formatted="false">%.0f x %s</string>
+  <string name="fleet_details_destroyed" formatted="false">%.0f x %s, and was destroyed</string>
   <string name="build_details">%s</string>
 
   <string name="create_empire">Create empire</string>
@@ -160,7 +160,7 @@
   </string>
   <string name="empire_settings_shield_choose">Choose Shield</string>
   <string name="empire_settings_reset">Reset Empire</string>
-  <string name="empire_settings_reset_desc">
+  <string name="empire_settings_reset_desc" formatted="false">
     Resetting your empire will destroy your current empire and allow you to restart the game from a
     fresh star. The cost of this purchase increases as the size of your empire increase: to reset
     an empire with four stars or less is free, resetting an empire with up to 10 stars is %1s and

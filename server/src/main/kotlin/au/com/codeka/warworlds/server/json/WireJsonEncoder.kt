@@ -65,6 +65,7 @@ class WireJsonEncoder {
         writer.value(value as String)
       }
       List::class -> {
+        @Suppress("UNCHECKED_CAST")
         writeArray(writer, value as List<Any>, type)
       }
       Boolean::class -> {

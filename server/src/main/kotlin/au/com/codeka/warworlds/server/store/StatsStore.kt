@@ -22,7 +22,7 @@ class StatsStore internal constructor(fileName: String) : BaseStore(fileName) {
             "VALUES (?, ?, ?, ?, ?, ?)")
         .param(0, now)
         .param(1, StatsHelper.timestampToDay(now))
-        .param(2, if (account.empire_id == null) 0 else account.empire_id)
+        .param(2, account.empire_id)
         .param(3, loginRequest!!.device_info.device_id)
         .param(4, account.email)
         .param(5, loginRequest.device_info.encode())

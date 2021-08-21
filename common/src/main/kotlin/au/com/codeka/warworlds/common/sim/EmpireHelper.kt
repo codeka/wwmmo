@@ -48,10 +48,10 @@ object EmpireHelper {
   fun getStoreIndex(star: Star, empireId: Long?): Int {
     star.empire_stores.indices.forEach { i ->
       val store = star.empire_stores[i]
-      if (store.empire_id == null && empireId == null) {
+      if (empireId == null) {
         return i
       }
-      if (store.empire_id != null && store.empire_id == empireId) {
+      if (store.empire_id == empireId) {
         return i
       }
     }

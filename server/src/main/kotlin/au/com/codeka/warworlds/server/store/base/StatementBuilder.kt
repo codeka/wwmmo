@@ -172,18 +172,18 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   companion object {
     private val log = Log("StatementBuilder")
 
-    private fun debugSql(sql: String?, params: ArrayList<Any?>?): String {
-      var sql = sql
-      sql = sql!!.replace("\n", " ")
-      sql = sql.replace(" +".toRegex(), " ")
-      if (sql.length > 70) {
-        sql = sql.substring(0, 68) + "..."
+    private fun debugSql(sql: String, params: ArrayList<Any>): String {
+      var str = sql
+      str = str.replace("\n", " ")
+      str = str.replace(" +".toRegex(), " ")
+      if (str.length > 70) {
+        str = str.substring(0, 68) + "..."
       }
-      for (i in params!!.indices) {
-        sql += " ; "
-        sql += params[i]
+      for (i in params.indices) {
+        str += " ; "
+        str += params[i]
       }
-      return sql
+      return str
     }
   }
 }

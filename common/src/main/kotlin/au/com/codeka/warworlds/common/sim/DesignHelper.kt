@@ -59,7 +59,7 @@ object DesignHelper {
         }
         var isMet = false
         for (building in colony.buildings) {
-          if (building.design_type == dep.type && building.level!! >= dep.level!!) {
+          if (building.design_type == dep.type && building.level >= dep.level!!) {
             isMet = true
             break
           }

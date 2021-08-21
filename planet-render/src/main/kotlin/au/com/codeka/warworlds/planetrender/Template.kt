@@ -50,10 +50,11 @@ class Template {
   open class BaseTemplate {
     val parameters: MutableList<BaseTemplate>
 
-    fun <T : BaseTemplate?> getParameters(classFactory: Class<T>?): List<T> {
+    fun <T : BaseTemplate?> getParameters(classFactory: Class<T>): List<T> {
       val params: MutableList<T> = ArrayList()
       for (bt in parameters) {
         if (bt.javaClass.isAssignableFrom(classFactory)) {
+          @Suppress("UNCHECKED_CAST")
           params.add(bt as T)
         }
       }

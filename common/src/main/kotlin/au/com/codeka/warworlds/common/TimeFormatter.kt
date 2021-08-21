@@ -53,22 +53,22 @@ class TimeFormatter private constructor() {
   }
 
   fun format(millis: Long): String {
-    var millis = millis
+    var ms = millis
     var suffix = ""
     if (timeInPast) {
-      millis = -millis
+      ms = -ms
       suffix = " ago"
     }
-    val days = millis / Time.DAY
+    val days = ms / Time.DAY
     if (days > maxDays) {
       if (timeInPast) {
-        millis = -millis
+        ms = -ms
       }
-      val date = System.currentTimeMillis() + millis
+      val date = System.currentTimeMillis() + ms
       return dateFormat.format(Date(date))
     }
-    val hours = (millis - days * Time.DAY) / Time.HOUR
-    val minutes = (millis - days * Time.DAY - hours * Time.HOUR) / Time.MINUTE
+    val hours = (ms - days * Time.DAY) / Time.HOUR
+    val minutes = (ms - days * Time.DAY - hours * Time.HOUR) / Time.MINUTE
     return if (days > 0) {
       if (alwaysIncludeMinutes) {
         String.format(
@@ -105,7 +105,7 @@ class TimeFormatter private constructor() {
       String.format(
           Locale.ENGLISH,
           "%d min%s%s",
-          minutes, if (millis == 1L) "" else "s", suffix)
+          minutes, if (ms == 1L) "" else "s", suffix)
     }
   }
 
@@ -115,5 +115,4 @@ class TimeFormatter private constructor() {
       return TimeFormatter()
     }
   }
-
 }

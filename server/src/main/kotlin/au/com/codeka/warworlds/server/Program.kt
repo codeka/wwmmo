@@ -34,7 +34,7 @@ object Program {
     SmtpHelper.i.start()
     NotificationManager.i.start()
 
-    val options = FirebaseOptions.Builder()
+    val options = FirebaseOptions.builder()
         .setCredentials(Configuration.i.getFirebaseCredentials())
         .setDatabaseUrl("https://wwmmo-2.firebaseio.com")
         .build()
