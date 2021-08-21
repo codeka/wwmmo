@@ -6,7 +6,7 @@ class MutableBuilding(private val building: Building) {
   var id = building.id!!
 
   val designType
-    get() = building.design_type!!
+    get() = building.design_type
 
   var level = building.level ?: 0
 
@@ -38,7 +38,7 @@ class MutableBuildRequest(private val buildRequest: BuildRequest) {
   val startTime
     get() = buildRequest.start_time!!
   val designType
-    get() = buildRequest.design_type!!
+    get() = buildRequest.design_type
 
   val count
     get() = buildRequest.count ?: 1

@@ -9,16 +9,18 @@ import "au\\com\\codeka\\warworlds\\common\\proto\\empire.proto";
 import "au\\com\\codeka\\warworlds\\common\\proto\\star.proto";
 import "au\\com\\codeka\\warworlds\\common\\proto\\sitreport.proto";
 
-// Wrapper class for all the packets.
+// Wrapper class for all the packets. Only one at a time can be set.
 message Packet {
-  optional HelloPacket hello = 1;
-  optional WatchSectorsPacket watch_sectors = 2;
-  optional StarUpdatedPacket star_updated = 3;
-  optional ModifyStarPacket modify_star = 4;
-  optional RequestEmpirePacket request_empire = 5;
-  optional EmpireDetailsPacket empire_details = 6;
-  optional ChatMessagesPacket chat_msgs = 7;
-  optional RpcPacket rpc = 8;
+  oneof payload {
+    HelloPacket hello = 1;
+    WatchSectorsPacket watch_sectors = 2;
+    StarUpdatedPacket star_updated = 3;
+    ModifyStarPacket modify_star = 4;
+    RequestEmpirePacket request_empire = 5;
+    EmpireDetailsPacket empire_details = 6;
+    ChatMessagesPacket chat_msgs = 7;
+    RpcPacket rpc = 8;
+  }
 }
 
 // The "hello" packet that's sent by the client when it first connects to the game socket.
@@ -97,7 +99,7 @@ message RpcPacket {
     repeated SituationReport sit_reports = 1;
   }
 
-  oneof Payload {
+  oneof payload {
     SitReportRequest sit_report_request = 10;
     SitReportResponse sit_report_response = 11;
   }

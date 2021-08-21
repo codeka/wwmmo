@@ -119,6 +119,8 @@ class Simulation constructor(
         }
       }
     }
+
+    star.lastSimulation = timeOverride
   }
 
   /**
@@ -153,7 +155,8 @@ class Simulation constructor(
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
       for (br in colony.buildRequests) {
-        val predictionBuildRequest = colony.buildRequests.find { it.id == br.id } ?: continue
+        val predictionBuildRequest =
+            ColonyHelper.findBuildRequest(predictionStar, br.id) ?: continue
         br.mineralsEfficiency = predictionBuildRequest.mineralsEfficiency
         br.populationEfficiency = predictionBuildRequest.populationEfficiency
         br.progressPerStep = predictionBuildRequest.progressPerStep
@@ -325,12 +328,11 @@ class Simulation constructor(
       if (!equalEmpire(colony.empireId, empireId)) {
         continue
       }
-      val buildRequests = colony.buildRequests ?: continue
 
       // not all build requests will be processed this turn. We divide up the population
       // based on the number of ACTUAL build requests they'll be working on this turn
       var numValidBuildRequests = 0
-      for (br in buildRequests) {
+      for (br in colony.buildRequests) {
         if (br.startTime >= now) {
           continue
         }
@@ -383,9 +385,9 @@ class Simulation constructor(
           //  ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());
           //  buildCost = upgrade.getBuildCost();
           //}
-          log("---- Building [design=%s %s] [count=%d] cost [workers=%.2f] [minerals=%.2f] [start-time=%d]",
-              design.design_kind, design.type, br.count, buildCost.population, buildCost.minerals,
-              br.startTime)
+          log("---- Building [id=%d] [design=%s %s] [count=%d] cost [workers=%.2f]" +
+              " [minerals=%.2f] [start-time=%d]",  br.id, design.design_kind, design.type, br.count,
+              buildCost.population, buildCost.minerals, br.startTime)
 
           // The total amount of time to build something is based on the number of workers it
           // requires, if you have the right number of workers and the right amount of minerals,
@@ -545,8 +547,8 @@ class Simulation constructor(
       colony.population = newPopulation
     }
     storage.totalGoods = storage.totalGoods.coerceAtMost(storage.maxGoods)
-    storage.totalMinerals = storage.totalMinerals.coerceAtMost(storage.maxGoods)
-    storage.totalEnergy = storage.totalEnergy.coerceAtMost(storage.maxGoods)
+    storage.totalMinerals = storage.totalMinerals.coerceAtMost(storage.maxMinerals)
+    storage.totalEnergy = storage.totalEnergy.coerceAtMost(storage.maxEnergy)
     storage.goodsDeltaPerHour = goodsDeltaPerHour
     storage.mineralsDeltaPerHour = mineralsDeltaPerHour
     storage.energyDeltaPerHour = energyDeltaPerHour

@@ -190,19 +190,19 @@ message Planet {
 // Represents the details of an empire's stored goods in a star. For example, keeps track of stored
 // food, energy, minerals, etc, etc.
 message EmpireStorage {
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 
-  optional float total_goods = 2;
-  optional float total_minerals = 3;
-  optional float total_energy = 4;
+  required float total_goods = 2;
+  required float total_minerals = 3;
+  required float total_energy = 4;
 
   optional float goods_delta_per_hour = 5;
   optional float minerals_delta_per_hour = 6;
   optional float energy_delta_per_hour = 7;
 
-  optional float max_goods = 8;
-  optional float max_minerals = 9;
-  optional float max_energy = 10;
+  required float max_goods = 8;
+  required float max_minerals = 9;
+  required float max_energy = 10;
 
   optional int64 goods_zero_time = 11;
 }

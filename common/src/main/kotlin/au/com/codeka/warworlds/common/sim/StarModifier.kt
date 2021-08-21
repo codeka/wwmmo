@@ -144,19 +144,22 @@ class StarModifier(private val identifierGenerator: () -> Long) {
         "  colonized: colony_id=%d",
         star.planets[modification.planet_index].colony?.id))
 
-    // if there's no storage for this empire, add one with some defaults now.
-    val storageIndex = getStorageIndex(star, modification.empire_id)
-    if (storageIndex < 0) {
-      val storage = createDefaultStorage(modification.empire_id)
-      storage.totalEnergy += remainingFuel
-      star.empireStores.add(storage)
-    } else {
-      val storage = star.empireStores[storageIndex]
-      storage.totalEnergy += remainingFuel
+    // if there's no storage for this empire, add one with some defaults now (only for non-natives)
+    val empireId = modification.empire_id
+    if (empireId != null) {
+      val storageIndex = getStorageIndex(star, empireId)
+      if (storageIndex < 0) {
+        val storage = createDefaultStorage(empireId)
+        storage.totalEnergy += remainingFuel
+        star.empireStores.add(storage)
+      } else {
+        val storage = star.empireStores[storageIndex]
+        storage.totalEnergy += remainingFuel
+      }
     }
   }
 
-  private fun createDefaultStorage(empireId: Long?): MutableEmpireStorage {
+  private fun createDefaultStorage(empireId: Long): MutableEmpireStorage {
     return MutableEmpireStorage(EmpireStorage(
         empire_id = empireId,
         total_goods = 100.0f,
