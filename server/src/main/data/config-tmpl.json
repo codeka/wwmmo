@@ -5,6 +5,16 @@
   // Base URL for requests to the server.
   "baseUrl": "http://localhost:8080",
 
+  // Parameters for logging.
+  "logging": {
+    // The base file name to log to. We'll append ".log" for the "live" log and then use this
+    // as the base name for backups, too.
+    "fileName": "data/logs/wwmmo",
+
+    // The maximum level to log at. Typically DEBUG for development and INFO for prod.
+    "maxLevel": "DEBUG"
+  },
+
   // Settings for sending outbound SMTP messages, the below are the defaults and what will be used
   // if this block isn't present in the config.
   "smtp": {

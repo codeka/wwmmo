@@ -25,8 +25,8 @@ object Program {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    LogImpl.setup()
     Configuration.i.load()
+    LogImpl.setup(Configuration.i.logging)
     DataStore.i.open()
     DesignDefinitions.init(loadDesignDefinitions())
     StarSimulatorQueue.i.start()
@@ -64,6 +64,10 @@ object Program {
       log.info("Server started on http://localhost:%d/", port)
       server.join()
     } catch (e: Exception) {
+      // Print on stdout as well, since the logging might be in trouble.
+      println("Exception on main thread, aborting.")
+      println(e)
+
       log.error("Exception on main thread, aborting.", e)
     }
   }

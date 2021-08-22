@@ -27,6 +27,9 @@ class Configuration private constructor() {
   val smtp: SmtpConfig
 
   @Expose
+  val logging: LoggingConfig
+
+  @Expose
   private val firebase: JsonElement? = null
 
   @Expose
@@ -90,7 +93,14 @@ class Configuration private constructor() {
 
     @Expose
     val senderAddr = "noreply@war-worlds.com"
+  }
 
+  class LoggingConfig {
+    @Expose
+    val fileName: String? = null
+
+    @Expose
+    val maxLevel: String? = null
   }
 
   class PatreonConfig {
@@ -119,5 +129,6 @@ class Configuration private constructor() {
 
   init {
     smtp = SmtpConfig()
+    logging = LoggingConfig()
   }
 }

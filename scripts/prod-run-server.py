@@ -23,7 +23,6 @@ cmd = [
     "java",
     "-classpath", classpath,
     "-DConfigFile=" + str(path) + "/data/config-prod.json",
-    "-Djava.util.logging.config.file=logging.properties",
     "au.com.codeka.warworlds.server.Program"
 ]
 

@@ -31,7 +31,6 @@ def build_and_run_server():
         "java",
         "-classpath", classpath,
         "-DConfigFile=" + str(dataPath) + "/config-debug.json",
-        "-Djava.util.logging.config.file=logging-debug.properties",
         "au.com.codeka.warworlds.server.Program"
         ]
 
