@@ -21,18 +21,17 @@ class SectorManager {
     synchronized(sectors) {
       var sector = sectors[coord]
       if (sector == null) {
-        var s: Sector? = DataStore.i.sectors().getSector(coord.x, coord.y)
-        if (s!!.state == SectorState.New.value) {
+        var s = DataStore.i.sectors().getSector(coord.x, coord.y)
+        if (s.state == SectorState.New.value) {
           s = SectorGenerator().generate(s)
         }
-        sector = WatchableObject(s!!)
+        sector = WatchableObject(s)
         sectors[coord] = sector
 
         // Watch all the stars so that we can update the sector when the star is updated.
         val watcher: WatchableObject.Watcher<Star> = StarWatcher(coord)
         for (sectorStar in sector.get().stars) {
-          val star: WatchableObject<Star>? = StarManager.i.getStar(sectorStar.id)
-          star?.addWatcher(watcher)
+          StarManager.i.getStarOrError(sectorStar.id).addWatcher(watcher)
         }
       }
       return sector
@@ -64,7 +63,7 @@ class SectorManager {
   fun verifyNativeColonies(sector: WatchableObject<Sector>) {
     for (star in sector.get().stars) {
       // If there's any fleets on it, it's not eligible.
-      if (star.fleets.size > 0) {
+      if (star.fleets.isNotEmpty()) {
         continue
       }
 

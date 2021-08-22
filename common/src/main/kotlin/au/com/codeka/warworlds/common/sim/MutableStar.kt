@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.common.sim
 import au.com.codeka.warworlds.common.proto.*
 
 class MutableBuilding(private val building: Building) {
-  var id = building.id!!
+  var id = building.id ?: 0
 
   val designType
     get() = building.design_type
@@ -144,7 +144,7 @@ class MutableFleet(private val fleet: Fleet) {
   var stance = fleet.stance
   var numShips = fleet.num_ships
   var isDestroyed = fleet.is_destroyed ?: false
-  var fuelAmount = fleet.fuel_amount
+  var fuelAmount = fleet.fuel_amount ?: 0f
   var destinationStarId = fleet.destination_star_id
   var eta = fleet.eta
 
@@ -196,8 +196,8 @@ class MutableEmpireStorage(private val empireStore: EmpireStorage) {
   }
 }
 
-class MutableCombatReport(combatReport: CombatReport = CombatReport()) {
-  var time = combatReport.time ?: 0L
+class MutableCombatReport(combatReport: CombatReport = CombatReport(time = 0)) {
+  var time = combatReport.time
 
   // Note: we want to make sure our before/after are copies!
   var fleetsBefore = combatReport.fleets_before.map { it.copy() }

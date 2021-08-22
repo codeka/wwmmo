@@ -18,8 +18,8 @@ import java.util.*
  * out for new players (or when a player creeps up on the edge of the universe).
  */
 class SectorGenerator {
-  fun generate(sector: Sector?): Sector? {
-    if (sector!!.state != SectorState.New.value) {
+  fun generate(sector: Sector): Sector {
+    if (sector.state != SectorState.New.value) {
       return sector
     }
     log.info("Generating sector (%d, %d)...", sector.x, sector.y)
@@ -27,7 +27,7 @@ class SectorGenerator {
     if (!DataStore.i.sectors().updateSectorState(
             coord, SectorState.New, SectorState.Generating)) {
       log.warning("Could not update sector state to generating, assuming we can't generate there.")
-      return null
+      return sector
     }
     val random = Random(sector.x * 73649274L xor sector.y xor System.currentTimeMillis())
     val points = PoissonGenerator()
@@ -39,8 +39,8 @@ class SectorGenerator {
     for (star in stars) {
       DataStore.i.stars().put(star.id, star)
     }
-    DataStore.i.sectors().updateSectorState(
-        coord, SectorState.Generating, SectorState.Empty)
+    DataStore.i.sectors().updateSectorState(coord, SectorState.Generating, SectorState.Empty)
+    log.info("  sector (${sector.x}, ${sector.y}) generated with ${stars.size} stars.")
     return sector.copy(
         stars = stars,
         state = SectorState.Empty.value)

@@ -190,7 +190,7 @@ message Planet {
 // Represents the details of an empire's stored goods in a star. For example, keeps track of stored
 // food, energy, minerals, etc, etc.
 message EmpireStorage {
-  required int64 empire_id = 1;
+  optional int64 empire_id = 1;
 
   required float total_goods = 2;
   required float total_minerals = 3;

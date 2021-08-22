@@ -28,17 +28,15 @@ class StarManager private constructor() {
       StarModifier { DataStore.i.seq().nextIdentifier() }
 
   fun getStar(id: Long): WatchableObject<Star>? {
-    var watchableStar: WatchableObject<Star>?
     synchronized(stars) {
-      watchableStar = stars[id]
-      if (watchableStar == null) {
-        val star = store[id] ?: return null
-        watchableStar = WatchableObject(star)
-        watchableStar!!.addWatcher(starWatcher)
-        stars[star.id] = watchableStar!!
+      return stars[id] ?: run {
+        val star = store.get(id) ?: return null
+        val w = WatchableObject(star)
+        w.addWatcher(starWatcher)
+        stars[id] = w
+        w
       }
     }
-    return watchableStar
   }
 
   /**
@@ -52,16 +50,7 @@ class StarManager private constructor() {
 
   fun deleteStar(id: Long) {
     val watchableStar = stars[id]
-    val star: Star?
-    if (watchableStar != null) {
-      star = watchableStar.get()
-    } else {
-      star = store[id]
-      if (star == null) {
-        // If the star's not in the store, it doesn't exist.
-        return
-      }
-    }
+    val star = watchableStar?.get() ?: store.get(id) ?: return
     val coord = SectorCoord(x = star.sector_x, y = star.sector_y)
     store.delete(id)
     synchronized(stars) { stars.remove(id) }

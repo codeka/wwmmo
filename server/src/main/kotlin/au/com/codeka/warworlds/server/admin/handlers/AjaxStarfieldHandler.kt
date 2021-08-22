@@ -75,6 +75,7 @@ class AjaxStarfieldHandler : AjaxHandler() {
 
   private fun handleXyRequest(x: Long, y: Long) {
     val sector = SectorManager.i.getSector(SectorCoord(x = x, y = y))
+    log.info("DEANH got sector $x, $y with ${sector.get().stars.size} stars")
     SectorManager.i.verifyNativeColonies(sector)
     setResponseJson(sector.get())
   }

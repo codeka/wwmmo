@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.server.store
 
+import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.MutableStar
 import au.com.codeka.warworlds.server.store.base.BaseStore
@@ -9,14 +10,15 @@ import java.util.*
  * A store for storing stars, including some extra indices for special queries that we can do.
  */
 class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
-  operator fun get(id: Long): Star? {
+  val log = Log("StarsStore")
+
+  fun get(id: Long): Star? {
     newReader().stmt("SELECT star FROM stars WHERE id = ?").param(0, id).query().use { res ->
       if (res.next()) {
         return processStar(Star.ADAPTER.decode(res.getBytes(0)))
       }
     }
 
-    // TODO: return null or throw exception?
     return null
   }
 
@@ -157,6 +159,10 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
       newWriter()
           .stmt("CREATE INDEX IX_empire_stars ON star_empires (star_id, empire_id)")
           .execute()
+      version++
+    }
+    if (version == 2) {
+      // This version was temporary and not need if starting from scratch.
       version++
     }
     return version

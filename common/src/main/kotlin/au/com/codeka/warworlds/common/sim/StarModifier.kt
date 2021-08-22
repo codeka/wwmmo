@@ -100,7 +100,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     var remainingFuel = 0f
 
     // Destroy a colony ship, unless this is a native colony.
-    if (modification.empire_id != null) {
+    if (modification.empire_id != 0L) {
       var found = false
       for (i in star.fleets.indices) {
         val fleet = star.fleets[i]
@@ -209,7 +209,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       // It'll be refueled when we simulate, if there's any energy on the star.
       fuelAmount = 0f
       if (modification.fleet != null) {
-        fuelAmount = modification.fleet.fuel_amount
+        fuelAmount = modification.fleet.fuel_amount ?: 0f
       }
     }
 
@@ -654,7 +654,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       }
     }
 
-    star.empireStores = ArrayList(star.empireStores.filter { it.empireId != null })
+    star.empireStores = ArrayList(star.empireStores.filter { it.empireId != 0L })
     star.fleets = ArrayList(star.fleets.filter { it.empireId != null })
   }
 
