@@ -61,42 +61,44 @@ class SectorManager {
    * eligible for a native colony have one.
    */
   fun verifyNativeColonies(sector: WatchableObject<Sector>) {
-    for (star in sector.get().stars) {
-      // If there's any fleets on it, it's not eligible.
-      if (star.fleets.isNotEmpty()) {
-        continue
-      }
-
-      // If there's any colonies, it's also not eligible.
-      var numColonies = 0
-      for (planet in star.planets) {
-        if (planet.colony != null) {
-          numColonies++
+    synchronized(sector.lock) {
+      for (star in sector.get().stars) {
+        // If there's any fleets on it, it's not eligible.
+        if (star.fleets.isNotEmpty()) {
+          continue
         }
-      }
-      if (numColonies > 0) {
-        continue
-      }
 
-      // If it was emptied < 3 days ago, it's not eligible.
-      val timeEmptied = star.time_emptied
-      if (timeEmptied != null && System.currentTimeMillis() - timeEmptied < 3 * Time.DAY) {
-        continue
-      }
-
-      // If there's no planets with a population congeniality above 500, it's not eligible.
-      var numEligiblePlanets = 0
-      for (planet in star.planets) {
-        if (planet.population_congeniality > 500) {
-          numEligiblePlanets++
+        // If there's any colonies, it's also not eligible.
+        var numColonies = 0
+        for (planet in star.planets) {
+          if (planet.colony != null) {
+            numColonies++
+          }
         }
-      }
-      if (numEligiblePlanets == 0) {
-        continue
-      }
+        if (numColonies > 0) {
+          continue
+        }
 
-      // Looks like it's eligible, let's do it.
-      StarManager.i.addNativeColonies(star.id)
+        // If it was emptied < 3 days ago, it's not eligible.
+        val timeEmptied = star.time_emptied
+        if (timeEmptied != null && System.currentTimeMillis() - timeEmptied < 3 * Time.DAY) {
+          continue
+        }
+
+        // If there's no planets with a population congeniality above 500, it's not eligible.
+        var numEligiblePlanets = 0
+        for (planet in star.planets) {
+          if (planet.population_congeniality > 500) {
+            numEligiblePlanets++
+          }
+        }
+        if (numEligiblePlanets == 0) {
+          continue
+        }
+
+        // Looks like it's eligible, let's do it.
+        StarManager.i.addNativeColonies(star.id)
+      }
     }
   }
 
@@ -109,7 +111,6 @@ class SectorManager {
         for (star in sector.stars) {
           if (star.id != obj.get().id) {
             sectorStars.add(star)
-            break
           }
         }
         sectorStars.add(obj.get())
