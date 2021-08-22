@@ -41,7 +41,7 @@ class EmpireScreen : Screen() {
         val req = HttpRequest.Builder()
             .url(getUrl("/accounts/patreon-begin"))
             .authenticated()
-            .body(PatreonBeginRequest(empire_id = EmpireManager.getMyEmpire().id!!).encode())
+            .body(PatreonBeginRequest(empire_id = EmpireManager.getMyEmpire().id).encode())
             .method(HttpRequest.Method.POST)
             .build()
         if (req.responseCode != 200 || req.exception != null) {

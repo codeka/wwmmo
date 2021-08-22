@@ -11,6 +11,7 @@ import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.common.proto.*
@@ -155,7 +156,7 @@ class ShipsView(
         }
         if (buildRequest != null) {
           val verb = if (fleet == null) "Building" else "Upgrading"
-          row2.text = Html.fromHtml(String.format(Locale.ENGLISH,
+          row2.text = fromHtml(String.format(Locale.ENGLISH,
               "<font color=\"#0c6476\">%s:</font> %d %%, %s left", verb,
             (buildRequest.progress!! * 100.0f).roundToInt(),
               BuildHelper.formatTimeRemaining(buildRequest)))
@@ -174,13 +175,13 @@ class ShipsView(
           }
           progress.visibility = View.GONE
           if (upgrades.isEmpty()) {
-            row2.text = Html.fromHtml("Upgrades: <i>none</i>")
+            row2.text = fromHtml("Upgrades: <i>none</i>")
           } else {
             row2.text = String.format(Locale.US, "Upgrades: %s", upgrades)
           }
           val requiredHtml = DesignHelper.getDependenciesHtml(colony, design)
           row3.visibility = View.VISIBLE
-          row3.text = Html.fromHtml(requiredHtml)
+          row3.text = fromHtml(requiredHtml)
         }
         if (fleet?.notes != null) {
           notes.text = fleet.notes
@@ -206,7 +207,7 @@ class ShipsView(
         BuildViewHelper.setDesignIcon(design!!, icon)
         row1.text = FleetListHelper.getFleetName(null as Fleet?, design)
         val requiredHtml = DesignHelper.getDependenciesHtml(colony, design)
-        row2.text = Html.fromHtml(requiredHtml)
+        row2.text = fromHtml(requiredHtml)
         row3.visibility = View.GONE
       }
       return view
@@ -249,11 +250,11 @@ class ShipsView(
         // TODO: upgrade
         buildLayout.showBuildSheet(entry.design)
       } else {
-        buildLayout.showProgressSheet(null, entry.buildRequest!!)
+        buildLayout.showProgressSheet(entry.buildRequest!!)
       }
     }
-    onItemLongClickListener = OnItemLongClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-      val entry = shipListAdapter.getItem(position) as ItemEntry
+    onItemLongClickListener = OnItemLongClickListener { _: AdapterView<*>?, _: View?, _: Int, _: Long ->
+     // val entry = shipListAdapter.getItem(position) as ItemEntry
       true
     }
   }

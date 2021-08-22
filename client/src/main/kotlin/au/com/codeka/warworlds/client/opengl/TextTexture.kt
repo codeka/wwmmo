@@ -100,7 +100,7 @@ class TextTexture : Texture() {
   }
 
   init {
-    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444)
+    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     canvas = Canvas(bitmap)
     paint = Paint()
     paint.textSize = TEXT_HEIGHT.toFloat()

@@ -34,11 +34,9 @@ class TransparentWebView(context: Context, attrs: AttributeSet?) : WebView(conte
    * A helper that loads a template HTML (from your assets folder) and then replaces the string "%s"
    * in that template with the HTML you've supplied.
    */
-  fun loadHtml(templateFileName: String?, html: String?) {
-    var html = html
+  fun loadHtml(templateFileName: String, html: String) {
     val tmpl = getHtmlFile(context, templateFileName)
-    html = String.format(tmpl, html)
-    loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
+    loadDataWithBaseURL(null, String.format(tmpl, html), "text/html", "UTF-8", null)
   }
 
   private fun setTransparent() {
@@ -49,7 +47,7 @@ class TransparentWebView(context: Context, attrs: AttributeSet?) : WebView(conte
     // motdView.setLayerType(View.LAYER_TYPE_SOFTWARE, new Paint());
     try {
       val setLayerType = View::class.java.getMethod("setLayerType", Int::class.javaPrimitiveType, Paint::class.java)
-      setLayerType?.invoke(this, 1, Paint())
+      setLayerType.invoke(this, 1, Paint())
     } catch (e: Exception) {
       // ignore if the method isn't supported on this platform...
     }

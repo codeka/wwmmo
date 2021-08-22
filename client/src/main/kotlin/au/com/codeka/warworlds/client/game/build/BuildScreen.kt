@@ -33,8 +33,8 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
     currColony = extractColonies(star, planetIndex)
   }
 
-  override fun onCreate(context: ScreenContext, parent: ViewGroup) {
-    super.onCreate(context, parent)
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
+    super.onCreate(context, container)
     this.context = context
     layout = BuildLayout(context.activity, star, colonies, colonies.indexOf(currColony))
     layout.refreshColonyDetails(currColony)

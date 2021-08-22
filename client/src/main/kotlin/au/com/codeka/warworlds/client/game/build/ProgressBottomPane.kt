@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.common.proto.BuildRequest
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.BuildHelper
@@ -63,7 +64,7 @@ class ProgressBottomPane(
       miningEfficiency.progress = (buildRequest.minerals_efficiency!! * 100).roundToInt()
     }
     val verb = "Building" // (buildRequest.build_request_id == null ? "Building" : "Upgrading");
-    timeRemaining.text = Html.fromHtml(String.format(Locale.ENGLISH,
+    timeRemaining.text = fromHtml(String.format(Locale.ENGLISH,
         "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
         verb, progress,
         BuildHelper.formatTimeRemaining(buildRequest)))
@@ -77,7 +78,7 @@ class ProgressBottomPane(
     buildProgress = findViewById(R.id.build_progress)
     populationEfficiency = findViewById(R.id.population_efficiency)
     miningEfficiency = findViewById(R.id.mining_efficiency)
-    findViewById<View>(R.id.cancel).setOnClickListener { view: View? -> callback.onCancelBuild() }
+    findViewById<View>(R.id.cancel).setOnClickListener { callback.onCancelBuild() }
     val design = DesignHelper.getDesign(buildRequest.design_type)
     BuildViewHelper.setDesignIcon(design, buildIcon)
     buildName.text = DesignHelper.getDesignName(design, false)

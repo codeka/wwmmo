@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.ctrl
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.text.Html
 import android.util.AttributeSet
 import android.view.View
@@ -62,7 +63,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
 
   private fun appendMessage(msg: ChatMessage) {
     val tv = TextView(context)
-    tv.text = Html.fromHtml(ChatHelper.format(msg, true, false, autoTranslate))
+    tv.text = fromHtml(ChatHelper.format(msg, isPublic = true, messageOnly = false, autoTranslate))
     tv.tag = msg
     while (msgsContainer.childCount >= MAX_ROWS) {
       msgsContainer.removeViewAt(0)
@@ -92,7 +93,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
     //  numUnread += conversation.getUnreadCount();
     //}
     private val totalUnreadCount: Int
-      private get() =//for (ChatConversation conversation : ChatManager.i.getConversations()) {
+      get() =//for (ChatConversation conversation : ChatManager.i.getConversations()) {
       //  numUnread += conversation.getUnreadCount();
           //}
         0
@@ -107,11 +108,11 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
       setBackgroundColor(Color.argb(0xaa, 0, 0, 0))
       //mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
       refreshUnreadCountButton()
-      msgsContainer.setOnClickListener { v: View? ->
+      msgsContainer.setOnClickListener {
         callback.showChat(null /* conversationId */)
       }
       msgsContainer.isClickable = true
-      unreadMsgCount.setOnClickListener { v: View? ->
+      unreadMsgCount.setOnClickListener {
         // move to the first conversation with an unread message
 //      List<ChatConversation> conversations = ChatManager.i.getConversations();
 //      for (int i = 0; i < conversations.size(); i++) {
@@ -132,15 +133,16 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
       for (i in 0 until msgsContainer.childCount) {
         val tv = msgsContainer.getChildAt(i) as TextView
         val msg = tv.tag as ChatMessage
-        if (msg?.empire_id != null && msg.empire_id == empire.id) {
-          tv.text = Html.fromHtml(ChatHelper.format(msg, true, false, autoTranslate))
+        if (msg.empire_id != null && msg.empire_id == empire.id) {
+          tv.text =
+              fromHtml(ChatHelper.format(msg, isPublic = true, messageOnly = false, autoTranslate))
         }
       }
       scrollToBottom()
     }
 
     @EventHandler
-    fun onMessagesUpdatedEvent(event: ChatMessagesUpdatedEvent?) {
+    fun onMessagesUpdatedEvent(@Suppress("unused_parameter") event: ChatMessagesUpdatedEvent?) {
       refreshMessages()
     }
   }

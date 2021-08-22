@@ -118,7 +118,7 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
     } else {
       renameButton.visibility = View.GONE
     }
-    scoutReportButton.isEnabled = star.scout_reports.size > 0
+    scoutReportButton.isEnabled = star.scout_reports.isNotEmpty()
     starName.text = star.name
     starKind.text = String.format(Locale.ENGLISH, "%s %s", star.classification,
         StarHelper.getCoordinateString(star))
@@ -137,7 +137,7 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
     }
 
     @EventHandler
-    fun onEmpireUpdated(empire: Empire?) {
+    fun onEmpireUpdated(@Suppress("unused_parameter") empire: Empire?) {
       refresh()
     }
   }

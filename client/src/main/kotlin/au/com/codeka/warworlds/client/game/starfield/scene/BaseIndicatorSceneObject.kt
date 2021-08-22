@@ -21,7 +21,7 @@ import java.nio.ShortBuffer
 open class BaseIndicatorSceneObject(
     dimensionResolver: DimensionResolver, debugName: String, colour: Colour, lineThickness: Float)
     : SceneObject(dimensionResolver, debugName) {
-  private val shader: IndicatorShader
+  private val shader: IndicatorShader = IndicatorShader(colour, lineThickness)
   private val positionBuffer: FloatBuffer
   private val texCoordBuffer: FloatBuffer
   private val indexBuffer: ShortBuffer
@@ -40,7 +40,11 @@ open class BaseIndicatorSceneObject(
 
   /** [Shader] for the indicator entity.  */
   private class IndicatorShader(colour: Colour, private val lineThickness: Float) : Shader() {
-    private val color: FloatArray
+    private val color: FloatArray = floatArrayOf(
+        colour.r.toFloat(),
+        colour.g.toFloat(),
+        colour.b.toFloat()
+    )
     var posHandle = 0
       private set
     var texCoordHandle = 0
@@ -49,7 +53,7 @@ open class BaseIndicatorSceneObject(
     private var lineThicknessHandle = 0
 
     override val vertexShaderCode: String
-      protected get() = TextUtils.join("\n", arrayOf(
+      get() = TextUtils.join("\n", arrayOf(
           "uniform mat4 uMvpMatrix;",
           "attribute vec4 aPosition;",
           "attribute vec2 aTexCoord;",
@@ -60,7 +64,7 @@ open class BaseIndicatorSceneObject(
           "}"))
 
     override val fragmentShaderCode: String
-      protected get() = TextUtils.join("\n", arrayOf(
+      get() = TextUtils.join("\n", arrayOf(
           "precision mediump float;",
           "varying vec2 vTexCoord;",
           "uniform vec3 uColour;",
@@ -96,17 +100,9 @@ open class BaseIndicatorSceneObject(
       GLES20.glDisableVertexAttribArray(texCoordHandle)
     }
 
-    init {
-      color = floatArrayOf(
-          colour.r.toFloat(),
-          colour.g.toFloat(),
-          colour.b.toFloat()
-      )
-    }
   }
 
   companion object {
-    private val log = Log("BISO")
     private val SQUARE_COORDS = floatArrayOf(
         -0.5f, 0.5f, 0.0f,  // top left
         -0.5f, -0.5f, 0.0f,  // bottom left
@@ -116,7 +112,6 @@ open class BaseIndicatorSceneObject(
   }
 
   init {
-    shader = IndicatorShader(colour, lineThickness)
 
     // initialize vertex byte buffer for shape coordinates
     // (# of coordinate values * 4 bytes per float)

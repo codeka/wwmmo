@@ -11,6 +11,7 @@ import android.widget.AdapterView.OnItemClickListener
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.concurrency.Threads.Companion.checkOnThread
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.BuildHelper
 import au.com.codeka.warworlds.common.sim.DesignHelper
@@ -202,7 +203,7 @@ class BuildingsView(
         row1.text = design.display_name
         if (buildRequest != null) {
           val verb = if (building == null) "Building" else "Upgrading"
-          row2.text = Html.fromHtml(String.format(Locale.ENGLISH,
+          row2.text = fromHtml(String.format(Locale.ENGLISH,
               "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
               verb, (buildRequest.progress!! * 100.0f).roundToInt(),
               BuildHelper.formatTimeRemaining(buildRequest)))
@@ -217,7 +218,7 @@ class BuildingsView(
           } else {
             progress.visibility = View.GONE
             val requiredHtml = DesignHelper.getDependenciesHtml(colony, design, building.level + 1)
-            row2.text = Html.fromHtml(requiredHtml)
+            row2.text = fromHtml(requiredHtml)
             row3.visibility = View.GONE
           }
         }
@@ -245,7 +246,7 @@ class BuildingsView(
         BuildViewHelper.setDesignIcon(design!!, icon)
         row1.text = design.display_name
         val requiredHtml = DesignHelper.getDependenciesHtml(colony, design)
-        row2.text = Html.fromHtml(requiredHtml)
+        row2.text = fromHtml(requiredHtml)
         row3.visibility = View.GONE
       }
       return view
@@ -271,7 +272,7 @@ class BuildingsView(
         buildLayout.showUpgradeSheet(entry.building)
       } else {
         // entry.buildRequest should not be null here.
-        buildLayout.showProgressSheet(null, entry.buildRequest!!)
+        buildLayout.showProgressSheet(entry.buildRequest!!)
       }
     }
   }

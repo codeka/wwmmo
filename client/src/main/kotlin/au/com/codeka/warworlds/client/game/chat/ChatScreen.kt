@@ -131,7 +131,7 @@ class ChatScreen : Screen() {
   companion object {
     private fun isEnglish(str: String): Boolean {
       for (element in str) {
-        if (element.toInt() > 0x80) {
+        if (element.code > 0x80) {
           return false
         }
       }

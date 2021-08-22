@@ -6,15 +6,16 @@ import com.squareup.wire.ProtoAdapter
 import java.io.IOException
 
 /** Helper for serializing and deserializing protobuf messages in a generic fashion.  */
-internal class ProtobufSerializer<M : Message<*, *>?>(cls: Class<M>) {
-  private var protoAdapter: ProtoAdapter<M>? = null
+internal class ProtobufSerializer<M : Message<*, *>>(cls: Class<M>) {
+  private var protoAdapter: ProtoAdapter<M> = createAdapter(cls)
+
   fun serialize(value: M): ByteArray {
-    return value!!.encode()
+    return value.encode()
   }
 
-  fun deserialize(value: ByteArray?): M {
+  fun deserialize(value: ByteArray): M {
     return try {
-      protoAdapter!!.decode(value!!)
+      protoAdapter.decode(value)
     } catch (e: IOException) {
       log.error("Exception deserializing protobuf.", e)
       throw RuntimeException(e)
@@ -23,14 +24,11 @@ internal class ProtobufSerializer<M : Message<*, *>?>(cls: Class<M>) {
 
   companion object {
     private val log = Log("ProtobufSerializer")
-  }
 
-  init {
-    protoAdapter = try {
+    @Suppress("unchecked_cast")
+    fun <M : Message<*, *>?> createAdapter(cls: Class<M>): ProtoAdapter<M> {
       val f = cls.getField("ADAPTER")
-      f[null] as ProtoAdapter<M>
-    } catch (e: Exception) {
-      throw RuntimeException("Unexpected exception getting ADAPTER: " + e.message)
+      return f.get(null) as ProtoAdapter<M>
     }
   }
 }

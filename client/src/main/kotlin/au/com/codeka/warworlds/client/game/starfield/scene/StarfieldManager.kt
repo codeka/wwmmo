@@ -22,6 +22,7 @@ import au.com.codeka.warworlds.common.proto.Design.DesignType
 import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.StarHelper
 import java.util.*
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 /**
@@ -357,13 +358,19 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     // We'll wait at least one second before attempting to update the sector bounds again.
     App.taskRunner.runTask({
       sectorsUpdating = false
-      if (pendingSectorBottom != null) {
-        val left = pendingSectorLeft!! ; pendingSectorLeft = null
-        val top = pendingSectorTop!! ; pendingSectorTop = null
-        val right = pendingSectorRight!! ; pendingSectorRight = null
-        val bottom = pendingSectorBottom!! ; pendingSectorBottom = null
-        val removeAllSectors = pendingRemoveAllSectors!! ; pendingRemoveAllSectors = null
-        updateSectorBounds(left, top, right, bottom, removeAllSectors)
+      val pendingLeft = pendingSectorLeft
+      val pendingTop = pendingSectorTop
+      val pendingRight = pendingSectorRight
+      val pendingBottom = pendingSectorBottom
+      val pendingRemoveAll = pendingRemoveAllSectors
+      if (pendingLeft != null && pendingTop != null && pendingRight != null &&
+          pendingBottom != null && pendingRemoveAll != null) {
+        pendingSectorLeft = null
+        pendingSectorTop = null
+        pendingSectorRight = null
+        pendingSectorBottom = null
+        pendingRemoveAllSectors = null
+        updateSectorBounds(pendingLeft, pendingTop, pendingRight, pendingBottom, pendingRemoveAll)
       }
     }, Threads.UI, 1000)
   }
@@ -540,7 +547,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
           iconInfo = EmpireIconInfo(empire)
-          empires[empire.id!!] = iconInfo
+          empires[empire.id] = iconInfo
         }
         iconInfo.numColonies += 1
       }
@@ -555,12 +562,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
           iconInfo = EmpireIconInfo(empire)
-          empires[empire.id!!] = iconInfo
+          empires[empire.id] = iconInfo
         }
         if (fleet.design_type == DesignType.FIGHTER) {
-          iconInfo.numFighterShips += Math.ceil(fleet.num_ships.toDouble()).toInt()
+          iconInfo.numFighterShips += ceil(fleet.num_ships.toDouble()).toInt()
         } else {
-          iconInfo.numNonFighterShips += Math.ceil(fleet.num_ships.toDouble()).toInt()
+          iconInfo.numNonFighterShips += ceil(fleet.num_ships.toDouble()).toInt()
         }
       }
     }
@@ -573,7 +580,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       val sprite = scene.createSprite(SpriteTemplate.Builder()
           .shader(scene.spriteShader)
           .texture(scene.textureManager.loadTextureUrl(
-              ImageHelper.getEmpireImageUrlExactDimens(context, iconInfo.empire, 64, 64)))
+              ImageHelper.getEmpireImageUrlExactDimens(iconInfo.empire, 64, 64)))
           .build(), "Empire:$empireId")
       sprite.translate(pt.x.toFloat() + 10.0f, pt.y.toFloat())
       sprite.setSize(20.0f, 20.0f)
@@ -681,11 +688,11 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private fun detachNonMovingFleet(fleet: Fleet, sceneObject: SceneObject) {
     // If you had it selected, we'll need to un-select it.
     if (selectedFleet != null && selectedFleet!!.id == fleet.id) {
-      App.taskRunner.runTask(Runnable { setSelectedFleet(null, null) }, Threads.UI)
+      App.taskRunner.runTask({ setSelectedFleet(null, null) }, Threads.UI)
     }
 
     val soi: SceneObjectInfo = sceneObject.tag as SceneObjectInfo
-    val coord = Pair<Long, Long>(soi.star.sector_x, soi.star.sector_y)
+    val coord = Pair(soi.star.sector_x, soi.star.sector_y)
 
     synchronized(scene.lock) {
       removeSectorSceneObject(coord, sceneObject)

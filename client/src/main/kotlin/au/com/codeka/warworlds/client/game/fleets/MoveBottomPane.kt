@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager
 import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager.TapListener
 import au.com.codeka.warworlds.client.game.world.StarManager
@@ -39,8 +40,8 @@ class MoveBottomPane(
 
   init {
     View.inflate(context, R.layout.ctrl_fleet_move_bottom_pane, this)
-    findViewById<View>(R.id.move_btn).setOnClickListener { view: View -> onMoveClick() }
-    findViewById<View>(R.id.cancel_btn).setOnClickListener { view: View -> onCancelClick() }
+    findViewById<View>(R.id.move_btn).setOnClickListener { onMoveClick() }
+    findViewById<View>(R.id.cancel_btn).setOnClickListener { onCancelClick() }
   }
 
   fun setFleet(star: Star, fleetId: Long) {
@@ -90,13 +91,13 @@ class MoveBottomPane(
       val distanceInParsecs = StarHelper.distanceBetween(star, destStar!!)
       val leftDetails = String.format(Locale.ENGLISH, "<b>Star:</b> %s<br /><b>Distance:</b> %.2f pc",
           destStar!!.name, distanceInParsecs)
-      (findViewById<View>(R.id.star_details_left) as TextView).text = Html.fromHtml(leftDetails)
+      (findViewById<View>(R.id.star_details_left) as TextView).text = fromHtml(leftDetails)
       val design = DesignHelper.getDesign(fleet.design_type)
       val timeInHours = distanceInParsecs / design.speed_px_per_hour!!
       val hrs = floor(timeInHours).toInt()
       val mins = floor((timeInHours - hrs) * 60.0f).toInt()
       val estimatedFuel = design.fuel_cost_per_px!! * distanceInParsecs * fleet.num_ships
-      val actualFuel: Double = if (fleet.fuel_amount == null) 0.0 else fleet.fuel_amount!!.toDouble()
+      val actualFuel: Double = fleet.fuel_amount.toDouble()
       val fuel = String.format(Locale.US, "%.1f / %.1f", estimatedFuel, actualFuel)
       var fontOpen = ""
       var fontClose = ""
@@ -108,13 +109,13 @@ class MoveBottomPane(
           Locale.ENGLISH,
           "<b>ETA:</b> %d hrs, %d mins<br />%s<b>Energy:</b> %s%s",
           hrs, mins, fontOpen, fuel, fontClose)
-      (findViewById<View>(R.id.star_details_right) as TextView).text = Html.fromHtml(rightDetails)
+      (findViewById<View>(R.id.star_details_right) as TextView).text = fromHtml(rightDetails)
     }
     val starSceneObject = starfieldManager.getStarSceneObject(star.id) ?: return
     val fmi = starfieldManager.createFleetSprite(fleet)
 
     fleetMoveIndicator = fmi
-    fmi.setDrawRunnable({
+    fmi.setDrawRunnable {
       if (destStar != null) {
         fleetMoveIndicatorFraction += 0.032f // TODO: pass in dt here?
         while (fleetMoveIndicatorFraction > 1.0f) {
@@ -128,7 +129,7 @@ class MoveBottomPane(
         dir.scale(fleetMoveIndicatorFraction.toDouble())
         fmi.setTranslation(0.0f, dir.length().toFloat())
       }
-    })
+    }
     starSceneObject.addChild(fmi)
   }
 

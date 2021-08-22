@@ -7,6 +7,7 @@ import android.text.SpannableStringBuilder
 import android.view.View
 import android.widget.*
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper.setDesignIcon
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper.getFleetDestination
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper.getFleetName
@@ -56,7 +57,7 @@ class FleetSelectedBottomPane(
       val msg = String.format(Locale.ENGLISH, "<b>ETA</b>: %.1f pc in %s",
           distanceInParsecs * fractionRemaining,
           TimeFormatter.create().format(eta - System.currentTimeMillis()))
-      progressText.text = Html.fromHtml(msg)
+      progressText.text = fromHtml(msg)
     }
     handler.postDelayed({ refreshFleet() }, REFRESH_DELAY_MS)
   }

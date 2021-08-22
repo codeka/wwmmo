@@ -116,7 +116,7 @@ class Server {
     log.info("Fetching firebase instance ID...")
     App.taskRunner.runTask(FirebaseMessaging.getInstance().token)
         .then(object : RunnableTask.RunnableP<String> {
-          override fun run(token: String) {
+          override fun run(param: String) {
             // Make sure we have the GoogleSignInAccount (if you've signed in) before sending it
             // to the server.
             val googleAccount = App.auth.futureAccount().get()
@@ -127,7 +127,7 @@ class Server {
                 .method(HttpRequest.Method.POST)
                 .body(LoginRequest(
                     cookie = cookie,
-                    device_info = populateDeviceInfo(token),
+                    device_info = populateDeviceInfo(param),
                     id_token = googleAccount?.idToken)
                   .encode())
                 .build()
@@ -175,7 +175,7 @@ class Server {
       queuedPackets = null
       send(Packet(
           hello = HelloPacket(
-              empire_id = loginResponse.empire!!.id!!,
+              empire_id = loginResponse.empire!!.id,
               our_star_last_simulation = StarManager.lastSimulationOfOurStar,
               last_chat_time = ChatManager.i.lastChatTime)))
       EmpireManager.onHello(loginResponse.empire!!)

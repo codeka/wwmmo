@@ -36,7 +36,7 @@ class StoreView(context: Context?, attributeSet: AttributeSet?)
     val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     var storage: EmpireStorage? = null
     for (s in star.empire_stores) {
-      if (s.empire_id != null && s.empire_id == myEmpire.id) {
+      if (s.empire_id == myEmpire.id) {
         storage = s
         break
       }
@@ -47,15 +47,15 @@ class StoreView(context: Context?, attributeSet: AttributeSet?)
     } else {
       log.debug("storage is not null")
       visibility = View.VISIBLE
-      storedGoods.text = NumberFormatter.format((storage.total_goods!!).roundToInt())
+      storedGoods.text = NumberFormatter.format((storage.total_goods).roundToInt())
       totalGoods.text = String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format((storage.max_goods!!).roundToInt()))
-      storedMinerals.text = NumberFormatter.format((storage.total_minerals!!).roundToInt())
+          NumberFormatter.format((storage.max_goods).roundToInt()))
+      storedMinerals.text = NumberFormatter.format((storage.total_minerals).roundToInt())
       totalMinerals.text = String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format((storage.max_minerals!!).roundToInt()))
-      storedEnergy.text = NumberFormatter.format((storage.total_energy!!).roundToInt())
+          NumberFormatter.format((storage.max_minerals).roundToInt()))
+      storedEnergy.text = NumberFormatter.format((storage.total_energy).roundToInt())
       totalEnergy.text = String.format(Locale.ENGLISH, "/ %s",
-          NumberFormatter.format((storage.max_energy!!).roundToInt()))
+          NumberFormatter.format((storage.max_energy).roundToInt()))
       if (get(storage.goods_delta_per_hour, 0.0f) >= 0) {
         deltaGoods.setTextColor(Color.GREEN)
         deltaGoods.text = String.format(Locale.ENGLISH, "+%d/hr",
@@ -69,7 +69,7 @@ class StoreView(context: Context?, attributeSet: AttributeSet?)
         deltaMinerals.setTextColor(Color.GREEN)
         deltaMinerals.text = String.format(Locale.ENGLISH, "+%d/hr",
           StarHelper.getDeltaMineralsPerHour(
-            star, myEmpire.id!!, System.currentTimeMillis()).roundToInt()
+            star, myEmpire.id, System.currentTimeMillis()).roundToInt()
         )
       } else {
         deltaMinerals.setTextColor(Color.RED)

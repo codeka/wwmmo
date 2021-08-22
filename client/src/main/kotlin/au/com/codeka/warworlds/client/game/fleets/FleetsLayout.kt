@@ -117,7 +117,9 @@ class FleetsLayout(context: Context?, starCollection: StarCollection?) : Relativ
       // if it's just one star, just expand it now.
       listView.expandGroup(0)
     }
-    listView.setOnChildClickListener { lv: ExpandableListView?, v: View?, groupPosition: Int, childPosition: Int, id: Long ->
+    listView.setOnChildClickListener {
+      _: ExpandableListView?, _: View?, groupPosition: Int, childPosition: Int, _: Long ->
+
       adapter.onItemClick(groupPosition, childPosition)
       false
     }

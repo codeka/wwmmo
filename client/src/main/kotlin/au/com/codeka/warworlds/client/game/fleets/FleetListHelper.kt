@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper.setDesignIcon
 import au.com.codeka.warworlds.client.game.world.ImageHelper
 import au.com.codeka.warworlds.client.game.world.StarManager
@@ -44,7 +45,7 @@ object FleetListHelper {
     val fuelLevelText = row.findViewById<TextView>(R.id.fuel_level_text)
     val fuelLevel = row.findViewById<ProgressBar>(R.id.fuel_level)
     if (fuelLevel != null && fuelLevelText != null && fuelLevelIcon != null) {
-      if (fleet.fuel_amount!! >= design.fuel_size!! * fleet.num_ships) {
+      if (fleet.fuel_amount >= design.fuel_size!! * fleet.num_ships) {
         fuelLevel.visibility = View.GONE
         fuelLevelText.visibility = View.GONE
         fuelLevelIcon.visibility = View.GONE
@@ -52,7 +53,7 @@ object FleetListHelper {
         fuelLevel.visibility = View.VISIBLE
         fuelLevelText.visibility = View.VISIBLE
         fuelLevelIcon.visibility = View.VISIBLE
-        val fuelPercent = 100 * fleet.fuel_amount!! / (design.fuel_size!! * fleet.num_ships)
+        val fuelPercent = 100 * fleet.fuel_amount / (design.fuel_size!! * fleet.num_ships)
         fuelLevel.progress = fuelPercent.roundToInt()
         fuelLevelText.text = String.format(
             Locale.ENGLISH, "%.0f / %.0f", fleet.fuel_amount,
@@ -148,9 +149,9 @@ object FleetListHelper {
     }
     if (includeEta) {
       val text = String.format("%s <b>ETA:</b> %s", name, eta)
-      ssb.append(Html.fromHtml(text))
+      ssb.append(fromHtml(text))
     } else {
-      ssb.append(Html.fromHtml(name))
+      ssb.append(fromHtml(name))
     }
     return ssb
   }

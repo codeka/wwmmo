@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.concurrency.Threads
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper
 import au.com.codeka.warworlds.client.game.world.ImageHelper
 import au.com.codeka.warworlds.client.game.world.StarManager
@@ -143,7 +144,7 @@ class SitReportAdapter(private val layoutInflater: LayoutInflater)
         buildCompleteReport != null -> {
           design = DesignHelper.getDesign(buildCompleteReport.design_type)
           reportTitleView.text =
-              Html.fromHtml(res.getString(R.string.build_complete, star?.name ?: "..."))
+              fromHtml(res.getString(R.string.build_complete, star?.name ?: "..."))
 
           if (design.design_kind == Design.DesignKind.SHIP) {
             // TODO: handle was_destroyed when we have it.
@@ -159,7 +160,7 @@ class SitReportAdapter(private val layoutInflater: LayoutInflater)
         moveCompleteReport != null -> {
           design = DesignHelper.getDesign(moveCompleteReport.design_type)
           reportTitleView.text =
-              Html.fromHtml(res.getString(R.string.fleet_move_complete, star?.name ?: "..."))
+              fromHtml(res.getString(R.string.fleet_move_complete, star?.name ?: "..."))
 
           val resId =
             if (design.design_kind == Design.DesignKind.SHIP && moveCompleteReport.was_destroyed) {
@@ -173,7 +174,7 @@ class SitReportAdapter(private val layoutInflater: LayoutInflater)
         else -> {
           design = null
           reportTitleView.text =
-              Html.fromHtml(res.getString(R.string.attack_on_star, star?.name ?: "..."))
+              fromHtml(res.getString(R.string.attack_on_star, star?.name ?: "..."))
         }
       }
       if (design != null) {

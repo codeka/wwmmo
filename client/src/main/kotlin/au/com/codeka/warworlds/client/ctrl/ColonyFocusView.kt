@@ -8,12 +8,13 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.common.proto.Colony
-import au.com.codeka.warworlds.common.proto.Star
 import com.squareup.wire.get
 import java.util.*
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 class ColonyFocusView(context: Context?, attrs: AttributeSet?) : FrameLayout(context!!, attrs) {
-  fun refresh(star: Star?, colony: Colony) {
+  fun refresh(colony: Colony) {
     var defence = (0.25 * colony.population * get(colony.defence_bonus, 1.0f)).toInt()
     if (defence < 1) {
       defence = 1
@@ -39,17 +40,19 @@ class ColonyFocusView(context: Context?, attrs: AttributeSet?) : FrameLayout(con
     val farmingValue = findViewById<View>(R.id.solarsystem_colony_farming_value) as TextView
     farmingValue.text = String.format(Locale.US, "%s%d / hr",
         if (get(colony.delta_goods, 0.0f) < 0) "-" else "+",
-        Math.abs(Math.round(get(colony.delta_goods, 0.0f))))
+        abs(get(colony.delta_goods, 0.0f).roundToInt())
+    )
     val miningFocus = findViewById<View>(R.id.solarsystem_colony_mining_focus) as ProgressBar
     miningFocus.progress = (100.0f * colony.focus.mining).toInt()
     val miningValue = findViewById<View>(R.id.solarsystem_colony_mining_value) as TextView
     miningValue.text = String.format(Locale.US, "%s%d / hr",
         if (get(colony.delta_minerals, 0.0f) < 0) "-" else "+",
-        Math.abs(Math.round(get(colony.delta_minerals, 0.0f))))
+        abs(get(colony.delta_minerals, 0.0f).roundToInt())
+    )
     val constructionFocus = findViewById<View>(R.id.solarsystem_colony_construction_focus) as ProgressBar
     constructionFocus.progress = (100.0f * colony.focus.construction).toInt()
     val constructionValue = findViewById<View>(R.id.solarsystem_colony_construction_value) as TextView
-    val numBuildRequests = if (colony.build_requests == null) 0 else colony.build_requests.size
+    val numBuildRequests = colony.build_requests.size
     if (numBuildRequests == 0) {
       constructionValue.text = context.getString(R.string.idle)
     } else {

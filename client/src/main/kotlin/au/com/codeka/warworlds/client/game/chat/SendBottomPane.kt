@@ -30,7 +30,7 @@ class SendBottomPane(context: Context?, private val callback: Callback) : Relati
   init {
     View.inflate(context, R.layout.chat_send_bottom_pane, this)
     message = findViewById(R.id.message)
-    findViewById<View>(R.id.send_btn).setOnClickListener { v: View -> onSendClick() }
+    findViewById<View>(R.id.send_btn).setOnClickListener { onSendClick() }
 
     //   message.setOnEditorActionListener((v, actionId, event) -> {
     //     if (actionId == EditorInfo.IME_NULL) {

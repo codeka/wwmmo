@@ -8,6 +8,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.common.proto.Building
 import au.com.codeka.warworlds.common.proto.Colony
 import au.com.codeka.warworlds.common.proto.Design
@@ -48,7 +49,7 @@ class UpgradeBottomPane(
     currentLevel.text = String.format(Locale.US, "%d", building.level)
     BuildViewHelper.setDesignIcon(design, buildIcon)
     buildName.text = design.display_name
-    buildDescription.text = Html.fromHtml(design.description)
+    buildDescription.text = fromHtml(design.description)
     updateBuildTime()
   }
 

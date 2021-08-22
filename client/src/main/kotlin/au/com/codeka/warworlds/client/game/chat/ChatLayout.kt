@@ -90,6 +90,7 @@ class ChatLayout(context: Context, private val callbacks: Callbacks) : RelativeL
 
   init {
     View.inflate(context, R.layout.chat, this)
+    @Suppress("DEPRECATION") // We need to support API level 21
     setBackgroundColor(context.resources.getColor(R.color.default_background))
     adapter = ChatPagerAdapter()
     viewPager = findViewById(R.id.pager)

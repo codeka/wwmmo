@@ -95,7 +95,7 @@ class BuildLayout(
    * Show the "progress" sheet for a currently-in progress fleet build. The fleet will be non-null
    * if we're upgrading.
    */
-  fun showProgressSheet(fleet: Fleet?, buildRequest: BuildRequest) {
+  fun showProgressSheet(buildRequest: BuildRequest) {
     bottomPaneContentView = ProgressBottomPane(context, buildRequest, object : ProgressBottomPane.Callback {
       override fun onCancelBuild() {
         // "Cancel" has been clicked.

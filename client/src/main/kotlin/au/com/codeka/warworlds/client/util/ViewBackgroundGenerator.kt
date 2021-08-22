@@ -75,10 +75,12 @@ object ViewBackgroundGenerator {
    * @param seed A seed that we use to generate the image. You can use this to ensure the same
    * image gets generated for the same seed.
    */
+  @Suppress("deprecation") // We need to work on API level 21.
   fun setBackground(view: View, onDrawHandler: OnDrawHandler?, seed: Long) {
     Preconditions.checkState(Threads.UI.isCurrentThread)
     if (bitmap == null || renderer == null) {
       val wm = view.context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+
       val display = wm.defaultDisplay
       val metrics = DisplayMetrics()
       display.getMetrics(metrics)
@@ -93,17 +95,7 @@ object ViewBackgroundGenerator {
       renderer!!.render(bitmap, seed)
       lastSeed = seed
     }
-    setBackground(view, BackgroundDrawable(bitmap, onDrawHandler))
-  }
-
-  @SuppressLint("NewApi")
-  private fun setBackground(view: View, drawable: BackgroundDrawable) {
-    val sdk = Build.VERSION.SDK_INT
-    if (sdk < Build.VERSION_CODES.JELLY_BEAN) {
-      view.setBackgroundDrawable(drawable)
-    } else {
-      view.background = drawable
-    }
+    view.background = BackgroundDrawable(bitmap, onDrawHandler)
   }
 
   interface OnDrawHandler {
@@ -178,12 +170,12 @@ object ViewBackgroundGenerator {
       }
       val gasSize = gasBitmap!!.width / 4
       for (i in 0..9) {
-        var x = r.nextInt(4) * gasSize
-        var y = r.nextInt(4) * gasSize
-        src = Rect(x, y, x + gasSize, y + gasSize)
-        x = r.nextInt(canvas.width) - src.width()
-        y = r.nextInt(canvas.height) - src.height()
-        dest = Rect(x, y, x + src.width() * 2, y + src.height() * 2)
+        var dx = r.nextInt(4) * gasSize
+        var dy = r.nextInt(4) * gasSize
+        src = Rect(dx, dy, dx + gasSize, dy + gasSize)
+        dx = r.nextInt(canvas.width) - src.width()
+        dy = r.nextInt(canvas.height) - src.height()
+        dest = Rect(dx, dy, dx + src.width() * 2, dy + src.height() * 2)
         canvas.drawBitmap(gasBitmap!!, src, dest, backgroundPaint)
       }
     }

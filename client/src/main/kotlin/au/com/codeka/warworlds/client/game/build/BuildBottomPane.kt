@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.SeekBar.OnSeekBarChangeListener
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Colony
 import au.com.codeka.warworlds.common.proto.ColonyFocus
@@ -64,12 +65,12 @@ class BuildBottomPane (
       override fun onStopTrackingTouch(seekBar: SeekBar) {}
     }
     buildCountSeek.setOnSeekBarChangeListener(buildCountSeekBarChangeListener)
-    findViewById<View>(R.id.build_button).setOnClickListener { v: View? -> build() }
+    findViewById<View>(R.id.build_button).setOnClickListener { build() }
     buildCount.setText("1")
     buildCountSeek.progress = 1
     BuildViewHelper.setDesignIcon(design, buildIcon)
     buildName.text = design.display_name
-    buildDescription.text = Html.fromHtml(design.description)
+    buildDescription.text = fromHtml(design.description)
     if (design.design_kind == Design.DesignKind.SHIP) {
       // You can only build more than ship at a time (not buildings).
       buildCountContainer.visibility = View.VISIBLE

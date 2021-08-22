@@ -103,6 +103,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    @Suppress("DEPRECATION")
     super.onActivityResult(requestCode, resultCode, data)
 
     if (requestCode == SIGN_IN_COMPLETE_RESULT_CODE) {

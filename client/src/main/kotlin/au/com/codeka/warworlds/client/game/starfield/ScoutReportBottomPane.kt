@@ -37,7 +37,7 @@ class ScoutReportBottomPane(
     starKind = findViewById(R.id.star_kind)
     starIcon = findViewById(R.id.star_icon)
     reportDate = findViewById(R.id.report_date)
-    findViewById<View>(R.id.back_btn).setOnClickListener { v: View? -> callback.onBackClicked() }
+    findViewById<View>(R.id.back_btn).setOnClickListener { callback.onBackClicked() }
     if (!isInEditMode) {
       refresh()
     }

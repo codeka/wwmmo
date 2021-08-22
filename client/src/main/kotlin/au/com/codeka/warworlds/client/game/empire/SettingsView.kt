@@ -21,7 +21,7 @@ class SettingsView(context: Context?, private val callback: Callback) : ScrollVi
   init {
     View.inflate(context, R.layout.empire_settings, this)
     val patreonBtn = findViewById<Button>(R.id.patreon_btn)
-    patreonBtn.setOnClickListener { v: View? ->
+    patreonBtn.setOnClickListener {
       patreonBtn.isEnabled = false
       callback.onPatreonConnectClick(
         object : PatreonConnectCompleteCallback {

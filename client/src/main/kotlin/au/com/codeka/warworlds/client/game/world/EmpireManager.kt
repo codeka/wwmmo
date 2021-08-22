@@ -64,7 +64,7 @@ object EmpireManager {
 
   /** Called by the server when we get the 'hello', and lets us know the empire.  */
   fun onHello(empire: Empire) {
-    empires.put(empire.id!!, empire)
+    empires.put(empire.id, empire)
     myEmpire = empire
     App.eventBus.publish(empire)
   }

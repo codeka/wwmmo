@@ -20,12 +20,15 @@ class StarSearchLayout(context: Context, callback: Callback) : RelativeLayout(co
 
   init {
     View.inflate(context, R.layout.starsearch, this)
+    @Suppress("deprecation") // We need to support API level 21.
     setBackgroundColor(context.resources.getColor(R.color.default_background))
     val lv = findViewById<ListView>(R.id.search_result)
     adapter = StarSearchListAdapter(LayoutInflater.from(context))
     lv.adapter = adapter
     adapter.setCursor(StarManager.myStars)
-    lv.onItemClickListener = OnItemClickListener { adapterView: AdapterView<*>?, view: View?, position: Int, l: Long ->
+    lv.onItemClickListener = OnItemClickListener {
+      _: AdapterView<*>?, _: View?, position: Int, _: Long ->
+
       val star = adapter.getStar(position)
       callback.onStarClick(star)
     }

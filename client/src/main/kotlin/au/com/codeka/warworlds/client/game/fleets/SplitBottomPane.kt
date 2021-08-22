@@ -46,8 +46,8 @@ class SplitBottomPane(
     splitLeft = findViewById(R.id.split_left)
     splitRight = findViewById(R.id.split_right)
     splitRatio = findViewById(R.id.split_ratio)
-    findViewById<View>(R.id.split_btn).setOnClickListener { view: View -> onSplitClick() }
-    findViewById<View>(R.id.cancel_btn).setOnClickListener { view: View -> onCancelClick() }
+    findViewById<View>(R.id.split_btn).setOnClickListener { onSplitClick() }
+    findViewById<View>(R.id.cancel_btn).setOnClickListener { onCancelClick() }
     splitLeft.addTextChangedListener(SplitTextWatcher(true))
     splitRight.addTextChangedListener(SplitTextWatcher(false))
     splitRatio.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {

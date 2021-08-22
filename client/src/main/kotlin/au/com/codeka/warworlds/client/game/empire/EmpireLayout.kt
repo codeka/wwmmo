@@ -35,6 +35,7 @@ class EmpireLayout(context: Context, private val settingsCallbacks: SettingsView
   }
 
   init {
+    @Suppress("deprecation") // We need to support API level 21
     setBackgroundColor(context.resources.getColor(R.color.default_background))
     addTab(R.string.overview)
     addTab(R.string.colonies)

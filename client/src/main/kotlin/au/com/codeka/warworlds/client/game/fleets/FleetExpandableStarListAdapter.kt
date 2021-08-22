@@ -26,7 +26,7 @@ import java.util.*
 class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars: StarCollection?)
   : ExpandableStarListAdapter<Fleet?>(stars!!) {
 
-  private val myEmpireId: Long = EmpireManager.getMyEmpire().id!!
+  private val myEmpireId: Long = EmpireManager.getMyEmpire().id
 
   private var multiSelect = false
   var selectedFleetId: Long? = null

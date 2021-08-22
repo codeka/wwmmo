@@ -27,8 +27,9 @@ class WarmWelcomeLayout(context: Context?, callbacks: Callbacks) : RelativeLayou
     val welcome: TransparentWebView = findViewById(R.id.welcome)
     val msg = getHtmlFile(getContext(), "html/warm-welcome.html")
     welcome.loadHtml("html/skeleton.html", msg)
-    findViewById<View>(R.id.next_btn).setOnClickListener { v: View? -> callbacks.onStartClick() }
-    findViewById<View>(R.id.help_btn).setOnClickListener { v: View? -> callbacks.onHelpClick() }
-    findViewById<View>(R.id.privacy_policy_btn).setOnClickListener { v: View? -> callbacks.onPrivacyPolicyClick() }
+    findViewById<View>(R.id.next_btn).setOnClickListener { callbacks.onStartClick() }
+    findViewById<View>(R.id.help_btn).setOnClickListener { callbacks.onHelpClick() }
+    findViewById<View>(R.id.privacy_policy_btn).setOnClickListener {
+        callbacks.onPrivacyPolicyClick() }
   }
 }

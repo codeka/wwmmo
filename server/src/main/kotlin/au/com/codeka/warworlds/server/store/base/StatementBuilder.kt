@@ -21,8 +21,8 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   protected val conn: Connection =
       transaction?.conn ?: dataSource.pooledConnection.connection
 
-  private var sql: String? = null
-  private var params: ArrayList<Any?>? = null
+  private var sql = ""
+  private var params = ArrayList<Any?>()
 
   /**
    * We store any errors we get building the statement and throw it when it comes time to execute.
@@ -31,7 +31,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   protected var e: SQLException? = null
 
   fun stmt(sql: String): T {
-    this.sql = Preconditions.checkNotNull(sql)
+    this.sql = sql
     try {
       stmt = conn.prepareStatement(sql)
       params = ArrayList()
@@ -163,25 +163,25 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   }
 
   private fun saveParam(index: Int, value: Any?) {
-    while (params!!.size <= index) {
-      params!!.add(null)
+    while (params.size <= index) {
+      params.add(null)
     }
-    params!![index] = value
+    params[index] = value
   }
 
   companion object {
     private val log = Log("StatementBuilder")
 
-    private fun debugSql(sql: String, params: ArrayList<Any>): String {
+    private fun debugSql(sql: String, params: ArrayList<Any?>): String {
       var str = sql
       str = str.replace("\n", " ")
       str = str.replace(" +".toRegex(), " ")
       if (str.length > 70) {
         str = str.substring(0, 68) + "..."
       }
-      for (i in params.indices) {
+      for (param in params) {
         str += " ; "
-        str += params[i]
+        str += param
       }
       return str
     }

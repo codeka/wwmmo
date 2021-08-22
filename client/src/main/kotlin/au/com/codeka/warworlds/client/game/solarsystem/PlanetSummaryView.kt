@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.solarsystem
 
 import android.content.Context
-import android.text.Html
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
@@ -10,9 +9,9 @@ import android.widget.TextView
 import androidx.transition.TransitionManager
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.ctrl.ColonyFocusView
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.common.proto.Colony
-import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.Planet
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.ColonyHelper
@@ -39,7 +38,7 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
     this.callbacks = callbacks
   }
 
-  fun setPlanet(star: Star, planet: Planet) {
+  fun setPlanet(planet: Planet) {
     TransitionManager.beginDelayedTransition(this)
     val colony = planet.colony
     if (colony == null) {
@@ -53,17 +52,17 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
       enemyColonyDetailsContainer.visibility = View.GONE
       if (colony.empire_id == null) {
         enemyColonyDetailsContainer.visibility = View.VISIBLE
-        refreshNativeColonyDetails(planet, colony)
+        refreshNativeColonyDetails(colony)
       } else {
         val colonyEmpire = EmpireManager.getEmpire(colony.empire_id)
         if (colonyEmpire != null) {
           val myEmpire = EmpireManager.getMyEmpire()
           if (myEmpire.id == colonyEmpire.id) {
             colonyDetailsContainer.visibility = View.VISIBLE
-            refreshColonyDetails(star, planet, colony)
+            refreshColonyDetails(planet, colony)
           } else {
             enemyColonyDetailsContainer.visibility = View.VISIBLE
-            refreshEnemyColonyDetails(colonyEmpire, planet, colony)
+            refreshEnemyColonyDetails(colony)
           }
         } else {
           // TODO: wait for the empire to come in.
@@ -76,7 +75,7 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
     populationCountTextView.text = context.getString(R.string.uncolonized)
   }
 
-  private fun refreshColonyDetails(star: Star, planet: Planet, colony: Colony) {
+  private fun refreshColonyDetails(planet: Planet, colony: Colony) {
     val pop = ("Pop: "
         + colony.population.roundToInt()
         + " <small>"
@@ -85,12 +84,12 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
         abs(get(colony.delta_population, 0.0f).roundToInt())
     ) + "</small> / "
         + ColonyHelper.getMaxPopulation(planet))
-    populationCountTextView.text = Html.fromHtml(pop)
+    populationCountTextView.text = fromHtml(pop)
     colonyFocusView.visibility = View.VISIBLE
-    colonyFocusView.refresh(star, colony)
+    colonyFocusView.refresh(colony)
   }
 
-  private fun refreshEnemyColonyDetails(empire: Empire, planet: Planet, colony: Colony) {
+  private fun refreshEnemyColonyDetails(colony: Colony) {
     populationCountTextView.text = String.format(Locale.US, "Population: %d",
       colony.population.roundToInt()
     )
@@ -109,9 +108,9 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
   */
   }
 
-  private fun refreshNativeColonyDetails(planet: Planet, colony: Colony) {
+  private fun refreshNativeColonyDetails(colony: Colony) {
     val pop = ("Pop: " + colony.population.roundToInt())
-    populationCountTextView.text = Html.fromHtml(pop)
+    populationCountTextView.text = fromHtml(pop)
     colonyFocusView.visibility = View.GONE
   }
 
@@ -122,7 +121,7 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
     enemyColonyDetailsContainer = findViewById(R.id.enemy_colony_details)
     populationCountTextView = findViewById(R.id.population_count)
     colonyFocusView = findViewById(R.id.colony_focus_view)
-    emptyViewButton.setOnClickListener { view: View? ->
+    emptyViewButton.setOnClickListener {
       if (callbacks != null) {
         callbacks!!.onViewClick()
       }

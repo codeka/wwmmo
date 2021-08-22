@@ -136,7 +136,7 @@ class PlanetListSimple : LinearLayout {
     val view = inflater.inflate(R.layout.ctrl_planet_list_simple_row, this, false)
     val icon = view.findViewById<ImageView>(R.id.starfield_planet_icon)
     val empireName = view.findViewById<TextView>(R.id.starfield_planet_type)
-    val allianceName = view.findViewById<TextView>(R.id.starfield_planet_colony)
+//    val allianceName = view.findViewById<TextView>(R.id.starfield_planet_colony)
     val empire = EmpireManager.getEmpire(empireID)
     if (empire != null) {
       Picasso.get()

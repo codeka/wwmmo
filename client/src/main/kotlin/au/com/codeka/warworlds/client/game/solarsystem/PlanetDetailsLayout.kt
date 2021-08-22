@@ -126,13 +126,11 @@ class PlanetDetailsLayout(
   }
 
   private fun refreshFocus() {
-    val colony = planet.colony ?: return
-    val focus = colony.focus
     for (i in 0..3) {
       focusLockButtons[i].setImageResource(
           if (focusLocks[i]) R.drawable.lock_closed else R.drawable.lock_opened)
       focusSeekBars[i].progress = (focusValues[i] * 1000.0f).toInt()
-      focusTextViews[i].text = NumberFormatter.format(Math.round(focusValues[i] * 100.0f))
+      focusTextViews[i].text = NumberFormatter.format((focusValues[i] * 100.0f).roundToInt())
     }
   }
 
@@ -160,8 +158,8 @@ class PlanetDetailsLayout(
   private fun onFocusMinusClick(view: View) {
     for (i in 0..3) {
       if (view === focusMinusButtons[i]) {
-        val newValue = Math.max(0.0f, focusValues[i] - 0.01f)
-        focusSeekBars[i].progress = Math.round(newValue * focusSeekBars[i].max)
+        val newValue = 0.0f.coerceAtLeast(focusValues[i] - 0.01f)
+        focusSeekBars[i].progress = (newValue * focusSeekBars[i].max).roundToInt()
         redistribute(i, newValue)
         break
       }
@@ -262,9 +260,9 @@ class PlanetDetailsLayout(
         findViewById(R.id.focus_construction_lock))
     empireName = findViewById(R.id.empire_name)
     attackBtn = findViewById(R.id.attack_btn)
-    attackBtn.setOnClickListener { v: View? -> callbacks.onAttackClick() }
+    attackBtn.setOnClickListener { callbacks.onAttackClick() }
     colonizeBtn = findViewById(R.id.colonize_btn)
-    colonizeBtn.setOnClickListener { v: View? -> callbacks.onColonizeClick() }
+    colonizeBtn.setOnClickListener { callbacks.onColonizeClick() }
     for (i in 0..3) {
       focusLockButtons[i].setOnClickListener { view: View -> onFocusLockClick(view) }
       focusPlusButtons[i].setOnClickListener { view: View -> onFocusPlusClick(view) }
@@ -278,7 +276,7 @@ class PlanetDetailsLayout(
         override fun onStopTrackingTouch(seekBar: SeekBar) {}
       })
     }
-    findViewById<View>(R.id.focus_save_btn).setOnClickListener { v: View? ->
+    findViewById<View>(R.id.focus_save_btn).setOnClickListener {
       callbacks.onSaveFocusClick(
           focusValues[FARMING_INDEX],
           focusValues[MINING_INDEX],

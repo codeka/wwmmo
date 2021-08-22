@@ -40,17 +40,13 @@ class WelcomeLayout(context: Context?, private val callbacks: Callbacks)
         .into(empireIcon)
   }
 
-  fun updateWelcomeMessage(html: String?) {
+  fun updateWelcomeMessage(html: String) {
     motdView.loadHtml("html/skeleton.html", html)
   }
 
-  fun setConnectionStatus(connected: Boolean, message: String?) {
+  fun setConnectionStatus(connected: Boolean, message: String) {
     startButton.isEnabled = connected
-    if (message == null) {
-      connectionStatus.text = ""
-    } else {
-      connectionStatus.text = message
-    }
+    connectionStatus.text = message
   }
 
   fun setSignInText(resId: Int) {
@@ -66,10 +62,10 @@ class WelcomeLayout(context: Context?, private val callbacks: Callbacks)
     empireName = Preconditions.checkNotNull(findViewById(R.id.empire_name))
     empireIcon = Preconditions.checkNotNull(findViewById(R.id.empire_icon))
     connectionStatus = Preconditions.checkNotNull(findViewById(R.id.connection_status))
-    val optionsButton = Preconditions.checkNotNull(findViewById<Button>(R.id.options_btn))
-    startButton.setOnClickListener { v: View? -> callbacks.onStartClick() }
-    findViewById<View>(R.id.help_btn).setOnClickListener { v: View? -> callbacks.onHelpClick() }
-    findViewById<View>(R.id.website_btn).setOnClickListener { v: View? -> callbacks.onWebsiteClick() }
-    signInButton.setOnClickListener { v: View? -> callbacks.onSignInClick() }
+ //   val optionsButton = Preconditions.checkNotNull(findViewById<Button>(R.id.options_btn))
+    startButton.setOnClickListener { callbacks.onStartClick() }
+    findViewById<View>(R.id.help_btn).setOnClickListener { callbacks.onHelpClick() }
+    findViewById<View>(R.id.website_btn).setOnClickListener { callbacks.onWebsiteClick() }
+    signInButton.setOnClickListener { callbacks.onSignInClick() }
   }
 }

@@ -54,14 +54,14 @@ class WelcomeScreen : Screen() {
     //    getFragmentTransitionManager().replaceFragment(GameSettingsFragment.class));
   }
 
-  override fun onShow(): ShowInfo? {
-    welcomeLayout.setConnectionStatus(false, null)
+  override fun onShow(): ShowInfo {
+    welcomeLayout.setConnectionStatus(false, "")
     updateServerState(App.server.currState)
     if (EmpireManager.hasMyEmpire()) {
       welcomeLayout.refreshEmpireDetails(EmpireManager.getMyEmpire())
     }
     if (motd != null) {
-      welcomeLayout.updateWelcomeMessage(motd)
+      welcomeLayout.updateWelcomeMessage(motd!!)
     }
 
     updateSignInButtonText(App.auth.account)
@@ -110,10 +110,17 @@ class WelcomeScreen : Screen() {
         .create().show();*/
   }
 
+  private fun parseDate(pubDate: String, format: SimpleDateFormat): Date? {
+    return try {
+      format.parse(pubDate)
+    } catch (e: ParseException) {
+      null
+    }
+  }
+
   private fun refreshWelcomeMessage() {
     App.taskRunner.runTask(Runnable {
-      val ins: InputStream?
-      ins = try {
+      val ins: InputStream? = try {
         fetchStream(MOTD_RSS)
       } catch (e: IOException) {
         log.warning("Error loading MOTD: %s", MOTD_RSS, e)
@@ -121,8 +128,7 @@ class WelcomeScreen : Screen() {
       }
       val builderFactory = DocumentBuilderFactory.newInstance()
       builderFactory.isValidating = false
-      val doc: Document
-      doc = try {
+      val doc: Document = try {
         val builder = builderFactory.newDocumentBuilder()
         builder.parse(ins)
       } catch (e: Exception) {
@@ -132,36 +138,32 @@ class WelcomeScreen : Screen() {
       val inputFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US)
       val outputFormat = SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US)
       val motd = StringBuilder()
-      if (doc != null) {
-        val itemNodes = doc.getElementsByTagName("item")
-        for (i in 0 until itemNodes.length) {
-          val itemElem = itemNodes.item(i) as Element
-          val title = itemElem.getElementsByTagName("title").item(0).textContent
-          val content = itemElem.getElementsByTagName("description").item(0).textContent
-          val pubDate = itemElem.getElementsByTagName("pubDate").item(0).textContent
-          val link = itemElem.getElementsByTagName("link").item(0).textContent
-          try {
-            val date = inputFormat.parse(pubDate)
-            motd.append("<h1>")
-            motd.append(outputFormat.format(date))
-            motd.append("</h1>")
-          } catch (e: ParseException) {
-            // Shouldn't ever happen.
-          }
-          motd.append("<h2>")
-          motd.append(title)
-          motd.append("</h2>")
-          motd.append(content)
-          motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; "
-              + "padding-bottom: 4px;\">")
-          motd.append("<a href=\"")
-          motd.append(link)
-          motd.append("\">")
-          motd.append("View forum post")
-          motd.append("</a></div>")
+      val itemNodes = doc.getElementsByTagName("item")
+      for (i in 0 until itemNodes.length) {
+        val itemElem = itemNodes.item(i) as Element
+        val title = itemElem.getElementsByTagName("title").item(0).textContent
+        val content = itemElem.getElementsByTagName("description").item(0).textContent
+        val pubDate = itemElem.getElementsByTagName("pubDate").item(0).textContent
+        val link = itemElem.getElementsByTagName("link").item(0).textContent
+        val date = parseDate(pubDate, inputFormat)
+        if (date != null) {
+          motd.append("<h1>")
+          motd.append(outputFormat.format(date))
+          motd.append("</h1>")
         }
+        motd.append("<h2>")
+        motd.append(title)
+        motd.append("</h2>")
+        motd.append(content)
+        motd.append("<div style=\"text-align: right; border-bottom: dashed 1px #fff; "
+            + "padding-bottom: 4px;\">")
+        motd.append("<a href=\"")
+        motd.append(link)
+        motd.append("\">")
+        motd.append("View forum post")
+        motd.append("</a></div>")
       }
-      App.taskRunner.runTask(Runnable {
+      App.taskRunner.runTask({
         this.motd = motd.toString()
         welcomeLayout.updateWelcomeMessage(motd.toString())
       }, Threads.UI)

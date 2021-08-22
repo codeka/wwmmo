@@ -11,7 +11,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper.setDesignIcon
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Fleet
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.DesignHelper
@@ -59,12 +58,10 @@ class FleetListSimple : LinearLayout {
   private fun setStar(s: Star, f: List<Fleet>, filter: FleetFilter?) {
     star = s
     fleets.clear()
-    if (star!!.fleets != null) {
-      for (fleet in f) {
-        if (fleet.state != Fleet.FLEET_STATE.MOVING && fleet.num_ships > 0.01f &&
-            (filter == null || filter.showFleet(fleet))) {
-          fleets.add(fleet)
-        }
+    for (fleet in f) {
+      if (fleet.state != Fleet.FLEET_STATE.MOVING && fleet.num_ships > 0.01f &&
+          (filter == null || filter.showFleet(fleet))) {
+        fleets.add(fleet)
       }
     }
     refresh()
@@ -84,8 +81,6 @@ class FleetListSimple : LinearLayout {
     }
     removeAllViews()
     val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        ?: // TODO: huh?
-        return
     for (fleet in fleets) {
       val rowView = getRowView(inflater, fleet)
       addView(rowView)
@@ -100,12 +95,12 @@ class FleetListSimple : LinearLayout {
     val row2 = view.findViewById<TextView>(R.id.fleet_row2)
     val fuelLevel = view.findViewById<ProgressBar>(R.id.fuel_level)
     val maxFuel = (design.fuel_size!! * fleet.num_ships).toInt()
-    if (fleet.fuel_amount!! >= maxFuel) {
+    if (fleet.fuel_amount >= maxFuel) {
       fuelLevel.visibility = View.GONE
     } else {
       fuelLevel.visibility = View.VISIBLE
       fuelLevel.max = maxFuel
-      fuelLevel.progress = (fleet.fuel_amount!!).roundToInt()
+      fuelLevel.progress = (fleet.fuel_amount).roundToInt()
     }
     setDesignIcon(design, icon)
     row1.text = FleetListHelper.getFleetName(fleet, design)
@@ -117,9 +112,5 @@ class FleetListSimple : LinearLayout {
 
   interface FleetSelectedHandler {
     fun onFleetSelected(fleet: Fleet?)
-  }
-
-  companion object {
-    private val log = Log("FleetListSimple")
   }
 }
