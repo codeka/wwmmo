@@ -40,7 +40,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -57,7 +57,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -74,7 +74,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -91,7 +91,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -108,7 +108,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -125,7 +125,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -148,7 +148,9 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       throw StoreException(e)
     } finally {
       val endTime = System.nanoTime()
-      log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql, params))
+      if (enableDebug) {
+        log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql, params))
+      }
     }
   }
 
@@ -171,6 +173,8 @@ open class StatementBuilder<T : StatementBuilder<T>>(
 
   companion object {
     private val log = Log("StatementBuilder")
+
+    private const val enableDebug = false
 
     private fun debugSql(sql: String, params: ArrayList<Any?>): String {
       var str = sql
