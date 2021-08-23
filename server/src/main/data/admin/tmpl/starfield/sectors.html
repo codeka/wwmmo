@@ -1,0 +1,111 @@
+{% extends "skeleton.html" %}
+{% block "title" %}Starfield{% end %}
+{% block "head" %}
+  <script type="text/javascript" src="/admin/js/tmpl.js"></script>
+  <script type="text/javascript" src="/admin/js/time.js"></script>
+  <script type="text/javascript" src="sectors.js"></script>
+{% end %}
+{% block "content" %}
+  <h1>Sectors</h1>
+  <ul>
+    <li><a href="javascript:findEmptySector();">Find empty sector</a></li>
+    <li><a href="javascript:expandUniverse();">Expand universe</a></li>
+    <li>
+      <input type="text" name="name" id="empire-name" placeholder="Name" style="width: 100px;"> &nbsp;
+      <input type="number" name="x" id="empire-sector-x" style="width: 50px;">,
+      <input type="number" name="y" id="empire-sector-y" style="width: 50px;">
+      <a href="javascript:createEmpire();">Create empire</a>
+    </li>
+    <li>
+      <input type="number" name="x1" id="watch-x1" style="width: 50px;">,
+      <input type="number" name="y1" id="watch-y1" style="width: 50px;"> -
+      <input type="number" name="x2" id="watch-x2" style="width: 50px;">,
+      <input type="number" name="y2" id="watch-y2" style="width: 50px;">
+      <a href="javascript:watchSectors();">Watch sectors</a>
+    </li>
+  </ul>
+  <div id="result"></div>
+  <script type="text/html" id="create-empire-tmpl">
+    <div>Name: <%= empireName %></div>
+    <div>Sector: <%= sectorX %>, <%= sectorY %></div>
+    <% if (typeof empire !== "undefined") %>
+      <div>Empire: <%= empire.id %> <%= empire.display_name %></div>
+    <% end %>
+    <h2>Logs</h2>
+    <div style="white-space: nowrap;">
+      <% for (var i = 0; i < logs.length; i++) %>
+        <div><%= logs[i] %></div>
+      <% end %>
+    </div>
+  </script>
+  <script>
+    function findEmptySector() {
+      $.ajax({
+        url: "/admin/ajax/sectors",
+        data: {
+          "action": "find-empty",
+        },
+        success: function(data) {
+          $("#result").html(JSON.stringify(data, null, "  "));
+        }
+      });
+    }
+
+    function createEmpire(name, x, y) {
+      if (name === undefined) {
+        name = $("#empire-name").val();
+      }
+
+      var data = {
+        "action": "create-empire",
+        "name": name
+      };
+      if (x === undefined && $("#empire-sector-x").val() !== "") {
+        x = parseInt($("#empire-sector-x").val());
+      }
+      if (y === undefined && $("#empire-sector-y").val() !== "") {
+        y = parseInt($("#empire-sector-y").val());
+      }
+      if (x !== undefined && x !== undefined) {
+        data["x"] = x;
+        data["y"] = y;
+      }
+
+      $.ajax({
+        url: "/admin/ajax/sectors",
+        data: data,
+        success: function(data) {
+          $("#result").html($("#create-empire-tmpl").applyTemplate(data));
+        }
+      });
+    }
+
+    function expandUniverse() {
+      $.ajax({
+        url: "/admin/ajax/sectors",
+        data: {
+          "action": "expand",
+        },
+        success: function(data) {
+          $("#result").html("Done.");
+        }
+      });
+    }
+
+    function watchSectors() {
+      $.ajax({
+        url: "/admin/ajax/sectors",
+        data: {
+          "action": "watch-sectors",
+          "x1": parseInt($("#watch-x1").val()),
+          "y1": parseInt($("#watch-y1").val()),
+          "x2": parseInt($("#watch-x2").val()),
+          "y2": parseInt($("#watch-y2").val())
+        },
+        success: function(data) {
+          $("#result").html("Done.");
+        }
+      });
+    }
+  </script>
+{% end %}
