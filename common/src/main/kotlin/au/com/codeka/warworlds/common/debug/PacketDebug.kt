@@ -1,7 +1,7 @@
 package au.com.codeka.warworlds.common.debug
 
+import au.com.codeka.warworlds.common.net.PacketHelper
 import au.com.codeka.warworlds.common.proto.Packet
-import com.squareup.wire.WireField
 
 /**
  * Helper class that contains some nice debugging details about our packets.
@@ -11,18 +11,15 @@ object PacketDebug {
     return getPacketDebug(pkt, -1)
   }
 
+  // Wire's generator doesn't do anything special for oneof fields (we don't get an enum like in
+  // Google's C++ or Java generator) so we have to manually inspect the packet.
   fun getPacketDebug(pkt: Packet, serializedLength: Int): String {
     val sb = StringBuilder()
-    for (field in pkt.javaClass.fields) {
-      if (field.isAnnotationPresent(WireField::class.java)) {
-        try {
-          if (field[pkt] != null) {
-            sb.append(field.type.simpleName)
-            sb.append(" ")
-          }
-        } catch (e: IllegalAccessException) {
-          // Ignore. (though should never happen)
-        }
+
+    for (prop in PacketHelper.properties.values) {
+      if (prop.getter.call(pkt) != null) {
+        sb.append(prop.name)
+        sb.append(" ")
       }
     }
     if (serializedLength > 0) {

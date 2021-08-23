@@ -277,7 +277,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * star.
    */
   fun onConnected() {
-    // Shouldn't be null after we're connected to the server.
+    log.info("DEANH onConnected: ${EmpireManager.getMyEmpire().home_star!!.id}")
     warpTo(EmpireManager.getMyEmpire().home_star!!)
   }
 
