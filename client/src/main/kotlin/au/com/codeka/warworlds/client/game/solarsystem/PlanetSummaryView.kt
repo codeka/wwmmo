@@ -50,7 +50,7 @@ class PlanetSummaryView(context: Context, attrs: AttributeSet?) : FrameLayout(co
       emptyViewButton.visibility = View.GONE
       colonyDetailsContainer.visibility = View.GONE
       enemyColonyDetailsContainer.visibility = View.GONE
-      if (colony.empire_id == null) {
+      if (colony.empire_id == 0L) {
         enemyColonyDetailsContainer.visibility = View.VISIBLE
         refreshNativeColonyDetails(colony)
       } else {

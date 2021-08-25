@@ -103,7 +103,7 @@ message Star {
     optional int64 dest_star_id = 1;
     optional int64 tune_complete_time = 2;
     repeated int64 tune_history = 3;
-    optional int64 empire_id = 4;
+    required int64 empire_id = 4;
   }
   optional Wormhole wormhole = 20;
 
@@ -136,13 +136,13 @@ message CombatReport {
 // if the scout is destroyed. A star will have exactly zero or one scout report per empire.
 message ScoutReport {
   // The ID of the star this report is for.
-  optional int64 star_id = 1;
+  required int64 star_id = 1;
 
   // The ID of the empire this report is for.
-  optional int64 empire_id = 2;
+  required int64 empire_id = 2;
 
   // The date/time this report was generated.
-  optional int64 report_time = 3;
+  required int64 report_time = 3;
 
   // A snapshot of the bits of the star we care about, at the time this report was generated.
   repeated Fleet fleets = 4;
@@ -190,7 +190,7 @@ message Planet {
 // Represents the details of an empire's stored goods in a star. For example, keeps track of stored
 // food, energy, minerals, etc, etc.
 message EmpireStorage {
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 
   required float total_goods = 2;
   required float total_minerals = 3;
@@ -272,7 +272,7 @@ message StarModification {
     // empire_id and colony_id are required.
     ATTACK_COLONY = 12;
   }
-  optional MODIFICATION_TYPE type = 1;
+  required MODIFICATION_TYPE type = 1;
 
   optional int64 empire_id = 2;
   optional int32 planet_index = 3;

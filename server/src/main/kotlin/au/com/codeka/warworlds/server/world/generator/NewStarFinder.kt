@@ -9,6 +9,7 @@ import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.world.SectorManager
 import au.com.codeka.warworlds.server.world.WatchableObject
+import kotlin.math.sqrt
 
 /**
  * Find a star which is suitable for a new empire.
@@ -57,8 +58,8 @@ class NewStarFinder {
   }
 
   /**
-   * Look for abandoned stars. We look for stars which are far enough from established empires, but still
-   * near the centre of the universe and not *too* far...
+   * Look for abandoned stars. We look for stars which are far enough from established empires,
+   * but still near the centre of the universe and not *too* far...
    */
   private fun findAbandonedStar(): Boolean { /*
     String sql = "SELECT star_id, empire_id" +
@@ -147,7 +148,7 @@ class NewStarFinder {
       // similarly, colonies with fleets are right out
       var hasFleets = false
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null) {
+        if (fleet.empire_id != 0L) {
           hasFleets = true
           break
         }
@@ -169,9 +170,9 @@ class NewStarFinder {
 
   private fun isColonized(star: Star): Boolean {
     for (planet in star.planets) {
-      val colony = planet.colony
+      val colony = planet.colony ?: continue
       // It's counted as colonized only if it's colonized by a non-native empire.
-      if (colony?.empire_id != null) {
+      if (colony.empire_id != 0L) {
         return true
       }
     }
@@ -179,8 +180,8 @@ class NewStarFinder {
   }
 
   private fun scoreStar(sector: Sector?, star: Star): Double {
-    val centre: Int = SectorManager.Companion.SECTOR_SIZE / 2
-    val distanceToCentre = Math.sqrt((star.offset_x - centre) * (star.offset_x - centre) +
+    val centre: Int = SectorManager.SECTOR_SIZE / 2
+    val distanceToCentre = sqrt((star.offset_x - centre) * (star.offset_x - centre) +
         (star.offset_y - centre) * (star.offset_y - centre).toDouble())
     // 0..10 (0 means the star is on the edge of the sector, 10 means it's the very centre)
     var distanceToCentreScore = (centre - distanceToCentre) / (centre / 10.0)
@@ -199,9 +200,11 @@ class NewStarFinder {
         continue
       }
       if (isColonized(otherStar)) {
-        val distanceToColony = Math.sqrt((
-            (star.offset_x - otherStar.offset_x) * (star.offset_x - otherStar.offset_x)
-                + (star.offset_y - otherStar.offset_y) * (star.offset_y - otherStar.offset_y)).toDouble())
+        val distanceToColony = sqrt((
+            (star.offset_x - otherStar.offset_x)
+                * (star.offset_x - otherStar.offset_x)
+                + (star.offset_y - otherStar.offset_y)
+                * (star.offset_y - otherStar.offset_y)).toDouble())
         if (otherColony == null || distanceToColony < distanceToOtherColony) {
           otherColony = otherStar
           distanceToOtherColony = distanceToColony

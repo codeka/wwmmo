@@ -539,7 +539,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val empires: MutableMap<Long, EmpireIconInfo> = TreeMap()
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (colony.empire_id == null) {
+      if (colony.empire_id == 0L) {
         continue
       }
       val empire = EmpireManager.getEmpire(colony.empire_id)
@@ -553,7 +553,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       }
     }
     for (fleet in star.fleets) {
-      if (fleet.empire_id == null || fleet.state == Fleet.FLEET_STATE.MOVING) {
+      if (fleet.empire_id == 0L || fleet.state == Fleet.FLEET_STATE.MOVING) {
         // Ignore native fleets, and moving fleets, which we'll draw them separately.
         continue
       }

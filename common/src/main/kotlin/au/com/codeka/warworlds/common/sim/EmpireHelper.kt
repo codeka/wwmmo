@@ -25,20 +25,17 @@ object EmpireHelper {
   }
 
   /** Gets the [EmpireStorage] for the given empire.  */
-  fun getStore(star: MutableStar, empireId: Long?): MutableEmpireStorage? {
+  fun getStore(star: MutableStar, empireId: Long): MutableEmpireStorage? {
     val index = getStoreIndex(star, empireId)
     return if (index < 0) {
       null
     } else star.empireStores[index]
   }
 
-  fun getStoreIndex(star: MutableStar, empireId: Long?): Int {
+  fun getStoreIndex(star: MutableStar, empireId: Long): Int {
     star.empireStores.indices.forEach { i ->
       val store = star.empireStores[i]
-      if (store.empireId == null && empireId == null) {
-        return i
-      }
-      if (store.empireId != null && store.empireId == empireId) {
+      if (store.empireId == empireId) {
         return i
       }
     }

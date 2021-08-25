@@ -68,16 +68,16 @@ class PlanetListSimple : LinearLayout {
     val myEmpire = EmpireManager.getMyEmpire()
     val empires = HashSet<Long>()
     for (fleet in fleets!!) {
-      val empireId = fleet.empire_id ?: continue
-      if (empireId == myEmpire.id) {
+      val empireId = fleet.empire_id
+      if (empireId == 0L || empireId == myEmpire.id) {
         continue
       }
       empires.add(empireId)
     }
     for (planet in planets!!) {
       val colony = planet.colony ?: continue
-      val empireId = colony.empire_id ?: continue
-      if (empireId == myEmpire.id) {
+      val empireId = colony.empire_id
+      if (empireId == 0L || empireId == myEmpire.id) {
         continue
       }
       empires.add(empireId)
@@ -86,7 +86,7 @@ class PlanetListSimple : LinearLayout {
       val rowView = getEmpireRowView(inflater, empireID)
       addView(rowView)
     }
-    if (!empires.isEmpty()) {
+    if (empires.isNotEmpty()) {
       // add a spacer...
       var spacer = View(context)
       spacer.layoutParams = LayoutParams(10, 10)
@@ -113,7 +113,7 @@ class PlanetListSimple : LinearLayout {
     val colony = planet.colony
     val colonyTextView = view.findViewById<View>(R.id.starfield_planet_colony) as TextView
     if (colony != null) {
-      if (colony.empire_id == null) {
+      if (colony.empire_id == 0L) {
         colonyTextView.text = getContext().getString(R.string.native_colony)
       } else {
         val empire = EmpireManager.getEmpire(colony.empire_id)

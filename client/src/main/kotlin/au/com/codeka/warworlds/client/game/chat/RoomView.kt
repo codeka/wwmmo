@@ -226,7 +226,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         message.gravity = Gravity.START
         var empire: Empire? = null
         if (entry.message!!.empire_id != null) {
-          empire = EmpireManager.getEmpire(entry.message!!.empire_id)
+          empire = EmpireManager.getEmpire(entry.message!!.empire_id!!)
         }
         val otherEmpire = EmpireManager.getEmpire(entry.message!!.message.toLong())
         if (action == MessageAction.ParticipantAdded) {
@@ -264,7 +264,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         val empireName = view.findViewById<TextView>(R.id.empire_name)
         val msgTime = view.findViewById<TextView>(R.id.msg_time)
         val message = view.findViewById<TextView>(R.id.message)
-        val empire = EmpireManager.getEmpire(entry.message!!.empire_id)
+        val empire = EmpireManager.getEmpire(entry.message!!.empire_id!!)
         if (empire != null) {
           empireName.text = empire.display_name
           ImageHelper.bindEmpireShield(empireIcon, empire)

@@ -37,7 +37,7 @@ class ShipsView(
     val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     val fleets = ArrayList<Fleet>()
     for (fleet in star.fleets) {
-      if (fleet.empire_id != null && myEmpire.id == fleet.empire_id) {
+      if (myEmpire.id == fleet.empire_id) {
         fleets.add(fleet)
       }
     }

@@ -58,7 +58,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     for (i in 0 until groupCount) {
       val star = getStar(i)
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null && fleet.empire_id == myEmpireId) {
+        if (fleet.empire_id == myEmpireId) {
           if (predicate(fleet)) {
             disabledFleetIds.add(fleet.id)
           }
@@ -126,7 +126,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     var numFleets = 0
     for (i in star!!.fleets.indices) {
       val empireID = star.fleets[i].empire_id
-      if (empireID != null && empireID == myEmpireId) {
+      if (empireID == myEmpireId) {
         numFleets++
       }
     }
@@ -137,7 +137,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     var fleetIndex = 0
     for (i in star!!.fleets.indices) {
       val empireID = star.fleets[i].empire_id
-      if (empireID != null && empireID == myEmpireId) {
+      if (empireID == myEmpireId) {
         if (fleetIndex == index) {
           return star.fleets[i]
         }
@@ -178,7 +178,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
       var numFighters = 0.0f
       var numNonFighters = 0.0f
       for (fleet in star.fleets) {
-        if (fleet.empire_id == null || fleet.empire_id != myEmpire.id) {
+        if (fleet.empire_id != myEmpire.id) {
           continue
         }
         if (fleet.design_type == Design.DesignType.FIGHTER) {

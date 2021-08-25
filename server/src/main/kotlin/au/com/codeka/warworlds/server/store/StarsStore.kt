@@ -26,18 +26,17 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
     val empireIds: MutableSet<Long> = HashSet()
     for (fleet in star.fleets) {
       val empireId = fleet.empire_id
-      if (empireId != null) {
-        empireIds.add(empireId)
-      }
+      empireIds.add(empireId)
     }
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      val empireId = colony.empire_id ?: continue
+      val empireId = colony.empire_id
       empireIds.add(empireId)
     }
     newTransaction().use { trans ->
       newWriter(trans)
-          .stmt("INSERT OR REPLACE INTO stars (id, sector_x, sector_y, next_simulation, star) VALUES (?, ?, ?, ?, ?)")
+          .stmt("INSERT OR REPLACE INTO stars (id, sector_x, sector_y, next_simulation, star)" +
+              " VALUES (?, ?, ?, ?, ?)")
           .param(0, id)
           .param(1, star.sector_x)
           .param(2, star.sector_y)
@@ -85,7 +84,8 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
    */
   fun fetchSimulationQueue(count: Int): ArrayList<Star> {
     newReader()
-        .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
+        .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL" +
+            " ORDER BY next_simulation ASC")
         .query().use { res ->
           val stars = ArrayList<Star>()
           while (res.next() && stars.size < count) {

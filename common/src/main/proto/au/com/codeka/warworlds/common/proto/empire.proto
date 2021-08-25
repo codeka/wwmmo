@@ -39,8 +39,7 @@ message Empire {
     BANNED = 2;
     ABANDONED = 3;
   }
-  // TODO: make this required once the data store has all the values
-  optional EmpireState state = 3 [default = ACTIVE];
+  required EmpireState state = 3 [default = ACTIVE];
 
   // if specified, contains the details of the empire's rank
   optional EmpireRank rank = 4;

@@ -99,7 +99,7 @@ class BuildScreen(private var star: Star, planetIndex: Int) : Screen() {
     colonies.clear()
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (colony.empire_id != null && colony.empire_id == myEmpire.id) {
+      if (colony.empire_id == myEmpire.id) {
         colonies.add(colony)
         if (planet.index == planetIndex) {
           selectedColony = colony

@@ -65,7 +65,7 @@ object ChatHelper {
         isFriendly = true
       }
       if (!messageOnly) {
-        val empire = EmpireManager.getEmpire(msg.empire_id)
+        val empire = EmpireManager.getEmpire(msg.empire_id!!)
         if (empire != null) {
           text = empire.display_name + " : " + text
         }

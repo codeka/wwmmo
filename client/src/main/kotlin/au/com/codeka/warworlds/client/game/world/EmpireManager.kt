@@ -10,7 +10,6 @@ import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket
 import au.com.codeka.warworlds.common.proto.Packet
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket
-import com.google.common.base.Preconditions
 import com.google.common.collect.Lists
 import java.util.*
 
@@ -97,11 +96,11 @@ object EmpireManager {
   }
 
   /**
-   * Gets the [Empire] with the given id. If the id is null, returns a pseudo-Empire that
+   * Gets the [Empire] with the given id. If the id is 0, returns a pseudo-Empire that
    * can be used for native colonies/fleets.
    */
-  fun getEmpire(id: Long?): Empire? {
-    if (id == null) {
+  fun getEmpire(id: Long): Empire? {
+    if (id == 0L) {
       return nativeEmpire
     }
     if (myEmpire != null && myEmpire!!.id == id) {

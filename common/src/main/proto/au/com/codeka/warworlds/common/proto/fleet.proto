@@ -11,8 +11,8 @@ message Fleet {
   // ID of this fleet, so that it can be referred to by other entities.
   required int64 id = 1;
 
-  // The ID of the empire who owns this fleet
-  optional int64 empire_id = 2;
+  // The ID of the empire who owns this fleet. Zero for native empire.
+  required int64 empire_id = 2;
 
   // The ID of the alliance this fleet belongs to. If not specified, it means the empire that owns
   // this fleet does not belong to an alliance.

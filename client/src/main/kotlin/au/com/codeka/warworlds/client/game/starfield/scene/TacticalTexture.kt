@@ -168,7 +168,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
     private fun getFleetOnlyEmpire(star: Star): Long? {
       // TODO: what if there is more than one fleet? Should try to mix the colors?
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null) {
+        if (fleet.empire_id != 0L) {
           return fleet.empire_id
         }
       }

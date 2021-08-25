@@ -73,6 +73,7 @@ class StarManager private constructor() {
           if (planet.populationCongeniality > 500) {
             starModifier.modifyStar(mutableStar, StarModification(
                 type = StarModification.MODIFICATION_TYPE.COLONIZE,
+                empire_id = 0L,
                 planet_index = planet.index))
             numColonies++
           }
@@ -84,6 +85,7 @@ class StarManager private constructor() {
           val numShips = 100 + (rand.next() * 40).toInt()
           starModifier.modifyStar(mutableStar, StarModification(
               type = StarModification.MODIFICATION_TYPE.CREATE_FLEET,
+              empire_id = 0L,
               design_type = DesignType.FIGHTER,
               count = numShips))
           numColonies--
@@ -176,7 +178,7 @@ class StarManager private constructor() {
                   design_type = br.designType,
                   upgrade = br.buildingId != null))
           val sitReports: MutableMap<Long, SituationReport> = Maps.newHashMap()
-          sitReports[colony.empireId!!] = sitReport
+          sitReports[colony.empireId] = sitReport
 
           if (design.design_kind == Design.DesignKind.BUILDING) {
             if (br.buildingId != null) {
@@ -258,7 +260,7 @@ class StarManager private constructor() {
 
         // Generate a sit report for the move-complete event.
         val sitReport = SituationReport(
-            empire_id = fleet.empireId ?: 0,
+            empire_id = fleet.empireId,
             star_id = destStar.get().id,
             report_time = System.currentTimeMillis(),
             move_complete_record = SituationReport.MoveCompleteRecord(
@@ -268,7 +270,7 @@ class StarManager private constructor() {
                 num_ships = fleet.numShips,
                 was_destroyed = false))
         val sitReports: MutableMap<Long, SituationReport> = Maps.newHashMap()
-        sitReports[fleet.empireId ?: 0] = sitReport
+        sitReports[fleet.empireId] = sitReport
 
         synchronized(destStar.lock) {
           // TODO: this could deadlock, need to lock in the same order

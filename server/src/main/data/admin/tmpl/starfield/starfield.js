@@ -54,7 +54,7 @@ $(function() {
       var empires = [];
       for (var i in star.planets) {
         var planet = star.planets[i];
-        if (planet.colony != null && planet.colony.empire_id != null) {
+        if (planet.colony != null && planet.colony.empire_id != 0) {
           if (empires.indexOf(planet.colony.empire_id) === -1) {
             empires.push(planet.colony.empire_id);
           }
@@ -62,7 +62,7 @@ $(function() {
       }
       for (var i in star.fleets) {
         var fleet = star.fleets[i];
-        if (fleet.empire_id != null) {
+        if (fleet.empire_id != 0) {
           if (empires.indexOf(fleet.empire_id) === -1) {
             empires.push(fleet.empire_id);
           }

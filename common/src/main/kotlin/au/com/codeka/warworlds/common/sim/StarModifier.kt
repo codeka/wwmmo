@@ -94,6 +94,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler?) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.COLONIZE)
+    modification.empire_id!!
     logHandler!!.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
 
     // When we destroy the colonyship, we'll take it's energy and add it to the star's supply.
@@ -146,7 +147,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
 
     // if there's no storage for this empire, add one with some defaults now (only for non-natives)
     val empireId = modification.empire_id
-    if (empireId != null) {
+    if (empireId != 0L) {
       val storageIndex = getStorageIndex(star, empireId)
       if (storageIndex < 0) {
         val storage = createDefaultStorage(empireId)
@@ -175,6 +176,8 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler?) {
     Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+    modification.empire_id!!
+
     var attack = false
     if (modification.fleet == null || modification.fleet.stance == Fleet.FLEET_STANCE.AGGRESSIVE) {
       for (fleet in star.fleets) {
@@ -209,7 +212,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       // It'll be refueled when we simulate, if there's any energy on the star.
       fuelAmount = 0f
       if (modification.fleet != null) {
-        fuelAmount = modification.fleet.fuel_amount ?: 0f
+        fuelAmount = modification.fleet.fuel_amount
       }
     }
 
@@ -276,7 +279,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     val scoutReport = ScoutReport(
       report_time = System.currentTimeMillis(), // TODO: record a better time
       star_id = star.id,
-      empire_id = modification.empire_id,
+      empire_id = modification.empire_id!!,
       fleets = fleets,
       planets = planets)
 
@@ -649,13 +652,13 @@ class StarModifier(private val identifierGenerator: () -> Long) {
 
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (colony.empireId == null) {
+      if (colony.empireId == 0L) {
         planet.colony = null
       }
     }
 
     star.empireStores = ArrayList(star.empireStores.filter { it.empireId != 0L })
-    star.fleets = ArrayList(star.fleets.filter { it.empireId != null })
+    star.fleets = ArrayList(star.fleets.filter { it.empireId != 0L })
   }
 
   private fun applyUpgradeBuilding(
@@ -703,7 +706,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     for (planet in star.planets) {
       val colony = planet.colony
       if (colony != null && colony.id == modification.colony_id!!) {
-        if (colony.empireId != null && colony.empireId == modification.empire_id) {
+        if (colony.empireId == modification.empire_id) {
           // Not suspicious, just dumb...
           logHandler.log("- trying to attack your own colony, ignoring.")
           return

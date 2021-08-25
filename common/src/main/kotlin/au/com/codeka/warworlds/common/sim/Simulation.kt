@@ -64,10 +64,11 @@ class Simulation constructor(
     // figure out the start time, which is the oldest last_simulation time
     val startTime = getSimulateStartTime(star)
     val endTime = trimTimeToStep(timeOverride)
-    val empireIds = HashSet<Long?>()
+    val empireIds = HashSet<Long>()
     for (planet in star.planets) {
-      if (planet.colony != null) {
-        empireIds.add(planet.colony?.empireId)
+      val colony = planet.colony
+      if (colony != null) {
+        empireIds.add(colony.empireId)
       }
     }
 
@@ -187,7 +188,7 @@ class Simulation constructor(
         }
       }
       for (fleet in star.fleets) {
-        if (fleet.empireId != null) {
+        if (fleet.empireId != 0L) {
           onlyNativeColonies = false
           break
         }
@@ -204,10 +205,10 @@ class Simulation constructor(
     return trimTimeToStep(lastSimulation) + STEP_TIME
   }
 
-  private fun simulateStepForAllEmpires(now: Long, star: MutableStar, empireIds: Set<Long?>) {
+  private fun simulateStepForAllEmpires(now: Long, star: MutableStar, empireIds: Set<Long>) {
     log("- Step [now=%d]", now)
     for (empireId in empireIds) {
-      log(String.format("-- Empire [%s]", empireId ?: "Native"))
+      log(String.format("-- Empire [%d]", empireId))
       simulateStep(now, star, empireId)
     }
 
@@ -222,7 +223,7 @@ class Simulation constructor(
     }
   }
 
-  private fun simulateStep(now: Long, star: MutableStar, empireId: Long?) {
+  private fun simulateStep(now: Long, star: MutableStar, empireId: Long) {
     var totalPopulation = 0.0f
     val storageIndex = getStoreIndex(star, empireId)
     if (storageIndex < 0) {
@@ -239,7 +240,7 @@ class Simulation constructor(
     var energyDeltaPerHour = 0.0f
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (!equalEmpire(colony.empireId, empireId)) {
+      if (colony.empireId != empireId) {
         continue
       }
 
@@ -325,7 +326,7 @@ class Simulation constructor(
     // A second loop though the colonies, once the goods/minerals/energy has been calculated.
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (!equalEmpire(colony.empireId, empireId)) {
+      if (colony.empireId != empireId) {
         continue
       }
 
@@ -511,7 +512,7 @@ class Simulation constructor(
     // now loop through the colonies and update the population/goods counter
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (!equalEmpire(colony.empireId, empireId)) {
+      if (colony.empireId != empireId) {
         continue
       }
 
@@ -698,7 +699,7 @@ class Simulation constructor(
       sitReports: MutableMap<Long, SituationReport>) {
     // Make sure we have all the empires set up in the situation report to begin with.
     for (fleet in fleetsBefore) {
-      if (fleet.empire_id != null && sitReports[fleet.empire_id] == null) {
+      if (sitReports[fleet.empire_id] == null) {
         sitReports[fleet.empire_id] = SituationReport(
             empire_id = fleet.empire_id,
             star_id = star.id,
@@ -721,10 +722,10 @@ class Simulation constructor(
         numDestroyed = fleetBefore.num_ships
       }
 
-      var thisFleetLost = fleetsLost[fleetBefore.empire_id ?: 0]
+      var thisFleetLost = fleetsLost[fleetBefore.empire_id]
       if (thisFleetLost == null) {
         thisFleetLost = EnumMap<Design.DesignType, Float>(Design.DesignType::class.java)
-        fleetsLost[fleetBefore.empire_id ?: 0] = thisFleetLost
+        fleetsLost[fleetBefore.empire_id] = thisFleetLost
       }
       thisFleetLost[fleetBefore.design_type] =
           (thisFleetLost[fleetBefore.design_type] ?: 0f) + numDestroyed
@@ -944,14 +945,5 @@ class Simulation constructor(
 
     /** Step time is 10 minutes.  */
     const val STEP_TIME = 10 * Time.MINUTE
-
-    private fun equalEmpire(one: Long?, two: Long?): Boolean {
-      if (one == null && two == null) {
-        return true
-      }
-      return if (one == null || two == null) {
-        false
-      } else one == two
-    }
   }
 }

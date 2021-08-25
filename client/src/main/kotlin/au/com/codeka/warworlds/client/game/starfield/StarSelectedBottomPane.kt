@@ -104,7 +104,7 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
     var numOtherEmpire = 0
     for (planet in star.planets) {
       val colony = planet.colony ?: continue
-      if (colony.empire_id == null) {
+      if (colony.empire_id == 0L) {
         continue
       }
       if (colony.empire_id == myEmpire.id) {

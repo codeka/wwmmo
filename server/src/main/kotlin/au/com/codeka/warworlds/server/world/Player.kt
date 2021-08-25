@@ -243,7 +243,7 @@ class Player(private val connection: Connection,
 
     // If there's any non-us scout reports we'll need to do a partial sanitization.
     for (scoutReport in star.scout_reports) {
-      if (scoutReport.empire_id != null && scoutReport.empire_id != myEmpireId) {
+      if (scoutReport.empire_id != myEmpireId) {
         needPartialSanitization = true
       }
     }

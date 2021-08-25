@@ -3,7 +3,7 @@ package au.com.codeka.warworlds.common.sim
 import au.com.codeka.warworlds.common.proto.*
 
 class MutableBuilding(private val building: Building) {
-  var id = building.id ?: 0
+  var id = building.id
 
   val designType
     get() = building.design_type
@@ -34,7 +34,7 @@ class MutableFocus(focus: ColonyFocus) {
 
 class MutableBuildRequest(private val buildRequest: BuildRequest) {
   val id
-    get() = buildRequest.id!!
+    get() = buildRequest.id
   val startTime
     get() = buildRequest.start_time!!
   val designType
@@ -144,7 +144,7 @@ class MutableFleet(private val fleet: Fleet) {
   var stance = fleet.stance
   var numShips = fleet.num_ships
   var isDestroyed = fleet.is_destroyed ?: false
-  var fuelAmount = fleet.fuel_amount ?: 0f
+  var fuelAmount = fleet.fuel_amount
   var destinationStarId = fleet.destination_star_id
   var eta = fleet.eta
 
@@ -163,7 +163,7 @@ class MutableFleet(private val fleet: Fleet) {
 }
 
 class MutableEmpireStorage(private val empireStore: EmpireStorage) {
-  val empireId: Long?
+  val empireId
     get() = empireStore.empire_id
 
   var maxEnergy = empireStore.max_energy

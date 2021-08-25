@@ -11,8 +11,8 @@ message Colony {
   // The ID of this colony, so that it can be referred to by other entities.
   required int64 id = 1;
 
-  // The ID of the empire that owns this colony.
-  optional int64 empire_id = 2;
+  // The ID of the empire that owns this colony. Zero for native empires.
+  required int64 empire_id = 2;
 
   // The population of the colony.
   required float population = 3;
@@ -53,7 +53,7 @@ message ColonyFocus {
 // Represents a completed building in a colony.
 message Building {
   // A unique ID for this building.
-  optional int64 id = 4;
+  required int64 id = 4;
 
   // The type of the design of this building
   required Design.DesignType design_type = 1;
@@ -67,7 +67,7 @@ message Building {
 
 // A build request is an in-progress build for the current colony.
 message BuildRequest {
-  optional int64 id = 1;
+  required int64 id = 1;
 
   // The type of the design being created.
   required Design.DesignType design_type = 2;

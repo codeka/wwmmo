@@ -18,7 +18,7 @@ class DebugBuildRequestsHandler : AdminHandler() {
       for (planet in star.planets) {
         val colony = planet.colony ?: continue
         for (buildRequest in colony.build_requests) {
-          buildRequestStars[buildRequest.id!!] = star
+          buildRequestStars[buildRequest.id] = star
           buildRequests.add(buildRequest)
         }
       }

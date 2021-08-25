@@ -53,7 +53,7 @@ class ScoutReportBottomPane(
     planetList.setStar(star, scoutReport.planets, scoutReport.fleets)
     reportDate.text = TimeFormatter.create()
         .withTimeInPast(true)
-        .format(scoutReport.report_time!! - System.currentTimeMillis())
+        .format(scoutReport.report_time - System.currentTimeMillis())
     starName.text = star.name
     starKind.text = String.format(Locale.ENGLISH, "%s %s", star.classification,
         StarHelper.getCoordinateString(star))

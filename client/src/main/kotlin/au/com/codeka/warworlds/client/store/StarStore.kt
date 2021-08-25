@@ -163,7 +163,7 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
         }
       }
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null && fleet.empire_id == myEmpire.id) {
+        if (fleet.empire_id == myEmpire.id) {
           return true
         }
       }

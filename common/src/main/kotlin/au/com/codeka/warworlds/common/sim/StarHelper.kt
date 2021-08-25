@@ -5,6 +5,7 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage
 import au.com.codeka.warworlds.common.proto.Star
 import com.squareup.wire.get
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * A helper for working with [Star]s.
@@ -62,10 +63,7 @@ object StarHelper {
    */
   fun getStorageIndex(star: MutableStar, empireId: Long?): Int {
     for (i in star.empireStores.indices) {
-      if (star.empireStores[i].empireId != null
-        && star.empireStores[i].empireId == empireId) {
-        return i
-      } else if (star.empireStores[i].empireId == null && empireId == null) {
+      if (star.empireStores[i].empireId == empireId) {
         return i
       }
     }
@@ -78,8 +76,8 @@ object StarHelper {
   fun getCoordinateString(star: Star): String {
     return String.format(Locale.US,
         "[%d.%02d, %d.%02d]",
-        star.sector_x, Math.round(100 * star.offset_x / 1024.0f),
-        star.sector_y, Math.round(100 * star.offset_y / 1024.0f))
+        star.sector_x, (100 * star.offset_x / 1024.0f).roundToInt(),
+        star.sector_y, (100 * star.offset_y / 1024.0f).roundToInt())
   }
 
   /**
@@ -87,7 +85,7 @@ object StarHelper {
    *
    *
    * For practical reasons, we assume that the given stars are not *too* far away (that
-   * is, that the distance betwen them can be represented by a 32-bit floating point value).
+   * is, that the distance between them can be represented by a 32-bit floating point value).
    */
   fun directionBetween(from: Star, to: Star): Vector2 {
     val sdx = to.sector_x - from.sector_x
