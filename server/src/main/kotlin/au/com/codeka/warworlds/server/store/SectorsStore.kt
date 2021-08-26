@@ -133,7 +133,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
         .param(3, currState.value)
         .execute()
     if (count == 0 && currState == SectorState.New) {
-      insertNewSector(coord)
+      insertNewSector(coord, newState)
       return true
     }
     return (count == 1)
@@ -194,7 +194,7 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
 
       // Now add all the new sectors.
       for (coord in missing) {
-        insertNewSector(coord)
+        insertNewSector(coord, SectorState.New)
       }
       trans.commit()
     }
@@ -214,13 +214,13 @@ class SectorsStore(fileName: String) : BaseStore(fileName) {
         .execute()
   }
 
-  private fun insertNewSector(coord: SectorCoord) {
+  private fun insertNewSector(coord: SectorCoord, state: SectorState) {
     newWriter()
         .stmt("INSERT INTO sectors (x, y, distance_to_centre, state) VALUES (?, ?, ?, ?)")
         .param(0, coord.x)
         .param(1, coord.y)
         .param(2, sqrt(coord.x * coord.x + coord.y * coord.y.toDouble()))
-        .param(3, SectorState.New.value)
+        .param(3, state.value)
         .execute()
   }
 

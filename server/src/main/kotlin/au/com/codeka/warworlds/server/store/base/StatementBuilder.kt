@@ -138,7 +138,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
     }
 
     val startTime = System.nanoTime()
-    return try {
+    val count = try {
       if (!stmt.execute()) {
         stmt.updateCount
       } else {
@@ -146,12 +146,12 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       }
     } catch (e: SQLException) {
       throw StoreException(e)
-    } finally {
-      val endTime = System.nanoTime()
-      if (enableDebug) {
-        log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql, params))
-      }
     }
+    val endTime = System.nanoTime()
+    if (enableDebug) {
+      log.debug("%.2fms %s = %d", (endTime - startTime) / 1000000.0, debugSql(sql, params), count)
+    }
+    return count
   }
 
   override fun close() {

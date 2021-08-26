@@ -30,8 +30,7 @@ class SectorGenerator {
       return sector
     }
     val random = Random(sector.x * 73649274L xor sector.y xor System.currentTimeMillis())
-    val points = PoissonGenerator()
-        .generate(STAR_DENSITY, STAR_RANDOMNESS, random)
+    val points = PoissonGenerator().generate(STAR_DENSITY, STAR_RANDOMNESS, random)
     val stars = ArrayList<Star>()
     for (point in points) {
       stars.add(generateStar(random, coord, point))
@@ -39,7 +38,10 @@ class SectorGenerator {
     for (star in stars) {
       DataStore.i.stars().put(star.id, star)
     }
-    DataStore.i.sectors().updateSectorState(coord, SectorState.Generating, SectorState.Empty)
+    if (!DataStore.i.sectors().updateSectorState(
+        coord, SectorState.Generating, SectorState.Empty)) {
+      log.warning("Error saving sector state after generating stars.")
+    }
     log.info("  sector (${sector.x}, ${sector.y}) generated with ${stars.size} stars.")
     return sector.copy(
         stars = stars,
