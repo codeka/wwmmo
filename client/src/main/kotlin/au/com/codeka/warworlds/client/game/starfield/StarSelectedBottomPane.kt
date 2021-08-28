@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.ctrl.PlanetListSimple
@@ -30,7 +30,7 @@ import java.util.*
  */
 @SuppressLint("ViewConstructor") // Must be constructed in code.
 class StarSelectedBottomPane(context: Context, private var star: Star, callback: Callback)
-  : FrameLayout(context, null) {
+  : ConstraintLayout(context, null) {
 
   interface Callback {
     fun onStarClicked(star: Star, planet: Planet?)

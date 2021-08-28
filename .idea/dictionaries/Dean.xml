@@ -2,6 +2,7 @@
   <dictionary name="Dean">
     <words>
       <w>coords</w>
+      <w>framerate</w>
       <w>motd</w>
       <w>patreon</w>
       <w>starfield</w>

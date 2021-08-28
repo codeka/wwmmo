@@ -1,136 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:tools="http://schemas.android.com/tools"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content">
+<merge
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+
+  <androidx.constraintlayout.widget.Guideline
+    android:id="@+id/center_vertical"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:orientation="vertical"
+    app:layout_constraintGuide_percent="0.5" />
 
   <ImageView
-      android:id="@+id/star_icon"
-      android:layout_width="40dp"
-      android:layout_height="40dp"
-      android:layout_alignParentStart="true"
-      android:layout_alignParentTop="true"
-      tools:src="@drawable/app_icon" />
+    android:id="@+id/star_icon"
+    android:layout_width="40dp"
+    android:layout_height="40dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:src="@drawable/app_icon" />
 
   <TextView
-      android:id="@+id/star_name"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_alignParentTop="true"
-      android:layout_toEndOf="@+id/star_icon"
-      android:textAppearance="?android:attr/textAppearanceMedium"
-      tools:text="Star name" />
+    android:id="@+id/star_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintStart_toEndOf="@id/star_icon"
+    app:layout_constraintTop_toTopOf="parent"
+    android:textAppearance="?android:attr/textAppearanceMedium"
+    tools:text="Star name" />
 
   <TextView
-      android:id="@+id/star_kind"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_below="@+id/star_name"
-      android:layout_toEndOf="@+id/star_icon"
-      android:textSize="12sp"
-      android:textAppearance="?android:attr/textAppearanceSmall"
-      tools:text="Blue" />
-
-  <Button
-      android:id="@+id/view_btn"
-      style="@style/Button"
-      android:layout_width="75dp"
-      android:layout_height="16pt"
-      android:layout_alignParentEnd="true"
-      android:layout_alignParentTop="true"
-      android:text="@string/view" />
+    android:id="@+id/star_kind"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@id/star_name"
+    app:layout_constraintStart_toEndOf="@id/star_icon"
+    android:textSize="12sp"
+    android:textAppearance="?android:attr/textAppearanceSmall"
+    tools:text="Blue" />
 
   <Button android:id="@+id/rename_btn"
-          style="@style/Button"
-          android:layout_width="75dp"
-          android:layout_height="16pt"
-          android:layout_toStartOf="@id/view_btn"
-          android:layout_alignTop="@id/view_btn"
-          android:layout_marginEnd="10dp"
-          android:text="@string/rename" />
+    style="@style/Button"
+    android:layout_width="100dp"
+    android:layout_height="16pt"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    android:layout_marginEnd="8dp"
+    android:text="@string/rename" />
 
-  <Button
-      android:id="@+id/scout_report_btn"
-      style="@style/Button"
-      android:layout_width="75dp"
-      android:layout_height="16pt"
-      android:layout_alignParentEnd="true"
-      android:layout_below="@+id/view_btn"
-      android:layout_marginTop="10dp"
-      android:text="@string/intel" />
-
-  <LinearLayout
-      android:id="@+id/details"
+  <ScrollView
+    android:id="@+id/planet_list_scroll"
+    android:layout_width="0dp"
+    android:layout_height="100dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toStartOf="@id/center_vertical"
+    app:layout_constraintTop_toBottomOf="@id/star_icon">
+    <FrameLayout
       android:layout_width="match_parent"
-      android:layout_height="100dp"
-      android:layout_below="@+id/star_icon"
-      android:layout_toStartOf="@+id/view_btn"
-      android:orientation="horizontal"
-      android:baselineAligned="false">
-    <ScrollView android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="100dp">
-      <FrameLayout
+      android:layout_height="wrap_content">
+    <au.com.codeka.warworlds.client.ctrl.PlanetListSimple
+        android:id="@+id/planet_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+      <RelativeLayout
+          android:id="@+id/wormhole_details"
           android:layout_width="match_parent"
           android:layout_height="wrap_content">
-        <au.com.codeka.warworlds.client.ctrl.PlanetListSimple
-            android:id="@+id/planet_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <RelativeLayout
-            android:id="@+id/wormhole_details"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-          <ImageView
-              android:id="@+id/empire_icon"
-              android:layout_width="20dp"
-              android:layout_height="20dp"
-              android:layout_marginTop="8dp"
-              android:layout_marginStart="4dp"
-              android:src="@drawable/app_icon" />
-          <TextView
-              android:id="@+id/empire_name"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_toEndOf="@id/empire_icon"
-              android:layout_alignTop="@id/empire_icon"
-              android:layout_marginStart="8dp"
-              tools:text="Empire name"/>
-          <TextView
-              android:id="@+id/destination_name"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_below="@id/empire_icon"
-              android:layout_marginTop="8dp"
-              android:layout_marginStart="4dp"
-              tools:text="-> Another wormhole" />
-          <Button
-              android:id="@+id/wormhole_locate"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_below="@id/destination_name"
-              android:layout_marginTop="8dp"
-              android:layout_centerHorizontal="true"
-              tools:text="  Locate  " />
-        </RelativeLayout>
-      </FrameLayout>
-    </ScrollView>
+        <ImageView
+            android:id="@+id/empire_icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/app_icon" />
+        <TextView
+            android:id="@+id/empire_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/empire_icon"
+            android:layout_alignTop="@id/empire_icon"
+            android:layout_marginStart="8dp"
+            tools:text="Empire name"/>
+        <TextView
+            android:id="@+id/destination_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/empire_icon"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="4dp"
+            tools:text="-> Another wormhole" />
+        <Button
+            android:id="@+id/wormhole_locate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/destination_name"
+            android:layout_marginTop="8dp"
+            android:layout_centerHorizontal="true"
+            tools:text="  Locate  " />
+      </RelativeLayout>
+    </FrameLayout>
+  </ScrollView>
 
-    <ScrollView android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="100dp">
-      <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
-          android:id="@+id/fleet_list"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content" />
-    </ScrollView>
-  </LinearLayout>
+  <ScrollView
+    android:layout_width="0dp"
+    android:layout_height="100dp"
+    app:layout_constraintStart_toEndOf="@id/center_vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/star_icon">
+    <au.com.codeka.warworlds.client.game.fleets.FleetListSimple
+        android:id="@+id/fleet_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+  </ScrollView>
+
+  <Button
+    android:id="@+id/view_btn"
+    style="@style/Button"
+    android:layout_width="100dp"
+    android:layout_height="16pt"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/planet_list_scroll"
+    android:layout_marginTop="8dp"
+    android:layout_marginEnd="8dp"
+    android:text="@string/view" />
+
+  <Button
+    android:id="@+id/scout_report_btn"
+    style="@style/Button"
+    android:layout_width="100dp"
+    android:layout_height="16pt"
+    app:layout_constraintEnd_toStartOf="@id/view_btn"
+    app:layout_constraintTop_toTopOf="@id/view_btn"
+    android:layout_marginEnd="8dp"
+    android:text="@string/intel" />
 
   <au.com.codeka.warworlds.client.ctrl.InfobarView
       android:id="@+id/infobar"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_below="@id/details"
-      android:layout_alignParentStart="true" />
+      app:layout_constraintTop_toTopOf="@id/view_btn"
+      app:layout_constraintBottom_toBottomOf="@id/view_btn" />
 
-</RelativeLayout>
+</merge>

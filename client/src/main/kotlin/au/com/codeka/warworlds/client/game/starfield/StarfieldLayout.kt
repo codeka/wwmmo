@@ -19,7 +19,8 @@ class StarfieldLayout(context: Context?, callbacks: Callbacks) : RelativeLayout(
   private val bottomPane: ViewGroup
   private val chatMiniView: ChatMiniView
   private var bottomPaneContent: ViewGroup? = null
-  fun showBottomPane(content: ViewGroup?, instant: Boolean) {
+
+  fun showBottomPane(content: ViewGroup, instant: Boolean) {
     bottomPaneContent = content
     if (!instant) {
       TransitionManager.beginDelayedTransition(this)

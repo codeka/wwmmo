@@ -493,7 +493,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       return false
     }
 
-    // If the moving fleets have changed, tha counts as a difference we care about.
+    // If the moving fleets have changed, that counts as a difference we care about.
     for (lhsFleet in lhs.fleets) {
       // If it's moving in LHS and not in RHS then it's a difference
       if (lhsFleet.state != Fleet.FLEET_STATE.MOVING) {
