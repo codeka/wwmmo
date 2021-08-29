@@ -6,6 +6,8 @@ import au.com.codeka.warworlds.common.Time
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Design.DesignType
 import au.com.codeka.warworlds.common.sim.*
+import au.com.codeka.warworlds.server.concurrency.TaskRunner
+import au.com.codeka.warworlds.server.concurrency.Threads
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.store.StarsStore
@@ -272,19 +274,17 @@ class StarManager private constructor() {
         val sitReports: MutableMap<Long, SituationReport> = Maps.newHashMap()
         sitReports[fleet.empireId] = sitReport
 
-        synchronized(destStar.lock) {
-          // TODO: this could deadlock, need to lock in the same order
-          val mutableDestStar = MutableStar.from(destStar.get())
-          starModifier.modifyStar(
-              mutableDestStar,
+        // Run this in a separate thread so we don't deadlock
+        TaskRunner.i.runTask({
+          modifyStar(
+            destStar,
+            listOf(
               StarModification(
-                  type = StarModification.Type.CREATE_FLEET,
-                  empire_id = fleet.empireId,
-                  fleet = fleet.build()),
-              sitReports = sitReports,
-              logHandler = logHandler)
-          destStar.set(mutableDestStar.build())
-        }
+                type = StarModification.Type.CREATE_FLEET,
+                empire_id = fleet.empireId,
+                fleet = fleet.build())),
+            logHandler)
+        }, Threads.BACKGROUND)
 
         // Save the situation reports to the data store.
         DataStore.i.sitReports().save(sitReports.values)
