@@ -435,11 +435,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       val y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f)
       container.translate(x, -y)
     } else {
-      oldStar = (container.tag as SceneObjectInfo?)!!.star
+      oldStar = (container.tag as SceneObjectInfo).star
 
       // Check to see that stuff we care about has actually changed. If any stuff hasn't changed
       // then don't update the star.
       if (!hasStarChanged(oldStar, star)) {
+        // Even if the star hasn't changed in a way we care about, we'll still want to save the
+        // new star in the container.
+        container.tag = SceneObjectInfo(star)
         return
       }
 
