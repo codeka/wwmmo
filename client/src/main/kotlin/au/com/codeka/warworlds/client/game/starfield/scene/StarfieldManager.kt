@@ -276,7 +276,6 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * star.
    */
   fun onConnected() {
-    log.info("DEANH onConnected: ${EmpireManager.getMyEmpire().home_star!!.id}")
     warpTo(EmpireManager.getMyEmpire().home_star!!)
   }
 
@@ -440,7 +439,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
       // Check to see that stuff we care about has actually changed. If any stuff hasn't changed
       // then don't update the star.
-      if (willRenderTheSame(oldStar, star)) {
+      if (!hasStarChanged(oldStar, star)) {
         return
       }
 
@@ -472,9 +471,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   /**
-   * Quick sanity check to see whether the two stars given will render exactly the same. Presumably
+   * Quick sanity check to see whether the two given star will render differently. Presumably
    * they're just different versions of the same star and often stuff that we don't care about
-   * rendering here will have changed (e.g. a building has completed building). In the case that
+   * rendering here will not have changed (e.g. a building has completed building). In the case that
    * they are going to render the same, we can save a lot of time by not changing the star.
    *
    * <p>We make a few assumptions here to simplify:
@@ -482,14 +481,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    *   2. Stars never change classification
    *   3. Stars with different IDs will always render differently
    */
-  private fun willRenderTheSame(lhs: Star, rhs: Star): Boolean {
+  private fun hasStarChanged(lhs: Star, rhs: Star): Boolean {
     // Obviously a different ID will be rendered differently.
     if (lhs.id != rhs.id) {
-      return false
+      return true
     }
 
     if (lhs.name != rhs.name) {
-      return false
+      return true
     }
 
     // If the moving fleets have changed, that counts as a difference we care about.
@@ -507,7 +506,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         }
       }
       if (!movingInRhs) {
-        return false
+        return true
       }
     }
 
@@ -518,19 +517,19 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       }
 
       var movingInLhs = false
-      for (lhsFleet in rhs.fleets) {
+      for (lhsFleet in lhs.fleets) {
         if (rhsFleet.id == lhsFleet.id && lhsFleet.state == Fleet.FLEET_STATE.MOVING) {
           movingInLhs = true
           break
         }
       }
       if (!movingInLhs) {
-        return false
+        return true
       }
     }
 
-    // OK it's a difference we don't care about. They would render the same way
-    return true
+    // Nothing's changed that we care about, they would render the same.
+    return false
   }
 
   /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
