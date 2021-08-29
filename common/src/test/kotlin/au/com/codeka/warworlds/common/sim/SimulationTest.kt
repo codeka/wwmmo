@@ -87,7 +87,7 @@ class SimulationTest {
                 farming_congeniality = 100,
                 mining_congeniality = 100,
                 population_congeniality = 1000,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -128,7 +128,7 @@ class SimulationTest {
                 farming_congeniality = 100,
                 mining_congeniality = 100,
                 population_congeniality = 1000,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -167,7 +167,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = 1000,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -210,7 +210,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = (buildCost.population * 1.2f).toInt(),
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -258,7 +258,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = (buildCost.population * 2).toInt(),
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -307,7 +307,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = buildCost.population.toInt(),
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -355,7 +355,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = buildCost.population.toInt(),
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -431,7 +431,7 @@ class SimulationTest {
                 farming_congeniality = 100,
                 mining_congeniality = 100,
                 population_congeniality = (buildCost.population * 2).toInt(),
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -485,7 +485,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = buildCost.population.toInt() * 200,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -556,7 +556,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = buildCost.population.toInt() * 2,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -611,7 +611,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = 1000,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,
@@ -683,7 +683,7 @@ class SimulationTest {
                 farming_congeniality = 200,
                 mining_congeniality = 300,
                 population_congeniality = 1000,
-                planet_type = Planet.PLANET_TYPE.TERRAN,
+                planet_type = Planet.Type.TERRAN,
                 colony = Colony(
                     id = 1L,
                     empire_id = 1L,

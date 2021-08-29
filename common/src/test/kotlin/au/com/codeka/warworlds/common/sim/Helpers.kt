@@ -11,7 +11,7 @@ import java.util.ArrayList
  */
 fun makeStar(
   id: Long, name: String = "Test star",
-  classification: Star.CLASSIFICATION = Star.CLASSIFICATION.BLUE, size: Int = 1,
+  classification: Star.Classification = Star.Classification.BLUE, size: Int = 1,
   offset_x: Int = 0, offset_y: Int = 0, sector_x: Long = 0L, sector_y: Long = 0L,
   planets: List<Planet> = ArrayList<Planet>(), fleets: List<Fleet> = ArrayList<Fleet>(),
   empire_stores: List<EmpireStorage> = ArrayList<EmpireStorage>()
