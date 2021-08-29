@@ -55,7 +55,7 @@ message Star {
 
   // the classification of this star. The order of these enum values
   // must correspond to the order of the StarTypes defined in sector.py
-  enum CLASSIFICATION {
+  enum Classification {
     BLUE = 0;
     WHITE = 1;
     YELLOW = 2;
@@ -66,7 +66,7 @@ message Star {
     MARKER = 7;
     WORMHOLE = 8;
   }
-  required CLASSIFICATION classification = 3;
+  required Classification classification = 3;
 
   // the apparent "size" of the star (which is really just a display thing)
   required int32 size = 5;
@@ -158,7 +158,7 @@ message Planet {
 
   // The various different "kinds" of planets. Planets are spawned in increasing order
   // of probability (so "terran" is most likely, "gas giant" least likely).
-  enum PLANET_TYPE {
+  enum Type {
     GASGIANT = 1;
     RADIATED = 2;
     INFERNO = 3;
@@ -169,7 +169,7 @@ message Planet {
     SWAMP = 8;
     TERRAN = 9;
   }
-  required PLANET_TYPE planet_type = 3;
+  required Type planet_type = 3;
 
   // How "congenial" is this planet to supporting population
   required int32 population_congeniality = 4;
@@ -211,9 +211,9 @@ message EmpireStorage {
 // of a colony, etc. This is to ensure edits happen in a deterministic fashion and we can control
 // the locking and synchronization better.
 message StarModification {
-  enum MODIFICATION_TYPE {
+  enum Type {
     // Do not use.
-    UNKNOWN = 0;
+    UNKNOWN_TYPE = 0;
 
     // Colonize a planet on the star.
     // empire_id and planet_index are required.
@@ -272,7 +272,7 @@ message StarModification {
     // empire_id and colony_id are required.
     ATTACK_COLONY = 12;
   }
-  required MODIFICATION_TYPE type = 1;
+  required Type type = 1;
 
   optional int64 empire_id = 2;
   optional int32 planet_index = 3;

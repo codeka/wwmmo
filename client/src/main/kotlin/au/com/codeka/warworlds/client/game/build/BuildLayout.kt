@@ -54,7 +54,7 @@ class BuildLayout(
         context, star, colony, design!!, object : BuildBottomPane.Callback {
       override fun onBuild(designType: DesignType?, count: Int) {
         StarManager.updateStar(star, StarModification(
-            type = StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST,
+            type = StarModification.Type.ADD_BUILD_REQUEST,
             colony_id = colony.id,
             design_type = designType,
             count = count))
@@ -78,7 +78,7 @@ class BuildLayout(
         context, star, colony, design, building, object : UpgradeBottomPane.Callback {
       override fun onUpgrade(building: Building?) {
         StarManager.updateStar(star, StarModification(
-            type = StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST,
+            type = StarModification.Type.ADD_BUILD_REQUEST,
             colony_id = colony.id,
             building_id = building?.id,
             design_type = building?.design_type))
@@ -100,7 +100,7 @@ class BuildLayout(
       override fun onCancelBuild() {
         // "Cancel" has been clicked.
         StarManager.updateStar(star, StarModification(
-            type = StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST,
+            type = StarModification.Type.DELETE_BUILD_REQUEST,
             build_request_id = buildRequest.id))
         hideBottomSheet()
       }

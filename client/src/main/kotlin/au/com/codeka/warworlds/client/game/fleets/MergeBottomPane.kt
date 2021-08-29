@@ -66,7 +66,7 @@ class MergeBottomPane(
         Iterables.filter(adapter.getSelectedFleetIds()) { fleetId -> selectedFleetId != fleetId })
     if (additionalFleetIds.isNotEmpty()) {
       StarManager.updateStar(star!!, StarModification(
-          type = StarModification.MODIFICATION_TYPE.MERGE_FLEET,
+          type = StarModification.Type.MERGE_FLEET,
           fleet_id = fleet!!.id,
           additional_fleet_ids = additionalFleetIds))
     }

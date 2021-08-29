@@ -58,7 +58,7 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
         farmingFocus: Float, miningFocus: Float, energyFocus: Float, constructionFocus: Float) {
       val colony = planet.colony ?: return
       StarManager.updateStar(star, StarModification(
-          type = StarModification.MODIFICATION_TYPE.ADJUST_FOCUS,
+          type = StarModification.Type.ADJUST_FOCUS,
           colony_id = colony.id,
           focus = ColonyFocus(
               farming = farmingFocus,
@@ -72,7 +72,7 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
       val colony = planet.colony ?: return
       val myEmpire = EmpireManager.getMyEmpire()
       StarManager.updateStar(star, StarModification(
-          type = StarModification.MODIFICATION_TYPE.ATTACK_COLONY,
+          type = StarModification.Type.ATTACK_COLONY,
           empire_id = myEmpire.id,
           colony_id = colony.id))
       context.popScreen()
@@ -81,7 +81,7 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
     override fun onColonizeClick() {
       val myEmpire = EmpireManager.getMyEmpire()
       StarManager.updateStar(star, StarModification(
-          type = StarModification.MODIFICATION_TYPE.COLONIZE,
+          type = StarModification.Type.COLONIZE,
           empire_id = myEmpire.id,
           planet_index = planet.index))
       context.popScreen()

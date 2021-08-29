@@ -72,7 +72,7 @@ class StarManager private constructor() {
         for (planet in mutableStar.planets) {
           if (planet.populationCongeniality > 500) {
             starModifier.modifyStar(mutableStar, StarModification(
-                type = StarModification.MODIFICATION_TYPE.COLONIZE,
+                type = StarModification.Type.COLONIZE,
                 empire_id = 0L,
                 planet_index = planet.index))
             numColonies++
@@ -84,7 +84,7 @@ class StarManager private constructor() {
         while (numColonies > 0) {
           val numShips = 100 + (rand.next() * 40).toInt()
           starModifier.modifyStar(mutableStar, StarModification(
-              type = StarModification.MODIFICATION_TYPE.CREATE_FLEET,
+              type = StarModification.Type.CREATE_FLEET,
               empire_id = 0L,
               design_type = DesignType.FIGHTER,
               count = numShips))
@@ -185,7 +185,7 @@ class StarManager private constructor() {
               // It's an existing building that we're upgrading.
               starModifier.modifyStar(mutableStar,
                   StarModification(
-                      type = StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING,
+                      type = StarModification.Type.UPGRADE_BUILDING,
                       colony_id = colony.id,
                       empire_id = colony.empireId,
                       building_id = br.buildingId),
@@ -196,7 +196,7 @@ class StarManager private constructor() {
               starModifier.modifyStar(
                   mutableStar,
                   StarModification(
-                      type = StarModification.MODIFICATION_TYPE.CREATE_BUILDING,
+                      type = StarModification.Type.CREATE_BUILDING,
                       colony_id = colony.id,
                       empire_id = colony.empireId,
                       design_type = br.designType),
@@ -207,7 +207,7 @@ class StarManager private constructor() {
             starModifier.modifyStar(
                 mutableStar,
                 StarModification(
-                    type = StarModification.MODIFICATION_TYPE.CREATE_FLEET,
+                    type = StarModification.Type.CREATE_FLEET,
                     empire_id = colony.empireId,
                     design_type = br.designType,
                     count = br.count),
@@ -278,7 +278,7 @@ class StarManager private constructor() {
           starModifier.modifyStar(
               mutableDestStar,
               StarModification(
-                  type = StarModification.MODIFICATION_TYPE.CREATE_FLEET,
+                  type = StarModification.Type.CREATE_FLEET,
                   empire_id = fleet.empireId,
                   fleet = fleet.build()),
               sitReports = sitReports,

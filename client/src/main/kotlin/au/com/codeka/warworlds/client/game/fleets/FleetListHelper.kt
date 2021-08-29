@@ -144,7 +144,7 @@ object FleetListHelper {
     ImageHelper.bindStarIcon(
         ssb, ssb.length - 2, ssb.length - 1, context, dest, 16, needRedrawCallback)
     var name = dest.name
-    if (dest.classification == Star.CLASSIFICATION.MARKER) {
+    if (dest.classification == Star.Classification.MARKER) {
       name = "<i>Empty Space</i>"
     }
     if (includeEta) {

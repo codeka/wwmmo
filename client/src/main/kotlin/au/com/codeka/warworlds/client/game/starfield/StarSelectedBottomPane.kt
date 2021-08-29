@@ -19,7 +19,6 @@ import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.Fleet
 import au.com.codeka.warworlds.common.proto.Planet
 import au.com.codeka.warworlds.common.proto.Star
-import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.StarHelper
 import com.google.common.base.Preconditions
 import com.squareup.picasso.Picasso
@@ -89,7 +88,7 @@ class StarSelectedBottomPane(context: Context, private var star: Star, callback:
   }
 
   private fun refresh() {
-    if (star.classification == CLASSIFICATION.WORMHOLE) {
+    if (star.classification == Star.Classification.WORMHOLE) {
       planetList.visibility = View.GONE
       findViewById<View>(R.id.wormhole_details).visibility = View.VISIBLE
       //      refreshWormholeDetails();

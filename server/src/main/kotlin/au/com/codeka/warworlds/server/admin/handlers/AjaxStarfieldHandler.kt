@@ -105,7 +105,7 @@ class AjaxStarfieldHandler : AjaxHandler() {
   private fun handleClearNativesRequest(starId: Long) {
     log.debug("delete star: %d", starId)
     modifyAndSimulate(starId, StarModification(
-        type = StarModification.MODIFICATION_TYPE.EMPTY_NATIVE))
+        type = StarModification.Type.EMPTY_NATIVE))
   }
 
   private fun handleForceMoveComplete(starId: Long, fleetId: Long) {

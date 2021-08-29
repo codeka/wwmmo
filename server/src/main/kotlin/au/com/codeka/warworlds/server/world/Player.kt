@@ -3,7 +3,6 @@ package au.com.codeka.warworlds.server.world
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.debug.PacketDebug
 import au.com.codeka.warworlds.common.proto.*
-import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.*
 import au.com.codeka.warworlds.server.concurrency.TaskRunner
 import au.com.codeka.warworlds.server.concurrency.Threads
@@ -213,7 +212,7 @@ class Player(private val connection: Connection,
   private fun sanitizeStar(star: Star): Star {
     // If the star is a wormhole, don't sanitize it -- a wormhole is basically fleets in transit
     // anyway.
-    if (star.classification == CLASSIFICATION.WORMHOLE) {
+    if (star.classification == Star.Classification.WORMHOLE) {
       return star
     }
     val myEmpireId = empire.get().id

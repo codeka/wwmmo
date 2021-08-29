@@ -225,9 +225,9 @@ class NewStarFinder {
     var miningCongeniality = 0.0
     var energyCongeniality = 0.0
     for (planet in star.planets) {
-      if (planet.planet_type == Planet.PLANET_TYPE.TERRAN ||
-          planet.planet_type == Planet.PLANET_TYPE.SWAMP ||
-          planet.planet_type == Planet.PLANET_TYPE.WATER) {
+      if (planet.planet_type == Planet.Type.TERRAN ||
+          planet.planet_type == Planet.Type.SWAMP ||
+          planet.planet_type == Planet.Type.WATER) {
         numTerranPlanets++
       }
       populationCongeniality += planet.population_congeniality.toDouble()

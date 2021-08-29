@@ -7,7 +7,6 @@ import au.com.codeka.warworlds.common.proto.Planet
 import au.com.codeka.warworlds.common.proto.Sector
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
-import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.world.SectorManager
@@ -73,7 +72,7 @@ class SectorGenerator {
   }
 
   private fun generateStar(random: Random, sectorCoord: SectorCoord, point: Vector2): Star {
-    val classification = CLASSIFICATION.fromValue(select(random, STAR_TYPE_BONUSES))!!
+    val classification = Star.Classification.fromValue(select(random, STAR_TYPE_BONUSES))!!
     val planets = generatePlanets(random, classification)
     return Star(
         id = DataStore.i.seq().nextIdentifier(),
@@ -87,7 +86,8 @@ class SectorGenerator {
         size = random.nextInt(8) + 16)
   }
 
-  private fun generatePlanets(random: Random, classification: CLASSIFICATION): ArrayList<Planet> {
+  private fun generatePlanets(
+      random: Random, classification: Star.Classification): ArrayList<Planet> {
     var numPlanets = 0
     while (numPlanets < 2) {
       numPlanets = select(random, PLANET_COUNT_BONUSES)
@@ -106,7 +106,7 @@ class SectorGenerator {
       val energyMultipler = PLANET_ENERGY_BONUSES[planetType]
       planets.add(Planet(
           index = planetIndex,
-          planet_type = Planet.PLANET_TYPE.fromValue(planetType + 1)!!,
+          planet_type = Planet.Type.fromValue(planetType + 1)!!,
           population_congeniality = (normalRandom(random, 1000) * populationMultiplier).toInt(),
           farming_congeniality = (normalRandom(random, 100) * farmingMultiplier).toInt(),
           mining_congeniality = (normalRandom(random, 100) * miningMultiplier).toInt(),

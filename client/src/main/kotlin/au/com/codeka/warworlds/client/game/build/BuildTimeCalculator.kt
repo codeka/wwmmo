@@ -36,7 +36,7 @@ class BuildTimeCalculator(private val star: Star, private val colony: Colony) {
       try {
         StarModifier { 0 }.modifyStar(mutableStar,
             StarModification(
-                type = StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST,
+                type = StarModification.Type.ADD_BUILD_REQUEST,
                 empire_id = myEmpire.id,
                 colony_id = colony.id,
                 count = count,

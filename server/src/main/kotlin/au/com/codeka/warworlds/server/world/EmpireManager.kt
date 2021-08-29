@@ -79,7 +79,7 @@ class EmpireManager private constructor() {
     }
     try {
       StarManager.i.modifyStar(star, Lists.newArrayList(
-          StarModification(type = StarModification.MODIFICATION_TYPE.EMPTY_NATIVE),
+          StarModification(type = StarModification.Type.EMPTY_NATIVE),
           createFleet(id, DesignType.COLONY_SHIP, 11),
           createFleet(id, DesignType.FIGHTER, 100),
           createFleet(id, DesignType.FIGHTER, 100),
@@ -99,7 +99,7 @@ class EmpireManager private constructor() {
           createFleet(id, DesignType.SCOUT, 0),
           StarModification(
               empire_id = id,
-              type = StarModification.MODIFICATION_TYPE.COLONIZE,
+              type = StarModification.Type.COLONIZE,
               planet_index = newStarFinder.planetIndex)
       ), StarModifier.EMPTY_LOG_HANDLER)
     } catch (e: SuspiciousModificationException) {
@@ -170,7 +170,7 @@ class EmpireManager private constructor() {
     val i = EmpireManager()
     private fun createFleet(empireId: Long, designType: DesignType, count: Int): StarModification {
       return StarModification(
-          type = StarModification.MODIFICATION_TYPE.CREATE_FLEET,
+          type = StarModification.Type.CREATE_FLEET,
           empire_id = empireId,
           design_type = designType,
           count = count,

@@ -95,7 +95,7 @@ class SplitBottomPane(
       return
     }
     StarManager.updateStar(star!!, StarModification(
-        type = StarModification.MODIFICATION_TYPE.SPLIT_FLEET,
+        type = StarModification.Type.SPLIT_FLEET,
         fleet_id = fleet!!.id,
         count = splitRatio.max - splitRatio.progress))
     cancelCallback()

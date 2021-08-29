@@ -147,7 +147,7 @@ class MoveBottomPane(
       return
     }
     StarManager.updateStar(star, StarModification(
-        type = StarModification.MODIFICATION_TYPE.MOVE_FLEET,
+        type = StarModification.Type.MOVE_FLEET,
         fleet_id = fleet.id,
         star_id = destStar!!.id))
     callback()

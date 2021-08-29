@@ -19,7 +19,6 @@ import au.com.codeka.warworlds.common.Vector2
 import au.com.codeka.warworlds.common.Vector3
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Design.DesignType
-import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.StarHelper
 import java.util.*
 import kotlin.math.ceil
@@ -403,10 +402,10 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         .texture(scene.textureManager.loadTexture("stars/stars.png"))
         .uvTopLeft(uvTopLeft)
         .uvBottomRight(Vector2(
-            uvTopLeft.x + if (star.classification == CLASSIFICATION.NEUTRON) 0.5f else 0.25f,
-            uvTopLeft.y + if (star.classification == CLASSIFICATION.NEUTRON) 0.5f else 0.25f))
+            uvTopLeft.x + if (star.classification == Star.Classification.NEUTRON) 0.5f else 0.25f,
+            uvTopLeft.y + if (star.classification == Star.Classification.NEUTRON) 0.5f else 0.25f))
         .build(), "Star:${star.id}:${star.name}")
-    if (star.classification == CLASSIFICATION.NEUTRON) {
+    if (star.classification == Star.Classification.NEUTRON) {
       sprite.setSize(90.0f, 90.0f)
     } else {
       sprite.setSize(40.0f, 40.0f)
@@ -859,14 +858,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
   private fun getStarUvTopLeft(star: Star): Vector2 {
     return when (star.classification) {
-      CLASSIFICATION.BLACKHOLE -> Vector2(0.0, 0.5)
-      CLASSIFICATION.BLUE -> Vector2(0.25, 0.5)
-      CLASSIFICATION.NEUTRON -> Vector2(0.0, 0.0)
-      CLASSIFICATION.ORANGE -> Vector2(0.0, 0.75)
-      CLASSIFICATION.RED -> Vector2(0.25, 0.75)
-      CLASSIFICATION.WHITE -> Vector2(0.5, 0.75)
-      CLASSIFICATION.WORMHOLE -> Vector2(0.0, 0.0)
-      CLASSIFICATION.YELLOW -> Vector2(0.5, 0.5)
+      Star.Classification.BLACKHOLE -> Vector2(0.0, 0.5)
+      Star.Classification.BLUE -> Vector2(0.25, 0.5)
+      Star.Classification.NEUTRON -> Vector2(0.0, 0.0)
+      Star.Classification.ORANGE -> Vector2(0.0, 0.75)
+      Star.Classification.RED -> Vector2(0.25, 0.75)
+      Star.Classification.WHITE -> Vector2(0.5, 0.75)
+      Star.Classification.WORMHOLE -> Vector2(0.0, 0.0)
+      Star.Classification.YELLOW -> Vector2(0.5, 0.5)
       else ->         // Shouldn't happen!
         Vector2(0.5, 0.0)
     }

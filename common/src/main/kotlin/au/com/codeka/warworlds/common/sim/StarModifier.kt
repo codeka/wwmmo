@@ -11,10 +11,8 @@ import au.com.codeka.warworlds.common.sim.FleetHelper.isOwnedBy
 import au.com.codeka.warworlds.common.sim.StarHelper.distanceBetween
 import au.com.codeka.warworlds.common.sim.StarHelper.getStorageIndex
 import com.google.common.base.Preconditions
-import com.google.common.collect.Iterables
 import com.google.common.collect.Lists
 import java.util.*
-import java.util.function.Predicate
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -70,18 +68,18 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     when (modification.type) {
-      StarModification.MODIFICATION_TYPE.COLONIZE -> applyColonize(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.CREATE_FLEET -> applyCreateFleet(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.CREATE_BUILDING -> applyCreateBuilding(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.ADJUST_FOCUS -> applyAdjustFocus(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST -> applyAddBuildRequest(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST -> applyDeleteBuildRequest(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.SPLIT_FLEET -> applySplitFleet(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.MERGE_FLEET ->  applyMergeFleet(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.MOVE_FLEET -> applyMoveFleet(star, auxStars!!, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.EMPTY_NATIVE -> applyEmptyNative(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING -> applyUpgradeBuilding(star, modification, logHandler)
-      StarModification.MODIFICATION_TYPE.ATTACK_COLONY -> applyAttackColony(star, modification, logHandler)
+      StarModification.Type.COLONIZE -> applyColonize(star, modification, logHandler)
+      StarModification.Type.CREATE_FLEET -> applyCreateFleet(star, modification, logHandler)
+      StarModification.Type.CREATE_BUILDING -> applyCreateBuilding(star, modification, logHandler)
+      StarModification.Type.ADJUST_FOCUS -> applyAdjustFocus(star, modification, logHandler)
+      StarModification.Type.ADD_BUILD_REQUEST -> applyAddBuildRequest(star, modification, logHandler)
+      StarModification.Type.DELETE_BUILD_REQUEST -> applyDeleteBuildRequest(star, modification, logHandler)
+      StarModification.Type.SPLIT_FLEET -> applySplitFleet(star, modification, logHandler)
+      StarModification.Type.MERGE_FLEET ->  applyMergeFleet(star, modification, logHandler)
+      StarModification.Type.MOVE_FLEET -> applyMoveFleet(star, auxStars!!, modification, logHandler)
+      StarModification.Type.EMPTY_NATIVE -> applyEmptyNative(star, modification, logHandler)
+      StarModification.Type.UPGRADE_BUILDING -> applyUpgradeBuilding(star, modification, logHandler)
+      StarModification.Type.ATTACK_COLONY -> applyAttackColony(star, modification, logHandler)
       else -> {
         logHandler.log("Unknown or unexpected modification type: ${modification.type}")
         log.error("Unknown or unexpected modification type: ${modification.type}")
@@ -93,7 +91,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       logHandler: Simulation.LogHandler?) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.COLONIZE)
+    Preconditions.checkArgument(modification.type == StarModification.Type.COLONIZE)
     modification.empire_id!!
     logHandler!!.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
 
@@ -175,7 +173,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       logHandler: Simulation.LogHandler?) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.CREATE_FLEET)
+    Preconditions.checkArgument(modification.type == StarModification.Type.CREATE_FLEET)
     modification.empire_id!!
 
     var attack = false
@@ -301,7 +299,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
+    Preconditions.checkArgument(modification.type == StarModification.Type.CREATE_BUILDING)
     val planet = getPlanetWithColony(star, modification.colony_id!!)
     if (planet != null) {
       val colony = planet.colony!! // TODO: suss
@@ -358,7 +356,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(
-      modification.type == StarModification.MODIFICATION_TYPE.ADJUST_FOCUS)
+      modification.type == StarModification.Type.ADJUST_FOCUS)
     val colony = getColony(star, modification)
 
     // TODO: make sure the focus is valid (i.e. all adds up to 1)
@@ -372,7 +370,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(
-        modification.type == StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
+        modification.type == StarModification.Type.ADD_BUILD_REQUEST)
 
     val colony = getColony(star, modification)
 
@@ -453,7 +451,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(
-        modification.type == StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
+        modification.type == StarModification.Type.DELETE_BUILD_REQUEST)
     var planet: MutablePlanet? = null
     var buildRequest: MutableBuildRequest? = null
     for (p in star.planets) {
@@ -513,7 +511,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       logHandler: Simulation.LogHandler?) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.SPLIT_FLEET)
+    Preconditions.checkArgument(modification.type == StarModification.Type.SPLIT_FLEET)
 
     val fleet = getFleet(star, modification)
     val design = getDesign(fleet.designType)
@@ -536,7 +534,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.MERGE_FLEET)
+    Preconditions.checkArgument(modification.type == StarModification.Type.MERGE_FLEET)
 
     val fleet = getFleet(star, modification)
     if (fleet.state != Fleet.FLEET_STATE.IDLE) {
@@ -600,7 +598,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       auxStars: Collection<Star>,
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.MOVE_FLEET)
+    Preconditions.checkArgument(modification.type == StarModification.Type.MOVE_FLEET)
     logHandler.log("- moving fleet")
     var targetStar: Star? = null
     for (s in auxStars) {
@@ -647,7 +645,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(
-      modification.type == StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
+      modification.type == StarModification.Type.EMPTY_NATIVE)
     logHandler.log("- emptying native colonies")
 
     for (planet in star.planets) {
@@ -666,7 +664,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(
-        modification.type == StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING)
+        modification.type == StarModification.Type.UPGRADE_BUILDING)
 
     val colony = getColony(star, modification)
     logHandler.log("- upgrading building")
@@ -700,7 +698,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
-    Preconditions.checkArgument(modification.type == StarModification.MODIFICATION_TYPE.ATTACK_COLONY)
+    Preconditions.checkArgument(modification.type == StarModification.Type.ATTACK_COLONY)
     logHandler.log("- attacking colony")
     var found = false
     for (planet in star.planets) {
