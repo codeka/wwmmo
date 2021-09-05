@@ -90,10 +90,10 @@ class StarModifier(private val identifierGenerator: () -> Long) {
   private fun applyColonize(
       star: MutableStar,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.Type.COLONIZE)
     modification.empire_id!!
-    logHandler!!.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
+    logHandler.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
 
     // When we destroy the colonyship, we'll take it's energy and add it to the star's supply.
     var remainingFuel = 0f
@@ -172,7 +172,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
   private fun applyCreateFleet(
       star: MutableStar,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.Type.CREATE_FLEET)
     modification.empire_id!!
 
@@ -215,7 +215,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     }
 
     // Now add the fleet itself.
-    logHandler!!.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d fuel=%.2f",
+    logHandler.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d fuel=%.2f",
         if (attack) "attacking" else "not attacking",
         numAttacking, fuelAmount))
     if (modification.fleet != null) {
@@ -510,13 +510,13 @@ class StarModifier(private val identifierGenerator: () -> Long) {
   private fun applySplitFleet(
       star: MutableStar,
       modification: StarModification,
-      logHandler: Simulation.LogHandler?) {
+      logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.Type.SPLIT_FLEET)
 
     val fleet = getFleet(star, modification)
     val design = getDesign(fleet.designType)
     val fuelFraction = fleet.fuelAmount / (design.fuel_size!! * fleet.numShips)
-    logHandler!!.log("- splitting fleet")
+    logHandler.log("- splitting fleet")
     // Modify the existing fleet to change it's number of ships
     val existingFleetNumShips = fleet.numShips - modification.count!!
 
