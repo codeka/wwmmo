@@ -24,7 +24,7 @@ $(function() {
   // clicking the toggle button toggles the menu
   $("#navmenu-toggle").on("click", function() {
     var $navmenu = $("#navmenu");
-    var show = ($navmenu.css("display") == "none");
+    var show = ($navmenu.css("display") === "none");
     localStorage["navmenu.hidden"] = !show;
 
     $navmenu.show();
@@ -39,7 +39,7 @@ $(function() {
         "left": (show ? "310" : "0")+"px"
       }, "fast");
   });
-  var isHidden = localStorage["navmenu.hidden"] == "true";
+  var isHidden = localStorage["navmenu.hidden"] === "true";
   if (isHidden) {
     $("#navmenu").hide();
     $("#maincontent").css("left", "0px");
@@ -62,11 +62,10 @@ function toTitleCase(str) {
 // Stolen without shame from http://stackoverflow.com/a/3855394/241462
 (function($) {
   $.QueryString = (function(a) {
-    if (a == "") return {};
-    var b = {};
-    for (var i = 0; i < a.length; ++i) {
-      var p=a[i].split('=', 2);
-      if (p.length != 2) continue;
+    let b = {};
+    for (let i = 0; i < a.length; ++i) {
+      const p = a[i].split('=', 2);
+      if (p.length !== 2) continue;
       b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
     }
     return b;

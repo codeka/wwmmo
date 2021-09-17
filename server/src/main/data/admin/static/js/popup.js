@@ -8,23 +8,23 @@
 //
 
 (function($) {
-  var scrim = null;
+  let scrim = null;
 
   $.fn.popup = function(action) {
     if (scrim == null) {
       scrim = $("#popup-scrim");
     }
 
-    if (typeof action == "undefined" || action == "open") {
+    if (typeof action == "undefined" || action === "open") {
       this.detach().appendTo(scrim);
       scrim.show();
       this.show();
 
-      var $popup = this;
+      const $popup = this;
       this.find(".popup-buttons .close").click(function() {
         $popup.popup("close");
       });
-    } else if (action == "close") {
+    } else if (action === "close") {
       scrim.hide();
       this.hide();
     }

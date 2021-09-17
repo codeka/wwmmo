@@ -2,8 +2,8 @@ $(function() {
 
   $("#send input").on({
     "keypress": function(evnt) {
-      if (evnt.charCode == 13) {
-        var data = {
+      if (evnt.key === 13) {
+        const data = {
           "action": "send",
           "msg": $("#send input").val(),
         };
@@ -12,14 +12,13 @@ $(function() {
           url: "/admin/ajax/chat",
           method: "POST",
           data: data,
-          success: function(data) {
+          success: function() {
             $("#send input").val("");
           }
         });
       }
     }
-  });
-  $("#send input").focus();
+  }).focus();
 
   var lastMsgTime = new Date().getTime() - (3600000 /* 1 hour */ * 24);
 
@@ -67,7 +66,7 @@ $(function() {
         lastMsgTime: lastMsgTime,
       },
       success: function(data) {
-        for (var i = 0; i < data.messages.length; i++) {
+        for (let i = 0; i < data.messages.length; i++) {
           appendMessage(data.messages[i]);
         }
       }

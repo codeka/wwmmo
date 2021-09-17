@@ -1,5 +1,6 @@
-var Designs = (function() {
-  var designs = null;
+const Designs = (function() {
+  let designs = null;
+
   $.ajax({
     url: "/admin/ajax/designs",
     success: function(data) {
@@ -9,8 +10,8 @@ var Designs = (function() {
   });
 
   function getDesign(designType) {
-    for (var i in designs) {
-      if (designs[i].type == designType) {
+    for (let i in designs) {
+      if (designs[i].type === designType) {
         return designs[i];
       }
     }

@@ -1,8 +1,8 @@
 
 $(function() {
-  var currStar = null;
-  var currSectorX = 0;
-  var currSectorY = 0;
+  let currStar = null;
+  let currSectorX = 0;
+  let currSectorY = 0;
 
   // Describe the sector state, keep in sync with SectorsStore.SectorState.
   function describeState(state) {
@@ -21,17 +21,17 @@ $(function() {
   }
 
   function renderSector(sector) {
-    var container = $("#starfield");
+    const container = $("#starfield");
     container.empty();
 
-    var div = $("<div/>");
+    let div = $("<div/>");
     div.addClass("sector-state");
     div.text(describeState(sector.state));
     container.append(div);
 
-    for (var index in sector.stars) {
-      var star = sector.stars[index];
-      var div = $("<div/>");
+    for (let index in sector.stars) {
+      const star = sector.stars[index];
+      div = $("<div/>");
       div.addClass("star-small");
       div.addClass("star-" + star.classification.toLowerCase());
       div.css("left", parseInt(star.offset_x * 0.5) + "px");
@@ -41,7 +41,7 @@ $(function() {
       div.on("click", function() { showStar($(this).data("star")); });
       container.append(div);
 
-      var label = $("<div/>");
+      let label = $("<div/>");
       label.addClass("starfield-label");
       label.addClass("noselect");
       label.css("left", parseInt(star.offset_x * 0.5) + "px");
@@ -51,24 +51,24 @@ $(function() {
       label.on("click", function() { showStar($(this).data("star")); });
       container.append(label);
 
-      var empires = [];
-      for (var i in star.planets) {
-        var planet = star.planets[i];
-        if (planet.colony != null && planet.colony.empire_id != 0) {
+      const empires = [];
+      for (let i in star.planets) {
+        const planet = star.planets[i];
+        if (planet.colony != null && planet.colony.empire_id !== 0) {
           if (empires.indexOf(planet.colony.empire_id) === -1) {
             empires.push(planet.colony.empire_id);
           }
         }
       }
-      for (var i in star.fleets) {
-        var fleet = star.fleets[i];
-        if (fleet.empire_id != 0) {
+      for (let i in star.fleets) {
+        const fleet = star.fleets[i];
+        if (fleet.empire_id !== 0) {
           if (empires.indexOf(fleet.empire_id) === -1) {
             empires.push(fleet.empire_id);
           }
         }
       }
-      for (var i in empires) {
+      for (let i in empires) {
         label = $("<div class=\"starfield-empire\"><img /><span>...</span></div>");
         $("span", label).attr("data-empireid", empires[i]).attr("data-nolink", "1");
         var angle = (Math.PI / 4.0) * (i + 1);
@@ -76,8 +76,8 @@ $(function() {
         var y = -20.0;
         var nx = (x * Math.cos(angle) - y * Math.sin(angle));
         var ny = (y * Math.cos(angle) + x * Math.sin(angle));
-        label.css("left", parseInt(star.offset_x * 0.5 + nx) + "px");
-        label.css("top", parseInt(star.offset_y * 0.5  + ny) + "px");
+        label.css("left", (star.offset_x * 0.5 + nx).toFixed() + "px");
+        label.css("top", (star.offset_y * 0.5  + ny).toFixed() + "px");
         $("img", label)
             .attr("src", "/render/empire/" + empires[i] + "/16x16/mdpi.png")
             .css("vertical-align", "bottom")
@@ -91,7 +91,7 @@ $(function() {
   function showStar(star) {
     currStar = star;
     if (star) {
-      var html = $("#star-details-tmpl").applyTemplate(star);
+      const html = $("#star-details-tmpl").applyTemplate(star);
       $("#star-details").html(html);
       time.refreshAll();
     } else {
@@ -102,7 +102,7 @@ $(function() {
 
   // Called to refresh which fields are visible, based on the modification type you've selected.
   function refreshVisibleFields() {
-    var VISIBLE_FIELDS = {
+    const VISIBLE_FIELDS = {
       "COLONIZE": ["empire_id", "planet_index"],
       "ADJUST_FOCUS": [/*"empire_id", "colony_id", "focus"*/],
       "CREATE_FLEET": ["empire_id", "design_type", "count", "full_fuel"],
@@ -114,19 +114,19 @@ $(function() {
       "DELETE_BUILD_REQUEST": ["empire_id", "build_request_id"]
     };
 
-    var type = $("#modify-popup select[name=type]").val()
-    var $parent = $("#modify-popup dl");
+    const type = $("#modify-popup select[name=type]").val()
+    const $parent = $("#modify-popup dl");
 
     // The <dl> will be a bunch of <dt><dd> pairs. The <dd> will have a child that has a name
     // attribute which is the name of the field we'll want to show/hide. If we want to hide the
     // field, we need to hide both the <dt> and <dd>
     $("dd", $parent).each(function (index, dd) {
-      $dd = $(dd);
-      $dt = $dd.prev();
+      let $dd = $(dd);
+      let $dt = $dd.prev();
 
       $dd.find("[name]").each(function (_, input) {
-        var name = $(input).attr("name");
-        if (name == "type") {
+        const name = $(input).attr("name");
+        if (name === "type") {
           return;
         }
 
@@ -148,10 +148,10 @@ $(function() {
 
     $("#modify-popup").show();
 
-    var planetIndexSelect = $("#modify-popup select[name=planet_index]");
-    var colonySelect = $("#modify-popup select[name=colony_id]");
-    var fleetSelect = $("#modify-popup select[name=fleet_id]");
-    var buildRequestsSelect = $("#modify-popup select[name=build_request_id]");
+    const planetIndexSelect = $("#modify-popup select[name=planet_index]");
+    const colonySelect = $("#modify-popup select[name=colony_id]");
+    const fleetSelect = $("#modify-popup select[name=fleet_id]");
+    const buildRequestsSelect = $("#modify-popup select[name=build_request_id]");
     planetIndexSelect.empty();
     colonySelect.empty();
     fleetSelect.empty();
@@ -161,11 +161,11 @@ $(function() {
     colonySelect.append($("<option>None</option>"));
     fleetSelect.append($("<option>None</option>"));
     buildRequestsSelect.append($("<option>None</option>"));
-    var empires = [];
+    let empires = [];
 
-    for (var i = 0; i < currStar.planets.length; i++) {
-      var planet = currStar.planets[i];
-      var opt = $("<option/>");
+    for (let i = 0; i < currStar.planets.length; i++) {
+      const planet = currStar.planets[i];
+      let opt = $("<option/>");
       opt.attr("value", i);
       opt.html((i + 1) + ": "
           + toTitleCase(planet.planet_type)
@@ -185,9 +185,9 @@ $(function() {
       }
     }
 
-    for (var i = 0; i < currStar.fleets.length; i++) {
-      var fleet = currStar.fleets[i];
-      var opt = $("<option/>");
+    for (let i = 0; i < currStar.fleets.length; i++) {
+      const fleet = currStar.fleets[i];
+      opt = $("<option/>");
       opt.attr("value", fleet.id);
       if (empires.indexOf(fleet.empire_id) < 0) {
         empires.push(fleet.empire_id);
@@ -198,13 +198,13 @@ $(function() {
     empires.forEach(function(empireId) {
       empireStore.getEmpire(empireId, function(empire) {
         $("#modify-popup select[name=colony_id]").children().each(function(index, elem) {
-          var colonyId = $(elem).attr("value");
+          const colonyId = $(elem).attr("value");
           if (!colonyId) {
             return;
           }
-          for (var planetIndex = 0; planetIndex < currStar.planets.length; planetIndex++) {
-            var planet = currStar.planets[planetIndex];
-            if (planet.colony && planet.colony.id == colonyId) {
+          for (let planetIndex = 0; planetIndex < currStar.planets.length; planetIndex++) {
+            const planet = currStar.planets[planetIndex];
+            if (planet.colony && planet.colony.id === colonyId) {
               $(elem).html(
                   (planetIndex + 1) + ": "
                   + toTitleCase(planet.planet_type)
@@ -213,14 +213,14 @@ $(function() {
           }
         });
         $("#modify-popup select[name=fleet_id]").children().each(function(index, elem) {
-          var fleetId = $(elem).attr("value");
+          const fleetId = $(elem).attr("value");
           if (!fleetId) {
             return;
           }
-          for (var fleetIndex = 0; fleetIndex < currStar.fleets.length; fleetIndex++) {
-            var fleet = currStar.fleets[fleetIndex];
-            var design = Designs.get(fleet.design_type);
-            if (fleet.id == fleetId) {
+          for (let fleetIndex = 0; fleetIndex < currStar.fleets.length; fleetIndex++) {
+            const fleet = currStar.fleets[fleetIndex];
+            const design = Designs.get(fleet.design_type);
+            if (fleet.id === fleetId) {
               $(elem).html(
                   (fleetIndex + 1) + ": "
                   + toTitleCase(design.display_name)
@@ -230,20 +230,20 @@ $(function() {
           }
         });
 
-        for (var i = 0; i < currStar.planets.length; i++) {
-          var planet = currStar.planets[i];
+        for (let i = 0; i < currStar.planets.length; i++) {
+          const planet = currStar.planets[i];
           if (planet.colony == null) {
             continue;
           }
-          if (planet.colony.empire_id != empire.id) {
+          if (planet.colony.empire_id !== empire.id) {
             continue;
           }
-          for (var j = 0; j < planet.colony.build_requests.length; j++) {
-            var buildRequest = planet.colony.build_requests[j];
-            var html = empire.display_name + ": " + buildRequest.id + " " + buildRequest.design_type
+          for (let j = 0; j < planet.colony.build_requests.length; j++) {
+            const buildRequest = planet.colony.build_requests[j];
+            const html = empire.display_name + ": " + buildRequest.id + " " + buildRequest.design_type
                 + " x " + buildRequest.count
                 + " (progress=" + buildRequest.progress + " finish: " + time.formatTime(new Date(buildRequest.end_time)) + ")";
-            var opt = $("<option/>");
+            const opt = $("<option/>");
             opt.attr("value", buildRequest.id);
             opt.html(html);
             buildRequestsSelect.append(opt);
@@ -253,14 +253,14 @@ $(function() {
       });
     });
 
-    var empireSelect = $("#modify-popup select[name=empire_id]");
+    const empireSelect = $("#modify-popup select[name=empire_id]");
     empireSelect.empty();
     empireSelect.append($("<option>None</option>"));
     empireSelect.append($("<option value=\"0\">Native</option>"));
-    var empires = empireStore.getAllEmpires();
-    for (var i in empires) {
-      var empire = empires[i];
-      var opt = $("<option/>");
+    empires = empireStore.getAllEmpires();
+    for (let i in empires) {
+      const empire = empires[i];
+      const opt = $("<option/>");
       opt.attr("value", empire.id);
       opt.html(empire.display_name);
       empireSelect.append(opt);
@@ -270,15 +270,15 @@ $(function() {
       $("#modify-popup").hide();
     });
     $("#modify-ok").on("click", function() {
-      var additionalFleetIds = [];
-      var additionalFleetIdsStrings =
+      const additionalFleetIds = [];
+      const additionalFleetIdsStrings =
           $("#modify-popup input[name=additional_fleet_ids]").val().split(",");
       for (var i in additionalFleetIdsStrings) {
         if (additionalFleetIds[i]) {
           additionalFleetIds.push(parseInt(additionalFleetIdsStrings[i]));
         }
       }
-      var json = {
+      const json = {
         type: $("#modify-popup select[name=type]").val(),
         empire_id: parseInt($("#modify-popup select[name=empire_id]").val()),
         planet_index: parseInt($("#modify-popup select[name=planet_index]").val()),
@@ -304,7 +304,7 @@ $(function() {
         },
         method: "POST",
         success: function(data) {
-          var html = $("#simulate-result-tmpl").applyTemplate(data);
+          const html = $("#simulate-result-tmpl").applyTemplate(data);
           $("#simulate-result").html(html);
 
           $("#modify-popup").hide();
@@ -327,7 +327,7 @@ $(function() {
       },
       method: "POST",
       success: function(data) {
-        var html = $("#simulate-result-tmpl").applyTemplate(data);
+        const html = $("#simulate-result-tmpl").applyTemplate(data);
         $("#simulate-result").html(html);
       }
     })
@@ -372,7 +372,7 @@ $(function() {
   });
 
   $("#star button").on("click", function() {
-    var starId = $("#star input[name=star_id]").val();
+    const starId = $("#star input[name=star_id]").val();
     $.ajax({
       url: "/admin/ajax/starfield",
       data: { "action": "search", "star_id": starId },
@@ -384,7 +384,7 @@ $(function() {
   });
 
   $("#star input[type=number]").on("keypress", function (e) {
-    if (e.which == 13) {
+    if (e.which === 13) {
       $("#star button").click();
     }
   });
@@ -410,9 +410,9 @@ $(function() {
       },
       success: function(data) {
         renderSector(data);
-        var shown = false;
-        for (var index in data.stars) {
-          if (data.stars[index].id == currStarId) {
+        let shown = false;
+        for (let index in data.stars) {
+          if (data.stars[index].id === currStarId) {
             showStar(data.stars[index]);
             shown = true;
           }
@@ -453,15 +453,15 @@ $(function() {
   }
 
   $("#starfield-container a").on("click", function() {
-    var dx = 0;
-    var dy = 0;
-    if (this.id == "starfield-up-btn") {
+    let dx = 0;
+    let dy = 0;
+    if (this.id === "starfield-up-btn") {
       dy = -1;
-    } else if (this.id == "starfield-down-btn") {
+    } else if (this.id === "starfield-down-btn") {
       dy = 1;
-    } else if (this.id == "starfield-left-btn") {
+    } else if (this.id === "starfield-left-btn") {
       dx = -1;
-    } else if (this.id == "starfield-right-btn") {
+    } else if (this.id === "starfield-right-btn") {
       dx = 1;
     }
     $("#xy input[name=x]").val(parseInt($("#xy input[name=x]").val()) + dx);

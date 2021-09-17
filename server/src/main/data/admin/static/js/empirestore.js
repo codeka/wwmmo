@@ -1,24 +1,24 @@
 
-var empireStore = (function() {
-  var storedEmpires = window.localStorage.getItem("empires");
+const empireStore = (function() {
+  let storedEmpires = window.localStorage.getItem("empires");
   if (!storedEmpires) {
     storedEmpires = {};
   } else {
     storedEmpires = JSON.parse(storedEmpires);
   }
-  var empires = {};
+  const empires = {};
 
   function defaultCallback(empire) {
     $("span[data-empireid], img[data-empireid]").each(function(i, elem) {
-      var $this = $(this);
-      if ($this.data("empireid") == empire.id) {
-        if (this.tagName == "SPAN") {
-          if ($this.data("nolink") == "1") {
+      const $this = $(this);
+      if ($this.data("empireid") === empire.id) {
+        if (this.tagName === "SPAN") {
+          if ($this.data("nolink") === "1") {
             $this.html(empire.display_name);
           } else {
             $this.html("<a href=\"/admin/empires/" + empire.id + "\">" + empire.display_name + "</a>");
           }
-        } else if (this.tagName == "IMG") {
+        } else if (this.tagName === "IMG") {
           $this.attr("src", "/render/empire/"
               + empire.id + "/"
               + $this.attr("width") + "x" + $this.attr("height")
@@ -28,7 +28,7 @@ var empireStore = (function() {
     });
   }
 
-  var callbacks = {};
+  const callbacks = {};
 
   return {
     getEmpire: function(empireId, callback) {
@@ -73,7 +73,7 @@ var empireStore = (function() {
         success: function(data) {
           empires[data.id] = data;
           window.localStorage.setItem("empires", JSON.stringify(empires));
-          for (var i = 0; i < callbacks[empireId].length; i++) {
+          for (let i = 0; i < callbacks[empireId].length; i++) {
             callbacks[empireId][i](data);
           }
         }
