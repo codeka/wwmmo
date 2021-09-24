@@ -31,17 +31,17 @@ public class AdminLoginHandler extends AdminHandler {
 
   @Override
   protected void get() throws RequestException {
-    HashMap<String, Object> data = new HashMap<String, Object>();
+    HashMap<String, Object> data = new HashMap<>();
     data.put("client_id", CLIENT_ID);
     render("login.html", data);
   }
 
   @Override
   protected void post() throws RequestException {
-    String emailAddr = null;
+    String emailAddr;
     try {
       String authResult = getRequest().getParameter("auth-result");
-      JsonObject json = new JsonParser().parse(authResult).getAsJsonObject();
+      JsonObject json = JsonParser.parseString(authResult).getAsJsonObject();
       String idToken = json.get("id_token").getAsString();
 
       TokenParser parser = new TokenParser(new String[] { CLIENT_ID }, CLIENT_ID);
@@ -51,16 +51,17 @@ public class AdminLoginHandler extends AdminHandler {
       }
       emailAddr = payload.getEmail();
       if (emailAddr == null) {
-        String entries = null;
+        StringBuilder entries = new StringBuilder();
         for (Map.Entry<String, Object> entry : payload.entrySet()) {
-          if (entries == null) {
-            entries = "";
-          } else {
-            entries += ", ";
+          if (!entries.isEmpty()) {
+            entries.append(", ");
           }
-          entries += String.format("%s = %s", entry.getKey(), entry.getValue());
+          entries.append(entry.getKey());
+          entries.append(" = ");
+          entries.append(entry.getValue());
         }
-        entries += "\r\n" + authResult;
+        entries.append("\r\n");
+        entries.append(authResult);
         throw new RequestException(500, "No email address: " + entries);
       }
     } catch (Exception e) {
@@ -69,7 +70,7 @@ public class AdminLoginHandler extends AdminHandler {
 
     BackendUser backendUser = new AdminController().getBackendUser(emailAddr);
     if (backendUser == null) {
-      render("admin/access-denied.html", new TreeMap<String, Object>());
+      render("admin/access-denied.html", new TreeMap<>());
       return;
     }
     new AdminController().recordLogin(backendUser);
@@ -92,44 +93,44 @@ public class AdminLoginHandler extends AdminHandler {
     getResponse().setHeader("Location", continueUrl);
   }
 
-  public class TokenParser {
-    private final List<String> mClientIDs;
-    private final String mAudience;
-    private final GoogleIdTokenVerifier mVerifier;
-    private final JsonFactory mJFactory;
-    private String mProblem = "Verification failed. (Time-out?)";
+  public static class TokenParser {
+    private final List<String> clientIDs;
+    private final String audience;
+    private final GoogleIdTokenVerifier verifier;
+    private final JsonFactory jFactory;
+    private String problem = "Verification failed. (Time-out?)";
 
     public TokenParser(String[] clientIDs, String audience) {
-      mClientIDs = Arrays.asList(clientIDs);
-      mAudience = audience;
+      this.clientIDs = Arrays.asList(clientIDs);
+      this.audience = audience;
       NetHttpTransport transport = new NetHttpTransport();
-      mJFactory = new GsonFactory();
-      mVerifier = new GoogleIdTokenVerifier(transport, mJFactory);
+      jFactory = new GsonFactory();
+      verifier = new GoogleIdTokenVerifier(transport, jFactory);
     }
 
     public GoogleIdToken.Payload parse(String tokenString) {
       GoogleIdToken.Payload payload = null;
       try {
-        GoogleIdToken token = GoogleIdToken.parse(mJFactory, tokenString);
-        if (mVerifier.verify(token)) {
+        GoogleIdToken token = GoogleIdToken.parse(jFactory, tokenString);
+        if (verifier.verify(token)) {
           GoogleIdToken.Payload tempPayload = token.getPayload();
-          if (!tempPayload.getAudience().equals(mAudience))
-            mProblem = "Audience mismatch, " + mAudience + " != " + tempPayload.getAudience();
-          else if (!mClientIDs.contains(tempPayload.getAuthorizedParty()))
-            mProblem = "Client ID mismatch";
+          if (!tempPayload.getAudience().equals(audience))
+            problem = "Audience mismatch, " + audience + " != " + tempPayload.getAudience();
+          else if (!clientIDs.contains(tempPayload.getAuthorizedParty()))
+            problem = "Client ID mismatch";
           else
             payload = tempPayload;
         }
       } catch (GeneralSecurityException e) {
-        mProblem = "Security issue: " + e.getLocalizedMessage();
+        problem = "Security issue: " + e.getLocalizedMessage();
       } catch (IOException e) {
-        mProblem = "Network problem: " + e.getLocalizedMessage();
+        problem = "Network problem: " + e.getLocalizedMessage();
       }
       return payload;
     }
 
     public String problem() {
-      return mProblem;
+      return problem;
     }
   }
 }
