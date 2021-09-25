@@ -17,26 +17,28 @@
       // Additional params including the callback, the rest of the params will
       // come from the page-level configuration.
       var args = {
-        "callback": complete,
-        "clientid": "{{client_id}}",
+        "onsuccess": complete,
+        "onfailure": error,
         "scope": "email",
         "cookiepolicy": "single_host_origin"
       };
-      gapi.signin.render('customGPlusBtn', args);
+      gapi.auth2.init({
+        "client_id": "{{client_id}}"
+      })
+      gapi.signin2.render("customGPlusBtn", args);
     }
 
-    function complete(authResult) {
-      if (authResult['status']['signed_in']) {
-        document.getElementById("auth-result").value = JSON.stringify(authResult);
+    function complete(user) {
+      if (user.isSignedIn()) {
+        document.getElementById("auth-result").value = JSON.stringify(user.getAuthResponse(true));
         document.getElementById("success").submit();
       } else {
-        // Update the app to reflect a signed out user
-        // Possible error values:
-        //   "user_signed_out" - User is signed-out
-        //   "access_denied" - User denied access to your app
-        //   "immediate_failed" - Could not automatically log in the user
-        document.getElementById("error").innerHTML = authResult['error'];
+        document.getElementById("error").innerHTML = "An unexpected error occurred.";
       }
+    }
+
+    function error() {
+      document.getElementById("error").innerHTML = "An unexpected error occurred.";
     }
     </script>
   </head>

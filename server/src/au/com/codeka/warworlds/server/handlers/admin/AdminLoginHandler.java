@@ -53,7 +53,7 @@ public class AdminLoginHandler extends AdminHandler {
       if (emailAddr == null) {
         StringBuilder entries = new StringBuilder();
         for (Map.Entry<String, Object> entry : payload.entrySet()) {
-          if (!entries.isEmpty()) {
+          if (entries.length() > 0) {
             entries.append(", ");
           }
           entries.append(entry.getKey());
