@@ -16,6 +16,7 @@ import au.com.codeka.warworlds.common.proto.Fleet
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.proto.StarModification
 import au.com.codeka.warworlds.common.sim.DesignHelper
+import java.lang.Integer.max
 import java.util.*
 import kotlin.math.floor
 
@@ -53,7 +54,9 @@ class SplitBottomPane(
     splitRatio.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
       override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         if (fromUser && !ignoreEdits && fleet != null) {
-          update(progress, floor(fleet!!.num_ships.toDouble()).toInt() - progress)
+          val leftCount = max(1, progress)
+          val rightCount = floor(fleet!!.num_ships.toDouble()).toInt() - leftCount
+          update(leftCount, rightCount)
         }
       }
 
