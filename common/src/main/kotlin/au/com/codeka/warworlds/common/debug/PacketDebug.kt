@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.common.debug
 
-import au.com.codeka.warworlds.common.net.PacketHelper
+import au.com.codeka.warworlds.common.net.packetProperties
 import au.com.codeka.warworlds.common.proto.Packet
 
 /**
@@ -16,7 +16,7 @@ object PacketDebug {
   fun getPacketDebug(pkt: Packet, serializedLength: Int): String {
     val sb = StringBuilder()
 
-    for (prop in PacketHelper.properties.values) {
+    for (prop in packetProperties.values) {
       if (prop.getter.call(pkt) != null) {
         sb.append(prop.name)
         sb.append(" ")

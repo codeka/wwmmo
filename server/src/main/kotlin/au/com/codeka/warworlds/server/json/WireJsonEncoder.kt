@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.server.json
 
 import au.com.codeka.warworlds.common.Log
+import au.com.codeka.warworlds.common.findProperties
 import com.google.gson.stream.JsonWriter
 import java.lang.Exception
 import kotlin.reflect.KType
