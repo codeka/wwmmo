@@ -19,7 +19,8 @@ class Post(yaml.YAMLObject):
 
 
 def _rootPath():
-  return os.path.join(current_app.config['DATA_PATH'], 'posts')
+  #return os.path.join(current_app.config['DATA_PATH'], 'posts')
+  return '/home/dean/src/wwmmo/website-data/posts'
 
 
 def listPosts():
@@ -49,3 +50,12 @@ def loadPost(filename):
   except:
     # Any errors, we'll just return none. Probably file not found?
     return None
+
+
+def savePost(post):
+  dir_path = os.path.join(_rootPath(), '%04d/%02d' % (post.posted.year, post.posted.month))
+  if not os.path.isdir(dir_path):
+    return False
+  filename = os.path.join(dir_path, post.slug + '.yaml')
+  with open(filename, 'w') as f:
+    return yaml.dump(post, f)
