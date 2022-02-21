@@ -4,7 +4,7 @@
 body {
   font-family: roboto, sans-serif;
   font-size: 12pt;
-  background: #000 url(/img/v2/bg.jpg) repeat;
+  background: #000 url(/static/img/bg.jpg) repeat;
   color: #222;
 }
 
@@ -129,17 +129,10 @@ header#page-header div.donate-btn {
   width: 100px;
 }
 
-header a.gplus-btn img {
-  display: block;
-  position: absolute;
-  right: 126px;
-  top: 24px;
-}
-
 header a.twitter-btn img {
   display: block;
   position: absolute;
-  right: 166px;
+  right: 126px;
   top: 24px;
 }
 

@@ -1,60 +1,41 @@
 
-import os
+  
 import datetime
-import webapp2 as webapp
+from flask import abort, render_template, request, redirect, Response
 
 import ctrl.blog
-import handlers
 
+from . import handlers
 
-class BlogPage(handlers.BaseHandler):
-  pass
-
-class HomePage(BlogPage):
-  def get(self):
+@handlers.route('/blog')
+def blog_index():
+  pageNo = 0
+  if request.args.get('page'):
+    pageNo = int(request.args.get('page'))
+  if pageNo < 0:
     pageNo = 0
-    if self.request.get('page'):
-      pageNo = int(self.request.get('page'))
-    if pageNo < 0:
-      pageNo = 0
 
-    posts = ctrl.blog.getPosts(pageNo)
-    if not posts and pageNo > 0:
-      self.redirect('/blog?page=%d' % (pageNo-1))
-    self.render('blog/index.html', {'posts': posts,
-                                    'pageNo': pageNo})
+  posts = ctrl.blog.getPosts(pageNo)
+  if not posts and pageNo > 0:
+    redirect('/blog?page=%d' % (pageNo - 1))
+  return render_template('blog/index.html', posts=posts, pageNo=pageNo)
 
-
-class PostPage(BlogPage):
-  def get(self, yearmonth, slug):
-    year, month = yearmonth.split('/')
-    year = int(year)
-    month = int(month)
-    post = ctrl.blog.getPostBySlug(year, month, slug)
-    if not post:
-      self.response.set_status(404)
-      return
-    self.render('blog/post.html', {'post': post})
-
-  def head(self, yearmonth, slug):
-    self.get(yearmonth, slug)
-    self.response.body = ''
+@handlers.route('/blog/<year>/<month>/<slug>')
+def blog_post(year, month, slug):
+  post = ctrl.blog.getPostBySlug(int(year), int(month), slug)
+  if not post:
+    abort(404)
+  return render_template('blog/post.html', post=post)
 
 
-class RssPage(BlogPage):
-  def get(self):
-    posts = ctrl.blog.getPosts(0)
-    pubDate = datetime.time()
-    if posts:
-      pubDate = posts[0].posted
-
-    self.response.headers['Content-Type'] = 'application/rss+xml'
-    self.render('blog/rss.xml', {'posts': posts,
-                                 'pubDate': pubDate.strftime('%a, %d %b %Y %H:%M:%S GMT')})
-
-
-
-app = webapp.WSGIApplication([('/blog/?', HomePage),
-                              ('/blog/([0-9]{4}/[0-9]{2})/(.*)', PostPage),
-                              ('/blog/rss', RssPage)],
-                             debug=os.environ['SERVER_SOFTWARE'].startswith('Development'))
+@handlers.route('/blog/rss')
+def blog_rss():
+  posts = ctrl.blog.getPosts(0, 15)
+  pubDate = datetime.time()
+  if posts and len(posts) > 0:
+    pubDate = posts[0].posted
+  
+  return Response(
+      render_template('blog/rss.xml', posts=posts,
+                      pubDate=pubDate.strftime('%a, %d %b %Y %H:%M:%S GMT')),
+      content_type='application/rss+xml')

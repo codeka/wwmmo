@@ -3,16 +3,16 @@
 <meta http-equiv="content-type" content="text/html; charset=UTF-8" >
   <title>{% block pagetitleprefix %}War Worlds &bull; {% endblock %}{% block pagetitle %}An Android MMO{% endblock %}</title>
   <meta name="viewport" content="width=device-width" />
-  <link rel="stylesheet" href="/css/v{{resource_version}}/reset.css">
-  <link rel="stylesheet" href="/css/v{{resource_version}}/style.css">
-  <link rel="stylesheet" href="/css/v{{resource_version}}/mobile.css" media="only screen and (max-width: 900px)" />
+  <link rel="stylesheet" href="{{url_for('static', filename='css/reset.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/mobile.css')}}" media="only screen and (max-width: 900px)" />
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Quando">
-  <script src="/js/v{{resource_version}}/jquery-3.1.1.min.js"></script>
+  <script src="{{url_for('static', filename='js/jquery-3.1.1.min.js')}}"></script>
 {% block header %}{% endblock %}
 </head>
 <body>
     <header id="page-header">
-      <a href="/"><img class="logo" src="/img/logo.png?v=2" width="72" height="72" alt=""></a>
+      <a href="/"><img class="logo" src="{{url_for('static', filename='/img/logo.png')}}" width="72" height="72" alt=""></a>
       <div><h1><span class="war-worlds"><a href="/">War Worlds</a></span> <span class="extra">&bull; {% block title %}An Android&trade; MMO{% endblock %}</span></h1></div>
       <div class="donate-btn">
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -21,30 +21,18 @@
           <input type="hidden" name="item_name" value="For War Worlds" />
           <input type="hidden" name="currency_code" value="USD" />
           <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-          <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
+          <img alt="" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
         </form>
       </div>
-        <img src="https://ssl.gstatic.com/images/icons/gplus-32.png" alt="Google+" width="32" height="32">
-      </a>
       <a href="http://twitter.com/WarWorlds" title="Follow us on Twitter!" class="twitter-btn">
-        <img src="/img/twitter.png" alt="Twitter" width="32" height="32" />
+        <img src="{{url_for('static', filename='img/twitter.png')}}" alt="Twitter" width="32" height="32" />
       </a>
       <ul class="main-nav">
         <li><a href="/blog">Blog</a>
-        <li><a href="/doc/">Docs</a>
-        <li><a href="/forum/">Forums</a>
+        <li><a href="https://discord.gg/ZAPRuhT">Discord</a>
         <li><a href="/privacy-policy">Privacy policy</a></li>
         <li><a href="https://play.google.com/store/apps/details?id=au.com.codeka.warworlds">Get the game</a>
       </ul>
-      <nav class="userinfo">
-        {% if is_logged_in %}
-          Welcome, <a href="/profile">{{'New User' if not user_profile else user_profile.display_name}}</a>.
-          <a href="{{logout_url}}">Log out</a>
-        {% else %}
-          You&rsquo;re not logged in.
-          <a href="{{login_url}}"><img src="/img/v{{resource_version}}/signin_normal.png" height="32"></a>
-        {% endif %}
-      </nav>
       {% block headerlinks %}{% endblock %}
     </header>
 {% if is_admin %}
