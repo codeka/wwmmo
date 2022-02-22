@@ -139,13 +139,13 @@ class StarManager private constructor() {
   }
 
   /**
-   * Call this after simulating a star to complete the actions required (e.g. if a building has
-   * finished or a fleet has arrived) and also save the star to the data store.
+   * Call this after simulating a star to complete the actions required (e.g. if a building has finished or a fleet has
+   * arrived) and also save the star to the data store.
    *
    * @param star The [<] of the star that we'll update.
    * @param mutableStar A simulated star that we need to finish up.
-   * @param logHandler An optional [Simulation.LogHandler] that we'll pass log messages
-   * through to. If null, we'll just do normal logging.
+   * @param logHandler An optional [Simulation.LogHandler] that we'll pass log messages through to. If null, we'll just
+   *                   do normal logging.
    * @throws SuspiciousModificationException if the
    */
   private fun completeActions(
@@ -217,12 +217,10 @@ class StarManager private constructor() {
                 logHandler = logHandler)
           }
 
-          // Subtract the minerals it used last turn (since that won't have happening in the
-          // simulation)
+          // Subtract the minerals it used last turn (since that won't have happening in the simulation)
           val storageIndex = StarHelper.getStorageIndex(mutableStar, colony.empireId)
           val empireStore = mutableStar.empireStores[storageIndex]
-          empireStore.totalMinerals -=
-              br.mineralsDeltaPerHour * Time.HOUR / Simulation.STEP_TIME * br.progressPerStep
+          empireStore.totalMinerals -= br.mineralsDeltaPerHour * Time.HOUR / Simulation.STEP_TIME * br.progressPerStep
           if (empireStore.totalMinerals < 0) {
             empireStore.totalMinerals = 0f
           }

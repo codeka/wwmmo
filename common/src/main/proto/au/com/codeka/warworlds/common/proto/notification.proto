@@ -4,6 +4,7 @@ package au.com.codeka.warworlds.common.proto;
 
 // https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
 import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\sitreport.proto";
 
 // A Notification is sent from the server to a particular device for a specific empire. It usually
 // contains a simple message from the server, a build complete notification, a move complete
@@ -31,4 +32,7 @@ message Notification {
 
   // The ID of the star that this notification is referring to.
   optional int64 star_id = 5;
+
+  // A situation report associated with this notification. Used for BUILD_COMPLETE.
+  optional SituationReport sit_report = 6;
 }

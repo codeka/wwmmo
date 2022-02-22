@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.server.world.chat
 
-import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.ChatMessage
 import au.com.codeka.warworlds.common.proto.ChatRoom
 import au.com.codeka.warworlds.server.store.DataStore
@@ -35,7 +34,7 @@ class Room(room: ChatRoom) {
         participant!!.onMessage(msg)
       }
     }
-    DataStore.Companion.i.chat().send(chatRoom, msg)
+    DataStore.i.chat().send(chatRoom, msg)
   }
 
   fun addParticipant(participant: Participant?) {
@@ -47,24 +46,22 @@ class Room(room: ChatRoom) {
   }
 
   /**
-   * Get the [ChatMessage]s send between startTime and endTime. ordered most recent message
-   * last.
+   * Get the [ChatMessage]s send between startTime and endTime. ordered most recent message last.
    */
   fun getMessages(startTime: Long, endTime: Long): List<ChatMessage> {
     synchronized(lock) {
       if (historyStartTime > startTime) {
-        val messages: List<ChatMessage> = DataStore.Companion.i.chat().getMessages(chatRoom.id, startTime, historyStartTime)
+        val messages: List<ChatMessage> = DataStore.i.chat().getMessages(chatRoom.id, startTime, historyStartTime)
         history.addAll(0, messages)
         historyStartTime = startTime
       }
       val messages = ArrayList<ChatMessage>()
-      // TODO: this is O(N^2) in the number of messages, we could make this O(N) by working out
-      // how many messages there are in total, then populating an array with that many. We could
-      // also make it O(N) by not trying to populate the list backwards, and maybe using a binary
-      // search to find the first message to start at.
+      // This is O(N^2) in the number of messages, we could make this O(N) by working out how many messages there
+      // are in total, then populating an array with that many. We could also make it O(N) by not trying to populate the
+      // list backwards, and maybe using a binary search to find the first message to start at.
       for (i in history.indices.reversed()) {
         val msg = history[i]
-        if (msg.date_posted > startTime && msg.date_posted <= endTime) {
+        if (msg.date_posted in (startTime + 1)..endTime) {
           messages.add(0, msg)
         } else if (msg.date_posted < startTime) {
           break
@@ -72,10 +69,6 @@ class Room(room: ChatRoom) {
       }
       return messages
     }
-  }
-
-  companion object {
-    private val log = Log("Room")
   }
 
   init {
