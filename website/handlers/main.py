@@ -29,6 +29,11 @@ def donate_thanks():
   return render_template('donate-thanks.html')
 
 
+@handlers.route('/forum/annoucements/rss')
+def announcements_rss():
+  return render_template('announcements_rss.xml')
+
+
 @handlers.route('/sitemap.xml')
 def sitemap():
   pages = []

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:ww="http://www.war-worlds.com/schema/rss-ext">
+  <channel>
+    <title>War Worlds - Forum - Announcements</title>
+    <description>Where I post announcements about War Worlds.</description>
+    <link>http://www.war-worlds.com/forum/announcements</link>
+    <pubDate>Sat, 05 Dec 2020 08:26:19 GMT</pubDate>
+    
+      <item>
+        <title>1.0.1030 - New troop carriers and redesign of the colony screen</title>
+        <description>&lt;p&gt;This update actually started a few days ago with the updated colony screen and two new upgrades for the troop carrier: missionary and emissary. The former allows you to take over a native colony using troop carriers only, rather than destroying the colony and then re-colonizing. The latter allows you to perform &#34;propaganda&#34; on an enemy colony and take it over (after a few minutes delay).&lt;/p&gt;
+&lt;p&gt;Today&#39;s update features some QOL improvements to the new design that people over on discord have been begging for. Be sure to &lt;a href=&#34;https://discord.gg/vhm69QKF&#34;&gt;join us over there&lt;/a&gt; to have your own say!&lt;/p&gt;
+&lt;p&gt;The other big change to today&#39;s build is I&#39;ve &lt;strong&gt;re-added support for push notifications&lt;/strong&gt;! This was broken a long time ago when Google changed the API I had to call and I never got around to fixing it. If you prefer a notification-free experience, you can turn notifications off in the options.&lt;/p&gt;
+</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-1030-new-troop-carriers-and-redesign-of-the-colony-screen</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Sat, 05 Dec 2020 08:26:19 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>1.0.1016</title>
+        <description>&lt;p&gt;This update adds a new setting to the &#34;Options&#34; screen. Under &#34;Game options&#34; you can choose the default focus you want any new colonies to have. The default is still 25% on all four, but you could configure it to be 50/50 between population and food or whatever you like.&lt;/p&gt;
+&lt;p&gt;Also fixed some layouts on smaller devices (let me know if you spot any more!).&lt;/p&gt;
+&lt;p&gt;As always, your feedback is most welcome, you can &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;join us on Discord&lt;/a&gt; or help to fund the game by &lt;a href=&#34;https://www.patreon.com/codeka&#34;&gt;supporting me on Patreon&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-1016</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Tue, 09 Jun 2020 01:42:05 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>Server migration</title>
+        <description>&lt;p&gt;I&#39;ll be migrating to a larger server later tonight, so expect ~1 hour of downtime. I&#39;ll be posting updates on the status &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;over on Discord&lt;/a&gt;, so join there if you want to stay updated.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Update:&lt;/strong&gt; &lt;em&gt;New server is up &amp;amp; running, please let me know on Discord if you run into any issues.&lt;/em&gt;&lt;/p&gt;
+</description>
+        <link>http://www.war-worlds.com/forum/announcements/server-migration-2</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Sat, 02 May 2020 01:28:50 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>1.0.1008</title>
+        <description>&lt;p&gt;There&#39;s not a lot of changes in build 1008, but I&#39;ve added the first version of a check that will stop the game from running on emulators such as BlueStacks. I&#39;ll be expanding this check in the future, but the game is meant to be run on real devices, so that it&#39;s fair for everybody.&lt;/p&gt;&lt;p&gt;I also fixed a glitch which erroneously allowed multiple Biospheres to be build on a planet.&lt;/p&gt;&lt;p&gt;As always, your feedback is most welcome, you can &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;join us on Discord&lt;/a&gt; or help to fund the game by &lt;a href=&#34;https://www.patreon.com/codeka&#34;&gt;supporting me on Patreon&lt;/a&gt;.&lt;/p&gt;</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-1008</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Mon, 30 Mar 2020 04:01:33 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>1.0.1007</title>
+        <description>&lt;p&gt;This version has a long-awaited fix for wormholes: you can now use them more than once without it deadlocking and not working again...&lt;/p&gt;&lt;p&gt;Also some minor fixes to better handle being rate-limited, more robust handling of the initial connection and a few other minor fixes.&lt;/p&gt;&lt;p&gt;As always, your feedback is most welcome, you can &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;join us on Discord&lt;/a&gt; or help to fund the game by &lt;a href=&#34;https://www.patreon.com/codeka&#34;&gt;supporting me on Patreon&lt;/a&gt;.&lt;/p&gt;</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-1007</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Sat, 07 Mar 2020 01:21:43 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>1.0.1006 Server reset</title>
+        <description>&lt;p&gt;I&#39;m sure you all noticed the recent server reset. I wanted to gather everybody&#39;s opinions and ideas, so please take a minute to fill out the survey below:&lt;/p&gt;&lt;p&gt;&lt;a href=&#34;https://docs.google.com/forms/d/1Ee6dJcyF7YpGACDXUANy4B4H-7XJfoiAkdHXXQbAGt0/edit&#34;&gt;Click here to open the survey.&lt;/a&gt;&lt;/p&gt;&lt;p&gt;As always, your feedback is most welcome, you can &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;join us on Discord&lt;/a&gt; and as always, help to fund the game by &lt;a href=&#34;https://www.patreon.com/codeka&#34;&gt;supporting me on Patreon&lt;/a&gt;.&lt;/p&gt;</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-1006-server-reset</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Mon, 21 Oct 2019 17:44:34 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>1.0.1002 Blocking empires in chat</title>
+        <description>&lt;p&gt;Due to popular demand, the &#34;penalty box&#34; has been removed from global chat, instead replaced with the ability to individual block empires that you don&#39;t want to hear from any more.&lt;/p&gt;&lt;p&gt;As always, please &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;join us in discord&lt;/a&gt; if you want to discuss the update, and of course if you want to keep up to date on the progress of War Worlds 2, then &lt;a href=&#34;https://www.patreon.com/codeka&#34;&gt;join my Patreon&lt;/a&gt;!&lt;/p&gt;</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-1002-blocking-empires-in-chat</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Sun, 29 Sep 2019 04:45:14 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>1.0 and the server's back</title>
+        <description>&lt;p&gt;OK, a couple of announcements here.&lt;/p&gt;
+&lt;p&gt;First, we have a brand new server, with a fresh restart of the universe. We&#39;re calling this the &#34;Default&#34; realm, because I&#39;ve incremented the version number 1.0(!!)&lt;/p&gt;
+&lt;p&gt;Honestly, there&#39;s not a lot of changes between 0.9.906 and 1.0.1000 except for this server reset. Oh, and your starting cash when you create a new empire has been bumped to $250k (for a limited time, while people get back up to speed).&lt;/p&gt;
+&lt;p&gt;The old server had been run by a dedicated fan, but it looks like their subscription expired. I&#39;m currently working to see if I can get a backup of the old universe. If I do, then I&#39;ll restore the &#34;Beta&#34; realm in all it&#39;s past glory.&lt;/p&gt;
+&lt;p&gt;If you want to stay in touch, please &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;join us on Discord&lt;/a&gt;. And of course, to help fund the game into the future, please consider &lt;a href=&#34;https://www.patreon.com/codeka&#34;&gt;supporting me on Patreon&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <link>http://www.war-worlds.com/forum/announcements/1-0-and-the-server-s-back</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Tue, 17 Sep 2019 04:53:20 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>Server is down</title>
+        <description>&lt;p&gt;Sorry all, the server&#39;s currently down. I&#39;m trying to get it back up ASAP.&lt;/p&gt;
+&lt;p&gt;In the meantime, &lt;a href=&#34;https://discord.gg/ZAPRuhT&#34;&gt;feel free to join us in Discord&lt;/a&gt; where I&#39;ll try to keep you updated on the progress.&lt;/p&gt;
+</description>
+        <link>http://www.war-worlds.com/forum/announcements/server-is-down</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Mon, 16 Sep 2019 15:47:52 GMT</pubDate>
+      </item>
+    
+      <item>
+        <title>0.9.906 - Greenhouses</title>
+        <description>&lt;p&gt;&lt;img alt=&#34;&#34; data-resp=&#34;eyJzdWNjZXNzIjp0cnVlLCJ1cmwiOiJodHRwOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9JWDc2Z0UxSWdZQUY2ajFxSnpSODdBLU14dG5wNEstS0lySERDYXRzaVlxbVBhRWI5aktJNGI2bmk5UVp3NFdvTVZSTXlWdGY2ZnFUYmQwcHpfcm5zaDkxLTZRPXMxMDAiLCJibG9iX2tleSI6IkFNSWZ2OTdPa19LZmxtb0U2cG9GZ1lCeFJVdjJkQlF3WmFvc0E2UE5rSWFHOUwtM19qQm9EaDE2QW80RjZvQzlYS0NIWDI1dzhQMWxYamdfYmxhNWNJVHJXdkNBS0hDVVdBRDVlV2kyaTBHcGFHRm9kVnhncVdyRjh6Vl83UXE0aVpaQ3gyaWhXVXU2VXhtc1VaZFE5elpwekM2Y3dJYnp2VkZ1aW9YU2h5Tmx2eG1IMEhkVWZwcyIsImhlaWdodCI6NTYsIndpZHRoIjo0OCwiZmlsZW5hbWUiOiJncmVlbmhvdXNlLnBuZyIsInNpemUiOjE2NzY2fQ==&#34; src=&#34;http://lh3.googleusercontent.com/IX76gE1IgYAF6j1qJzR87A-Mxtnp4K-KIrHDCatsiYqmPaEb9jKI4b6ni9QZw4WoMVRMyVtf6fqTbd0pz_rnsh91-6Q=s400&#34;/&gt;&lt;/p&gt;
+&lt;p&gt;This update sees the addition of a new greenhouse building! If you build a greenhouse on a planet, it will increase the farming statistic of the planet, a bit more for each level of the building. Turn the most inhosptiable planet into a workable farm!&lt;/p&gt;
+</description>
+        <link>http://www.war-worlds.com/forum/announcements/0-9-906-greenhouses</link>
+        <ww:replies>0</ww:replies>
+        <pubDate>Fri, 13 Sep 2019 02:23:03 GMT</pubDate>
+      </item>
+    
+  </channel>
+</rss>
