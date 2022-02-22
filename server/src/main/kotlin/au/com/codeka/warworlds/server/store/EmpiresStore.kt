@@ -155,10 +155,10 @@ class EmpiresStore internal constructor(fileName: String) : BaseStore(fileName) 
       for (i in 0 until empires.size) {
         var empire = empires[i]
         if (empire.display_name.trim { it <= ' ' } == "") {
-          empire = empire.newBuilder().display_name("~").build()
+          empire = empire.copy(display_name = "~")
         }
         while (seenNames.contains(empire.display_name)) {
-          empire = empire.newBuilder().display_name(empire.display_name + "~").build()
+          empire = empire.copy(display_name = empire.display_name + "~")
         }
         seenNames.add(empire.display_name)
         newWriter()

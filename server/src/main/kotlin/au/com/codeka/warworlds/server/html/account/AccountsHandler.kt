@@ -24,20 +24,14 @@ class AccountsHandler : ProtobufRequestHandler() {
 
     // Make sure the name is valid, unique, etc etc.
     if (req.empire_name.trim { it <= ' ' } == "") {
-      writeProtobuf(
-          NewAccountResponse.Builder()
-              .message("You must give your empire a name.")
-              .build())
+      writeProtobuf(NewAccountResponse(message = "You must give your empire a name."))
       return
     }
     val nameStatus = NameValidator.validate(
         req.empire_name,
         Configuration.i.limits!!.maxEmpireNameLength)
     if (!nameStatus.isValid) {
-      writeProtobuf(
-          NewAccountResponse.Builder()
-              .message(nameStatus.errorMsg)
-              .build())
+      writeProtobuf(NewAccountResponse(message = nameStatus.errorMsg))
       return
     }
 
@@ -46,10 +40,7 @@ class AccountsHandler : ProtobufRequestHandler() {
     // about, so we'll have to check manually.
     for (existingEmpire in existingEmpires) {
       if (existingEmpire.get().display_name.compareTo(nameStatus.name, ignoreCase = true) == 0) {
-        writeProtobuf(
-            NewAccountResponse.Builder()
-                .message("An empire with that name already exists.")
-                .build())
+        writeProtobuf(NewAccountResponse(message = "An empire with that name already exists."))
         return
       }
     }
@@ -57,7 +48,7 @@ class AccountsHandler : ProtobufRequestHandler() {
     // If they've give us an idToken, we'll immediately associate this empire with that account.
     // In that case, tokenInfo will be non-null.
     val tokenInfo = if (req.id_token != null) {
-      TokenVerifier.verify(req.id_token)
+      TokenVerifier.verify(req.id_token!!)
     } else {
       null
     }
@@ -70,22 +61,20 @@ class AccountsHandler : ProtobufRequestHandler() {
     if (empire == null) {
       // Some kind of unexpected error creating the empire.
       writeProtobuf(
-          NewAccountResponse.Builder()
-              .message("An error occurred while creating your empire, please try again.")
-              .build())
+          NewAccountResponse(
+            message = "An error occurred while creating your empire, please try again."))
       return
     }
 
     // Make a new account with all the details.
-    val acctBuilder = Account.Builder()
-        .empire_id(empire.get().id)
+    var account = Account(empire_id = empire.get().id)
     if (tokenInfo != null) {
-      acctBuilder
-          .email(tokenInfo.email)
-          .email_status(Account.EmailStatus.VERIFIED)
+      account = account.copy(
+          email = tokenInfo.email,
+          email_status = Account.EmailStatus.VERIFIED)
     }
-    DataStore.i.accounts().put(cookie, acctBuilder.build())
+    DataStore.i.accounts().put(cookie, account)
 
-    writeProtobuf(NewAccountResponse.Builder().cookie(cookie).build())
+    writeProtobuf(NewAccountResponse(cookie = cookie))
   }
 }

@@ -51,5 +51,4 @@ class PacketDecoder(ins: InputStream, private var handler: PacketHandler) {
     thread = Thread(readRunnable)
     thread.start()
   }
-
 }

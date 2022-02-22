@@ -8,6 +8,7 @@ import au.com.codeka.warworlds.server.handlers.RequestException
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.world.EmpireManager
+import au.com.codeka.warworlds.server.world.SectorManager
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder
 import java.util.*
 
@@ -18,6 +19,7 @@ class AjaxSectorsHandler : AjaxHandler() {
       "find-empty" -> handleFindEmptyRequest()
       "create-empire" -> handleCreateEmpireRequest()
       "expand" -> handleExpandRequest()
+      "watch-sectors" -> handleWatchSectors()
       else -> throw RequestException(400, "Unknown action: " + request.getParameter("action"))
     }
   }
@@ -37,7 +39,7 @@ class AjaxSectorsHandler : AjaxHandler() {
     resp.empireName = name
     var coord: SectorCoord? = null
     if (xs != null && ys != null) {
-      coord = SectorCoord.Builder().x(xs.toLong()).y(ys.toLong()).build()
+      coord = SectorCoord(x = xs.toLong(), y = ys.toLong())
       resp.sectorX = coord.x
       resp.sectorY = coord.y
     }
@@ -64,6 +66,14 @@ class AjaxSectorsHandler : AjaxHandler() {
 
   private fun handleExpandRequest() {
     DataStore.i.sectors().expandUniverse()
+  }
+
+  private fun handleWatchSectors() {
+    val x1 = request.getParameter("x1").toLong()
+    val y1 = request.getParameter("y1").toLong()
+    val x2 = request.getParameter("x2").toLong()
+    val y2 = request.getParameter("y2").toLong()
+    // TODO??
   }
 
   /** Class that's sent to the client via Gson-encoder.  */

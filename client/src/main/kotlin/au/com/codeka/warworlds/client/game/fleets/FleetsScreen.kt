@@ -16,34 +16,23 @@ import au.com.codeka.warworlds.common.proto.Star
  * merge, split, move, etc).
  */
 class FleetsScreen(star: Star?, private val initialFleetId: Long?) : Screen() {
-  private lateinit var starCollection: StarCollection
+  private var starCollection = if (star == null) {
+    MyEmpireStarCollection()
+  } else {
+    ArrayListStarCollection.of(star)
+  }
   private lateinit var layout: FleetsLayout
 
-  override fun onCreate(context: ScreenContext, parent: ViewGroup) {
-    super.onCreate(context, parent)
+  override fun onCreate(context: ScreenContext, container: ViewGroup) {
+    super.onCreate(context, container)
+
     layout = FleetsLayout(context.activity, starCollection)
     if (initialFleetId != null) {
       layout.selectFleet(initialFleetId)
     }
   }
 
-  override fun onShow(): ShowInfo? {
+  override fun onShow(): ShowInfo {
     return builder().view(layout).build()
-  }
-
-  /**
-   * Construct a new [FleetsScreen].
-   *
-   * @param star The [Star] to display fleets of. If null, the fleets of all stars will
-   * be displayed.
-   * @param fleetId If non-null, the ID of the fleet to have initially selected. Only possible when
-   * star is also non-null.
-   */
-  init {
-    starCollection = if (star == null) {
-      MyEmpireStarCollection()
-    } else {
-      ArrayListStarCollection.of(star)
-    }
   }
 }

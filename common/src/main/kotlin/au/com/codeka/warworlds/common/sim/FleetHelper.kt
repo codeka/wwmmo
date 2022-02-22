@@ -14,15 +14,8 @@ object FleetHelper {
   }
 
   /* Is the given {@link Fleet} friendly to the given {@link Empire}? */
-  fun isFriendly(fleet: Fleet, empireId: Long?): Boolean {
-    if (fleet.empire_id == null && empireId == null) {
-      // Natives are friendly to each other.
-      return true
-    }
-    return if (fleet.empire_id == null || empireId == null) {
-      // Natives are not friendly to anybody else.
-      false
-    } else fleet.empire_id == empireId
+  fun isFriendly(fleet: Fleet, empireId: Long): Boolean {
+    return fleet.empire_id == empireId
     // TODO: alliance?
   }
 
@@ -35,12 +28,7 @@ object FleetHelper {
   }
 
   fun isOwnedBy(fleet: Fleet, empireId: Long?): Boolean {
-    if (fleet.empire_id == null && empireId == null) {
-      return true
-    }
-    return if (fleet.empire_id == null || empireId == null) {
-      false
-    } else fleet.empire_id == empireId
+    return fleet.empire_id == empireId
   }
 
   fun findFleet(star: Star, fleetId: Long): Fleet? {
@@ -62,8 +50,8 @@ object FleetHelper {
     return false
   }
 
-  fun hasUpgrade(fleet: Fleet?, upgradeType: Design.UpgradeType?): Boolean {
+//  fun hasUpgrade(fleet: Fleet?, upgradeType: Design.UpgradeType?): Boolean {
     // TODO: implement upgrades
-    return false
-  }
+//    return false
+//  }
 }

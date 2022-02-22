@@ -106,11 +106,12 @@ class ChatScreen : Screen() {
   }
 
   private val layoutCallbacks = object : ChatLayout.Callbacks {
-    override fun onSend(msg: String?) {
+    override fun onSend(msg: String) {
       val room = rooms!![0]
-      val chatMessageBuilder = ChatMessage.Builder()
-          .message(msg)
-          .room_id(room.id)
+      val chatMessage = ChatMessage(
+          message = msg,
+          room_id = room.id,
+          date_posted = System.currentTimeMillis())
 
       // if this is our first chat after the update ...
 //    if (!Util.getSharedPreferences().getBoolean("au.com.codeka.warworlds.ChatAskedAboutTranslation", false)) {
@@ -123,15 +124,14 @@ class ChatScreen : Screen() {
 //        }
 //      }
 //    }
-      ChatManager.i.sendMessage(chatMessageBuilder.build())
+      ChatManager.i.sendMessage(chatMessage)
     }
   }
 
   companion object {
     private fun isEnglish(str: String): Boolean {
-      for (i in 0 until str.length) {
-        val ch = str[i]
-        if (ch.toInt() > 0x80) {
+      for (element in str) {
+        if (element.code > 0x80) {
           return false
         }
       }

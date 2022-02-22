@@ -21,18 +21,17 @@ class SectorManager {
     synchronized(sectors) {
       var sector = sectors[coord]
       if (sector == null) {
-        var s: Sector? = DataStore.i.sectors().getSector(coord.x, coord.y)
-        if (s!!.state == SectorState.New.value) {
+        var s = DataStore.i.sectors().getSector(coord.x, coord.y)
+        if (s.state == SectorState.New.value) {
           s = SectorGenerator().generate(s)
         }
-        sector = WatchableObject(s!!)
+        sector = WatchableObject(s)
         sectors[coord] = sector
 
         // Watch all the stars so that we can update the sector when the star is updated.
         val watcher: WatchableObject.Watcher<Star> = StarWatcher(coord)
         for (sectorStar in sector.get().stars) {
-          val star: WatchableObject<Star>? = StarManager.i.getStar(sectorStar.id)
-          star?.addWatcher(watcher)
+          StarManager.i.getStarOrError(sectorStar.id).addWatcher(watcher)
         }
       }
       return sector
@@ -62,58 +61,61 @@ class SectorManager {
    * eligible for a native colony have one.
    */
   fun verifyNativeColonies(sector: WatchableObject<Sector>) {
-    for (star in sector.get().stars) {
-      // If there's any fleets on it, it's not eligible.
-      if (star.fleets.size > 0) {
-        continue
-      }
-
-      // If there's any colonies, it's also not eligible.
-      var numColonies = 0
-      for (planet in star.planets) {
-        if (planet.colony != null) {
-          numColonies++
+    synchronized(sector.lock) {
+      for (star in sector.get().stars) {
+        // If there's any fleets on it, it's not eligible.
+        if (star.fleets.isNotEmpty()) {
+          continue
         }
-      }
-      if (numColonies > 0) {
-        continue
-      }
 
-      // If it was emptied < 3 days ago, it's not eligible.
-      if (star.time_emptied != null
-          && System.currentTimeMillis() - star.time_emptied < 3 * Time.DAY) {
-        continue
-      }
-
-      // If there's no planets with a population congeniality above 500, it's not eligible.
-      var numEligiblePlanets = 0
-      for (planet in star.planets) {
-        if (planet.population_congeniality > 500) {
-          numEligiblePlanets++
+        // If there's any colonies, it's also not eligible.
+        var numColonies = 0
+        for (planet in star.planets) {
+          if (planet.colony != null) {
+            numColonies++
+          }
         }
-      }
-      if (numEligiblePlanets == 0) {
-        continue
-      }
+        if (numColonies > 0) {
+          continue
+        }
 
-      // Looks like it's eligible, let's do it.
-      StarManager.i.addNativeColonies(star.id)
+        // If it was emptied < 3 days ago, it's not eligible.
+        val timeEmptied = star.time_emptied
+        if (timeEmptied != null && System.currentTimeMillis() - timeEmptied < 3 * Time.DAY) {
+          continue
+        }
+
+        // If there's no planets with a population congeniality above 500, it's not eligible.
+        var numEligiblePlanets = 0
+        for (planet in star.planets) {
+          if (planet.population_congeniality > 500) {
+            numEligiblePlanets++
+          }
+        }
+        if (numEligiblePlanets == 0) {
+          continue
+        }
+
+        // Looks like it's eligible, let's do it.
+        StarManager.i.addNativeColonies(star.id)
+      }
     }
   }
 
   private inner class StarWatcher(private val coord: SectorCoord) : WatchableObject.Watcher<Star> {
-
     override fun onUpdate(obj: WatchableObject<Star>) {
-      val sector = sectors[coord] ?: return
-      val newSector = sector.get().newBuilder()
-      for (i in newSector.stars.indices) {
-        if (newSector.stars[i].id == obj.get().id) {
-          newSector.stars.removeAt(i)
-          break
+      val watchableSector = sectors[coord] ?: return
+      synchronized(watchableSector.lock) {
+        val sector = watchableSector.get()
+        val sectorStars = ArrayList<Star>()
+        for (star in sector.stars) {
+          if (star.id != obj.get().id) {
+            sectorStars.add(star)
+          }
         }
+        sectorStars.add(obj.get())
+        watchableSector.set(sector.copy(stars = sectorStars))
       }
-      newSector.stars.add(obj.get())
-      sector.set(newSector.build())
     }
   }
 

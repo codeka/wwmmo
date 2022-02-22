@@ -32,7 +32,7 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
     layout = PlanetDetailsLayout(context.activity, star, planet, layoutCallbacks)
   }
 
-  override fun onShow(): ShowInfo? {
+  override fun onShow(): ShowInfo {
     return builder().view(layout).build()
   }
 
@@ -45,7 +45,7 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
       ssb.append(" ")
       ssb.append(RomanNumeralFormatter.format(planet.index + 1))
       ImageHelper.bindStarIcon(
-          ssb, 0, 1, context!!.activity, star, 24, object : Callback<SpannableStringBuilder> {
+          ssb, 0, 1, context.activity, star, 24, object : Callback<SpannableStringBuilder> {
             override fun run(param: SpannableStringBuilder) {
               // TODO: handle this
             }
@@ -56,43 +56,35 @@ class PlanetDetailsScreen(private val star: Star, private val planet: Planet) : 
   private val layoutCallbacks: PlanetDetailsLayout.Callbacks = object : PlanetDetailsLayout.Callbacks {
     override fun onSaveFocusClick(
         farmingFocus: Float, miningFocus: Float, energyFocus: Float, constructionFocus: Float) {
-      Preconditions.checkState(planet.colony != null && planet.colony.id != null)
-      StarManager.updateStar(star, StarModification.Builder()
-          .type(StarModification.MODIFICATION_TYPE.ADJUST_FOCUS)
-          .colony_id(planet.colony.id)
-          .focus(ColonyFocus.Builder()
-              .farming(farmingFocus)
-              .mining(miningFocus)
-              .energy(energyFocus)
-              .construction(constructionFocus)
-              .build()))
-      context!!.popScreen()
+      val colony = planet.colony ?: return
+      StarManager.updateStar(star, StarModification(
+          type = StarModification.Type.ADJUST_FOCUS,
+          colony_id = colony.id,
+          focus = ColonyFocus(
+              farming = farmingFocus,
+              mining = miningFocus,
+              energy = energyFocus,
+              construction = constructionFocus)))
+      context.popScreen()
     }
 
     override fun onAttackClick() {
-      if (planet.colony == null) {
-        return
-      }
-      val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
-      StarManager.updateStar(star, StarModification.Builder()
-          .type(StarModification.MODIFICATION_TYPE.ATTACK_COLONY)
-          .empire_id(myEmpire.id)
-          .colony_id(planet.colony.id))
-      context!!.popScreen()
+      val colony = planet.colony ?: return
+      val myEmpire = EmpireManager.getMyEmpire()
+      StarManager.updateStar(star, StarModification(
+          type = StarModification.Type.ATTACK_COLONY,
+          empire_id = myEmpire.id,
+          colony_id = colony.id))
+      context.popScreen()
     }
 
     override fun onColonizeClick() {
-      val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
-      StarManager.updateStar(star, StarModification.Builder()
-          .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-          .empire_id(myEmpire.id)
-          .planet_index(planet.index))
-      context!!.popScreen()
+      val myEmpire = EmpireManager.getMyEmpire()
+      StarManager.updateStar(star, StarModification(
+          type = StarModification.Type.COLONIZE,
+          empire_id = myEmpire.id,
+          planet_index = planet.index))
+      context.popScreen()
     }
   }
-
-  companion object {
-    private val log = Log("PlanetDetailsScreen")
-  }
-
 }

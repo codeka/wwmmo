@@ -34,11 +34,11 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
     isCreated = true
     this.context = context
     layout = SolarSystemLayout(context.activity, layoutCallbacks, star, planetIndex)
-    App.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 100)
+    App.taskRunner.runTask({ doRefresh() }, Threads.BACKGROUND, 100)
     App.eventBus.register(eventHandler)
   }
 
-  override fun onShow(): ShowInfo? {
+  override fun onShow(): ShowInfo {
     StarRecentHistoryManager.addToLastStars(star)
     return builder().view(layout).build()
   }
@@ -55,7 +55,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
       ssb.append("○ ")
       ssb.append(star.name)
       ImageHelper.bindStarIcon(
-          ssb, 0, 1, context!!.activity, star, 24, object : Callback<SpannableStringBuilder> {
+          ssb, 0, 1, context.activity, star, 24, object : Callback<SpannableStringBuilder> {
             override fun run(param: SpannableStringBuilder) {
               // TODO: handle this
             }
@@ -84,13 +84,13 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
   private fun doRefresh() {
     StarManager.simulateStarSync(star)
     if (isCreated) {
-      App.taskRunner.runTask(Runnable { doRefresh() }, Threads.BACKGROUND, 5000)
+      App.taskRunner.runTask({ doRefresh() }, Threads.BACKGROUND, 5000)
     }
   }
 
   private val layoutCallbacks: SolarSystemLayout.Callbacks = object : SolarSystemLayout.Callbacks {
     override fun onBuildClick(planetIndex: Int) {
-      context!!.pushScreen(
+      context.pushScreen(
           BuildScreen(star, planetIndex),
           SharedViews.Builder()
               .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
@@ -100,7 +100,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
 
     override fun onFocusClick(planetIndex: Int) {
       log.info("focus click: %d", planetIndex)
-      context!!.pushScreen(
+      context.pushScreen(
           PlanetDetailsScreen(star, star.planets[planetIndex]),
           SharedViews.Builder()
               .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
@@ -110,7 +110,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
 
     override fun onSitrepClick() {}
     override fun onViewColonyClick(planetIndex: Int) {
-      context!!.pushScreen(
+      context.pushScreen(
           PlanetDetailsScreen(star, star.planets[planetIndex]),
           SharedViews.Builder()
               .addSharedView(layout.getPlanetView(planetIndex), R.id.planet_icon)
@@ -119,7 +119,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
     }
 
     override fun onFleetClick(fleetId: Long) {
-      context!!.pushScreen(
+      context.pushScreen(
           FleetsScreen(star, fleetId),
           SharedViews.Builder()
               .addSharedView(R.id.bottom_pane)

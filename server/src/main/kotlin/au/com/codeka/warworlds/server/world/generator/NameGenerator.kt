@@ -35,7 +35,7 @@ class NameGenerator {
       try {
         val lines = Files.readLines(File(path, "blacklist"), Charset.defaultCharset())
         for (l in lines) {
-          val line = l.trim { it <= ' ' }.toLowerCase(Locale.ENGLISH)
+          val line = l.trim { it <= ' ' }.lowercase(Locale.ENGLISH)
           if (line.isEmpty()) {
             continue
           }
@@ -54,7 +54,7 @@ class NameGenerator {
         val vocab = Vocabulary(path)
         var line: String
         while (ins.readLine().also { line = it ?: "" } != null) {
-          for (word in line.split("[^a-zA-Z]+").toTypedArray()) {
+          for (word in line.split(Regex("[^a-zA-Z]+")).toTypedArray()) {
             val letters = word.trim { it <= ' ' }
             if (letters.isEmpty()) {
               continue
@@ -136,7 +136,7 @@ class NameGenerator {
     }
 
     // Make sure it's title case.
-    name = name!!.toLowerCase(Locale.ENGLISH)
+    name = name!!.lowercase(Locale.ENGLISH)
     return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name)
   }
 

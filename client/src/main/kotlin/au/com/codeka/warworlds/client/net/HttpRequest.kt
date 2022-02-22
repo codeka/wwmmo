@@ -52,6 +52,7 @@ class HttpRequest private constructor(builder: Builder) {
     }
 
   /** Simple wrapper around [.getBody] that casts to a proto message.  */
+  @Suppress("UNCHECKED_CAST")
   fun <T : Message<*, *>?> getBody(protoType: Class<T>): T? {
     val bytes = body ?: return null
     return try {

@@ -23,6 +23,6 @@ class Route @JvmOverloads constructor(
   }
 
   fun createRequestHandler(): RequestHandler {
-    return handlerClass.newInstance()
+    return handlerClass.getDeclaredConstructor().newInstance()
   }
 }

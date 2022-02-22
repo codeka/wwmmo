@@ -53,11 +53,11 @@ class BuildLayout(
     bottomPaneContentView = BuildBottomPane(
         context, star, colony, design!!, object : BuildBottomPane.Callback {
       override fun onBuild(designType: DesignType?, count: Int) {
-        StarManager.updateStar(star, StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-            .colony_id(colony.id)
-            .design_type(designType)
-            .count(count))
+        StarManager.updateStar(star, StarModification(
+            type = StarModification.Type.ADD_BUILD_REQUEST,
+            colony_id = colony.id,
+            design_type = designType,
+            count = count))
         hideBottomSheet()
       }
     })
@@ -73,15 +73,15 @@ class BuildLayout(
    */
   fun showUpgradeSheet(building: Building?) {
     val colony = colonies[viewPager.currentItem]
-    val design = DesignHelper.getDesign(building!!.design_type)
+    val design = DesignHelper.getDesign(building?.design_type!!)
     bottomPaneContentView = UpgradeBottomPane(
         context, star, colony, design, building, object : UpgradeBottomPane.Callback {
       override fun onUpgrade(building: Building?) {
-        StarManager.updateStar(star, StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-            .colony_id(colony.id)
-            .building_id(building?.id)
-            .design_type(building?.design_type))
+        StarManager.updateStar(star, StarModification(
+            type = StarModification.Type.ADD_BUILD_REQUEST,
+            colony_id = colony.id,
+            building_id = building?.id,
+            design_type = building?.design_type))
         hideBottomSheet()
       }
     })
@@ -95,13 +95,13 @@ class BuildLayout(
    * Show the "progress" sheet for a currently-in progress fleet build. The fleet will be non-null
    * if we're upgrading.
    */
-  fun showProgressSheet(fleet: Fleet?, buildRequest: BuildRequest) {
+  fun showProgressSheet(buildRequest: BuildRequest) {
     bottomPaneContentView = ProgressBottomPane(context, buildRequest, object : ProgressBottomPane.Callback {
       override fun onCancelBuild() {
         // "Cancel" has been clicked.
-        StarManager.updateStar(star, StarModification.Builder()
-            .type(StarModification.MODIFICATION_TYPE.DELETE_BUILD_REQUEST)
-            .build_request_id(buildRequest.id))
+        StarManager.updateStar(star, StarModification(
+            type = StarModification.Type.DELETE_BUILD_REQUEST,
+            build_request_id = buildRequest.id))
         hideBottomSheet()
       }
     })
@@ -118,10 +118,11 @@ class BuildLayout(
     bottomPane.removeAllViews()
   }
 
-  fun refreshColonyDetails(colony: Colony?) {
+  fun refreshColonyDetails(colony: Colony) {
     var planet: Planet? = null
     for (p in star.planets) {
-      if (p.colony != null && p.colony.id == colony!!.id) {
+      val c = p.colony ?: continue
+      if (c.id == colony.id) {
         planet = p
       }
     }
@@ -130,7 +131,7 @@ class BuildLayout(
         .into(planetIcon)
     planetName.text = String.format(Locale.US, "%s %s", star.name,
         format(planet.index + 1))
-    val buildQueueLength = colony!!.build_requests.size
+    val buildQueueLength = colony.build_requests.size
     if (buildQueueLength == 0) {
       buildQueueDescription.text = "Build queue: idle"
     } else {

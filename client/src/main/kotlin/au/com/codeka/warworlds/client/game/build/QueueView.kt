@@ -30,9 +30,8 @@ class QueueView /*
         dialog.show(getActivity().getSupportFragmentManager(), "");
       }
     });
-*/(context: Context, private val star: Star?, private val colony: Colony?) : ListView(context), TabContentView {
-  override fun refresh(star: Star?, colony: Colony?) {
+*/(context: Context, private val star: Star, private val colony: Colony) : ListView(context), TabContentView {
+  override fun refresh(star: Star, colony: Colony) {
     // TODO
   }
-
 }

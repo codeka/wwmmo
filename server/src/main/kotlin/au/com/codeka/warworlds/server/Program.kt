@@ -5,6 +5,7 @@ import au.com.codeka.warworlds.common.proto.Designs
 import au.com.codeka.warworlds.common.sim.DesignDefinitions
 import au.com.codeka.warworlds.server.admin.AdminServlet
 import au.com.codeka.warworlds.server.html.HtmlServlet
+import au.com.codeka.warworlds.server.json.WireTypeAdapterFactory
 import au.com.codeka.warworlds.server.net.ServerSocketManager
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.util.SmtpHelper
@@ -13,7 +14,6 @@ import au.com.codeka.warworlds.server.world.StarSimulatorQueue
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import com.google.gson.GsonBuilder
-import com.squareup.wire.WireTypeAdapterFactory
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.servlet.ServletContextHandler
@@ -25,8 +25,8 @@ object Program {
 
   @JvmStatic
   fun main(args: Array<String>) {
-    LogImpl.setup()
     Configuration.i.load()
+    LogImpl.setup(Configuration.i.logging)
     DataStore.i.open()
     DesignDefinitions.init(loadDesignDefinitions())
     StarSimulatorQueue.i.start()
@@ -34,9 +34,9 @@ object Program {
     SmtpHelper.i.start()
     NotificationManager.i.start()
 
-    val options = FirebaseOptions.Builder()
+    val options = FirebaseOptions.builder()
         .setCredentials(Configuration.i.getFirebaseCredentials())
-        .setDatabaseUrl("https://wwmmo-93bac.firebaseio.com")
+        .setDatabaseUrl("https://wwmmo-2.firebaseio.com")
         .build()
     FirebaseApp.initializeApp(options)
 
@@ -64,6 +64,10 @@ object Program {
       log.info("Server started on http://localhost:%d/", port)
       server.join()
     } catch (e: Exception) {
+      // Print on stdout as well, since the logging might be in trouble.
+      println("Exception on main thread, aborting.")
+      println(e)
+
       log.error("Exception on main thread, aborting.", e)
     }
   }
@@ -107,6 +111,7 @@ object Program {
     val gson = GsonBuilder()
         .registerTypeAdapterFactory(WireTypeAdapterFactory())
         .create()
-    return gson.fromJson(json, Designs::class.java)
+    val adapter = gson.getAdapter(Designs::class.java)
+    return adapter.fromJson(json)
   }
 }

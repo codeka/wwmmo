@@ -30,7 +30,7 @@ class EmpireScreen : Screen() {
     layout = EmpireLayout(context.activity, SettingsCallbacks())
   }
 
-  override fun onShow(): ShowInfo? {
+  override fun onShow(): ShowInfo {
     return builder().view(layout).build()
   }
 
@@ -41,9 +41,7 @@ class EmpireScreen : Screen() {
         val req = HttpRequest.Builder()
             .url(getUrl("/accounts/patreon-begin"))
             .authenticated()
-            .body(PatreonBeginRequest.Builder()
-                .empire_id(EmpireManager.getMyEmpire().id)
-                .build().encode())
+            .body(PatreonBeginRequest(empire_id = EmpireManager.getMyEmpire().id).encode())
             .method(HttpRequest.Method.POST)
             .build()
         if (req.responseCode != 200 || req.exception != null) {
@@ -65,9 +63,9 @@ class EmpireScreen : Screen() {
             + "&redirect_uri=" + Uri.encode(resp.redirect_uri)
             + "&state=" + Uri.encode(resp.state))
         log.info("Opening URL: %s", uri)
-        App.taskRunner.runTask(Runnable {
+        App.taskRunner.runTask({
           val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
-          context!!.activity.startActivity(intent)
+          context.activity.startActivity(intent)
         }, Threads.UI)
       }, Threads.BACKGROUND)
     }

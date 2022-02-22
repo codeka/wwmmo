@@ -7,14 +7,16 @@ import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.BuildHelper
+import au.com.codeka.warworlds.common.sim.MutableStar
 import au.com.codeka.warworlds.common.sim.StarModifier
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import com.google.common.collect.Lists;
 import java.util.*
+import kotlin.math.abs
 
 typealias BuildTimeCalculatorCallback = (buildTime: String?, buildMinerals: String?, mineralsColor: Int) -> Unit
 
-class BuildTimeCalculator(private val star: Star?, private val colony: Colony?) {
+class BuildTimeCalculator(private val star: Star, private val colony: Colony) {
 
   fun calculateBuildTime(design: Design?, count: Int, callback: BuildTimeCalculatorCallback) {
     calculateTime(design, null, count, callback)
@@ -29,37 +31,35 @@ class BuildTimeCalculator(private val star: Star?, private val colony: Colony?) 
     App.taskRunner.runTask(Runnable {
       // Add the build request to a temporary copy of the star, simulate it and figure out the
       // build time.
-      val starBuilder = star!!.newBuilder()
+      val mutableStar = MutableStar.from(star)
       val myEmpire = EmpireManager.getMyEmpire()
       try {
-        StarModifier { 0 }.modifyStar(starBuilder,
-            StarModification.Builder()
-                .type(StarModification.MODIFICATION_TYPE.ADD_BUILD_REQUEST)
-                .empire_id(myEmpire.id)
-                .colony_id(colony!!.id)
-                .count(count)
-                .building_id(building?.id)
-                .design_type(design!!.type)
-                .build())
+        StarModifier { 0 }.modifyStar(mutableStar,
+            StarModification(
+                type = StarModification.Type.ADD_BUILD_REQUEST,
+                empire_id = myEmpire.id,
+                colony_id = colony.id,
+                count = count,
+                building_id = building?.id,
+                design_type = design!!.type))
       } catch (e: SuspiciousModificationException) {
         log.error("Suspicious modification?", e)
         return@Runnable
       }
       // find the build request with ID 0, that's our guy
-      val updatedStar = starBuilder.build()
-      for (buildRequest in BuildHelper.getBuildRequests(updatedStar)) {
+      for (buildRequest in BuildHelper.getBuildRequests(mutableStar)) {
         if (buildRequest.id == 0L) {
-          App.taskRunner.runTask(Runnable {
-            val buildTime = BuildHelper.formatTimeRemaining(buildRequest)
+          App.taskRunner.runTask({
+            val buildTime = BuildHelper.formatTimeRemaining(buildRequest.build())
             val mineralsTime: String
             val mineralsColor: Int
-            val newEmpireStorage = BuildHelper.getEmpireStorage(updatedStar, myEmpire.id)
-            val oldEmpireStorage = BuildHelper.getEmpireStorage(star, myEmpire.id)
+            val newEmpireStorage = mutableStar.empireStores.find { it.empireId == myEmpire.id }
+            val oldEmpireStorage = star.empire_stores.find { it.empire_id == myEmpire.id }
             if (newEmpireStorage != null && oldEmpireStorage != null) {
-              val mineralsDelta = (newEmpireStorage.minerals_delta_per_hour
-                  - oldEmpireStorage.minerals_delta_per_hour)
+              val mineralsDelta =
+                (newEmpireStorage.mineralsDeltaPerHour - oldEmpireStorage.minerals_delta_per_hour!!)
               mineralsTime = String.format(Locale.US, "%s%.1f/hr",
-                  if (mineralsDelta < 0) "-" else "+", Math.abs(mineralsDelta))
+                  if (mineralsDelta < 0) "-" else "+", abs(mineralsDelta))
               mineralsColor = if (mineralsDelta < 0) Color.RED else Color.GREEN
             } else {
               mineralsTime = ""

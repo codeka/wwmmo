@@ -17,7 +17,7 @@ import java.util.*
  */
 class ChatLayout(context: Context, private val callbacks: Callbacks) : RelativeLayout(context) {
   interface Callbacks {
-    fun onSend(msg: String?)
+    fun onSend(msg: String)
   }
 
   private val viewPager: ViewPager
@@ -30,7 +30,7 @@ class ChatLayout(context: Context, private val callbacks: Callbacks) : RelativeL
   /** Show the default, send, pane.  */
   private fun showSendPane() {
     val sendBottomPane = SendBottomPane(context, object : SendBottomPane.Callback {
-      override fun onSendClick(message: String?) {
+      override fun onSendClick(message: String) {
         callbacks.onSend(message)
       }
     })
@@ -90,6 +90,7 @@ class ChatLayout(context: Context, private val callbacks: Callbacks) : RelativeL
 
   init {
     View.inflate(context, R.layout.chat, this)
+    @Suppress("DEPRECATION") // We need to support API level 21
     setBackgroundColor(context.resources.getColor(R.color.default_background))
     adapter = ChatPagerAdapter()
     viewPager = findViewById(R.id.pager)

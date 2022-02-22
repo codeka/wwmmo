@@ -2,29 +2,32 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.common.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/chat.proto";
-import "au/com/codeka/warworlds/common/proto/empire.proto";
-import "au/com/codeka/warworlds/common/proto/star.proto";
-import "au/com/codeka/warworlds/common/proto/sitreport.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\chat.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\empire.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\star.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\sitreport.proto";
 
-// Wrapper class for all the packets.
+// Wrapper class for all the packets. Only one at a time can be set.
 message Packet {
-  optional HelloPacket hello = 1;
-  optional WatchSectorsPacket watch_sectors = 2;
-  optional StarUpdatedPacket star_updated = 3;
-  optional ModifyStarPacket modify_star = 4;
-  optional RequestEmpirePacket request_empire = 5;
-  optional EmpireDetailsPacket empire_details = 6;
-  optional ChatMessagesPacket chat_msgs = 7;
-  optional RpcPacket rpc = 8;
+  oneof payload {
+    HelloPacket hello = 1;
+    WatchSectorsPacket watch_sectors = 2;
+    StarUpdatedPacket star_updated = 3;
+    ModifyStarPacket modify_star = 4;
+    RequestEmpirePacket request_empire = 5;
+    EmpireDetailsPacket empire_details = 6;
+    ChatMessagesPacket chat_msgs = 7;
+    RpcPacket rpc = 8;
+  }
 }
 
 // The "hello" packet that's sent by the client when it first connects to the game socket.
 message HelloPacket {
   // The ID of the empire you're connecting as. You should already know this from the response to
   // the login request.
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 
   // The most recent "last_simulation" time we have for any of our stars. The server will send us
   // an update on all of our stars with a last_simulation newer than this value. This does mean
@@ -56,7 +59,7 @@ message StarUpdatedPacket {
 // Send from the client to the server when it wants to modify a star. The server will modify the
 // star then send StarUpdatedPackets to everybody who is interested in this star.
 message ModifyStarPacket {
-  optional int64 star_id = 1;
+  required int64 star_id = 1;
   repeated StarModification modification = 2;
 }
 
@@ -96,7 +99,7 @@ message RpcPacket {
     repeated SituationReport sit_reports = 1;
   }
 
-  oneof Payload {
+  oneof payload {
     SitReportRequest sit_report_request = 10;
     SitReportResponse sit_report_response = 11;
   }

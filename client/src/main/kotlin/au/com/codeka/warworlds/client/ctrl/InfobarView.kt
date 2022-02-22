@@ -76,13 +76,13 @@ class InfobarView(context: Context?, attrs: AttributeSet?) : FrameLayout(context
   private val eventHandler: Any = object : Any() {
     @EventHandler
     fun onEmpireUpdated(empire: Empire) {
-      if (empire.id != null && empire.id == EmpireManager.getMyEmpire().id) {
+      if (empire.id == EmpireManager.getMyEmpire().id) {
         refreshEmpire(empire)
       }
     }
 
     @EventHandler(thread = Threads.UI)
-    fun onPacket(event: ServerPacketEvent?) {
+    fun onPacket(@Suppress("unused_parameter") event: ServerPacketEvent) {
       lastPacketTime = System.currentTimeMillis()
       refresh()
       handler.postDelayed({ refresh() }, PROGRESS_TIME_MS)

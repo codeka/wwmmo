@@ -12,7 +12,7 @@ class Participant(private val empireId: Long) {
   /** This interface is given to us when the player is online.  */
   interface OnlineCallback {
     /** Called when [ChatMessage]s is sent to a room we're in.  */
-    fun onChatMessage(msgs: List<ChatMessage?>?)
+    fun onChatMessage(msgs: List<ChatMessage>)
   }
 
   /**
@@ -20,11 +20,12 @@ class Participant(private val empireId: Long) {
    * currently offline.
    */
   private var callback: OnlineCallback? = null
+
   fun setOnlineCallback(callback: OnlineCallback?) {
     this.callback = callback
   }
 
-  fun onMessage(msg: ChatMessage?) {
+  fun onMessage(msg: ChatMessage) {
     if (callback != null) {
       callback!!.onChatMessage(Lists.newArrayList(msg))
     }

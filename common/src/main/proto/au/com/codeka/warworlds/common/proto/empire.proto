@@ -2,20 +2,21 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.common.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/star.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\star.proto";
 
 //
 // Details of an empire's rank (such as number of ships, number of colonies etc)
 message EmpireRank {
-  optional int64 empire_id = 1;
-  optional int32 rank = 2;
-  optional int32 last_rank = 3;
-  optional int32 total_stars = 4;
-  optional int32 total_colonies = 5;
-  optional int32 total_ships = 6;
-  optional int32 total_buildings = 7;
-  optional int32 total_population = 8;
+  required int64 empire_id = 1;
+  required int32 rank = 2;
+  required int32 last_rank = 3;
+  required int32 total_stars = 4;
+  required int32 total_colonies = 5;
+  required int32 total_ships = 6;
+  required int32 total_buildings = 7;
+  required int32 total_population = 8;
 }
 
 message EmpireRanks {
@@ -27,18 +28,18 @@ message EmpireRanks {
 // and stuff like that.
 message Empire {
   // A unique identifier for the empire, useful for referencing him in other parts of the
-  // system. This won't be present in the initial "PUT"
-  optional int64 id = 1;
+  // system. This will be 0 in the initial "PUT", and for native empires.
+  required int64 id = 1;
 
   // The "display" name for the player, which is what other players see.
-  optional string display_name = 2;
+  required string display_name = 2;
 
   enum EmpireState {
     ACTIVE = 1;
     BANNED = 2;
     ABANDONED = 3;
   }
-  optional EmpireState state = 3;
+  required EmpireState state = 3 [default = ACTIVE];
 
   // if specified, contains the details of the empire's rank
   optional EmpireRank rank = 4;

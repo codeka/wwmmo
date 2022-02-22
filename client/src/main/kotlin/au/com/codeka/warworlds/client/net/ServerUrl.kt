@@ -6,7 +6,6 @@ import java.net.URISyntaxException
 
 /** Helper class for getting the current server URL. */
 object ServerUrl {
-  @JvmStatic
   val url: String
     get() = GameSettings.getString(GameSettings.Key.SERVER)
 
@@ -19,12 +18,11 @@ object ServerUrl {
       null
     }
 
-  @JvmStatic
   fun getUrl(path: String): String {
-    var path = path
-    if (path.startsWith("/")) {
-      path = path.substring(1)
+    var p = path
+    if (p.startsWith("/")) {
+      p = p.substring(1)
     }
-    return url + path
+    return url + p
   }
 }

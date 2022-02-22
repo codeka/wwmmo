@@ -6,6 +6,8 @@ import au.com.codeka.warworlds.common.Time
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Design.DesignType
 import au.com.codeka.warworlds.common.sim.*
+import au.com.codeka.warworlds.server.concurrency.TaskRunner
+import au.com.codeka.warworlds.server.concurrency.Threads
 import au.com.codeka.warworlds.server.store.DataStore
 import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.store.StarsStore
@@ -28,17 +30,15 @@ class StarManager private constructor() {
       StarModifier { DataStore.i.seq().nextIdentifier() }
 
   fun getStar(id: Long): WatchableObject<Star>? {
-    var watchableStar: WatchableObject<Star>?
     synchronized(stars) {
-      watchableStar = stars[id]
-      if (watchableStar == null) {
-        val star = store[id] ?: return null
-        watchableStar = WatchableObject(star)
-        watchableStar!!.addWatcher(starWatcher)
-        stars[star.id] = watchableStar!!
+      return stars[id] ?: run {
+        val star = store.get(id) ?: return null
+        val w = WatchableObject(star)
+        w.addWatcher(starWatcher)
+        stars[id] = w
+        w
       }
     }
-    return watchableStar
   }
 
   /**
@@ -52,17 +52,8 @@ class StarManager private constructor() {
 
   fun deleteStar(id: Long) {
     val watchableStar = stars[id]
-    val star: Star?
-    if (watchableStar != null) {
-      star = watchableStar.get()
-    } else {
-      star = store[id]
-      if (star == null) {
-        // If the star's not in the store, it doesn't exist.
-        return
-      }
-    }
-    val coord = SectorCoord.Builder().x(star.sector_x).y(star.sector_y).build()
+    val star = watchableStar?.get() ?: store.get(id) ?: return
+    val coord = SectorCoord(x = star.sector_x, y = star.sector_y)
     store.delete(id)
     synchronized(stars) { stars.remove(id) }
     SectorManager.i.forgetSector(coord)
@@ -77,15 +68,15 @@ class StarManager private constructor() {
       log.debug("Adding native colonies to star %d \"%s\"...", star.get().id, star.get().name)
 
       // OK, so basically any planet with a population congeniality > 500 will get a colony.
-      val starBuilder = star.get().newBuilder()
+      val mutableStar = MutableStar.from(star.get())
       try {
         var numColonies = 0
-        for (i in starBuilder.planets.indices) {
-          if (starBuilder.planets[i].population_congeniality > 500) {
-            starModifier.modifyStar(starBuilder, StarModification.Builder()
-                .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-                .planet_index(i)
-                .build())
+        for (planet in mutableStar.planets) {
+          if (planet.populationCongeniality > 500) {
+            starModifier.modifyStar(mutableStar, StarModification(
+                type = StarModification.Type.COLONIZE,
+                empire_id = 0L,
+                planet_index = planet.index))
             numColonies++
           }
         }
@@ -94,18 +85,18 @@ class StarManager private constructor() {
         val rand = NormalRandom()
         while (numColonies > 0) {
           val numShips = 100 + (rand.next() * 40).toInt()
-          starModifier.modifyStar(starBuilder, StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-              .design_type(DesignType.FIGHTER)
-              .count(numShips)
-              .build())
+          starModifier.modifyStar(mutableStar, StarModification(
+              type = StarModification.Type.CREATE_FLEET,
+              empire_id = 0L,
+              design_type = DesignType.FIGHTER,
+              count = numShips))
           numColonies--
         }
       } catch (e: SuspiciousModificationException) {
         // Shouldn't happen, as we're creating the modifications ourselves.
         log.error("Unexpected suspicious modification.", e)
       }
-      star.set(starBuilder.build())
+      star.set(mutableStar.build())
     }
   }
 
@@ -126,7 +117,7 @@ class StarManager private constructor() {
       if (modification.star_id != null) {
         auxStars = auxStars ?: TreeMap()
         if (!auxStars.containsKey(modification.star_id)) {
-          val auxStar = getStarOrError(modification.star_id).get()
+          val auxStar = getStarOrError(modification.star_id!!).get()
           auxStars[auxStar.id] = auxStar
         }
       }
@@ -140,9 +131,10 @@ class StarManager private constructor() {
       modifications: Collection<StarModification>,
       logHandler: Simulation.LogHandler) {
     synchronized(star.lock) {
-      val starBuilder = star.get().newBuilder()
-      starModifier.modifyStar(starBuilder, modifications, auxStars, logHandler = logHandler)
-      completeActions(star, starBuilder, logHandler)
+      val mutableStar = MutableStar.from(star.get())
+      starModifier.modifyStar(mutableStar, modifications, auxStars, logHandler = logHandler)
+      completeActions(star, mutableStar, logHandler)
+      star.set(mutableStar.build())
     }
   }
 
@@ -151,14 +143,14 @@ class StarManager private constructor() {
    * finished or a fleet has arrived) and also save the star to the data store.
    *
    * @param star The [<] of the star that we'll update.
-   * @param starBuilder A simulated star that we need to finish up.
+   * @param mutableStar A simulated star that we need to finish up.
    * @param logHandler An optional [Simulation.LogHandler] that we'll pass log messages
    * through to. If null, we'll just do normal logging.
    * @throws SuspiciousModificationException if the
    */
   private fun completeActions(
       star: WatchableObject<Star>,
-      starBuilder: Star.Builder,
+      mutableStar: MutableStar,
       logHandler: Simulation.LogHandler) {
     // For any builds/moves/etc that finish in the future, make sure we schedule a job to
     // re-simulate the star then.
@@ -169,153 +161,136 @@ class StarManager private constructor() {
 
     // Any builds which have finished, we'll want to remove them and add modifications for them
     // instead.
-    for (i in starBuilder.planets.indices) {
-      val planet = starBuilder.planets[i]
-      if (planet.colony == null || planet.colony.build_requests == null) {
-        continue
-      }
-      val remainingBuildRequests = ArrayList<BuildRequest>()
-      for (br in planet.colony.build_requests) {
-        if (br.end_time <= now) {
+    for (planet in mutableStar.planets) {
+      val colony = planet.colony ?: continue
+      val remainingBuildRequests = ArrayList<MutableBuildRequest>()
+      for (br in colony.buildRequests) {
+        if (br.endTime <= now) {
           // It's finished. Add the actual thing it built.
-          val design = DesignHelper.getDesign(br.design_type)
+          val design = DesignHelper.getDesign(br.designType)
 
           // Generate a sit report for the build-complete event.
-          val sitReport = SituationReport.Builder()
-              .empire_id(planet.colony.empire_id)
-              .planet_index(planet.index)
-              .star_id(starBuilder.id)
-              .report_time(System.currentTimeMillis())
-              .build_complete_record(SituationReport.BuildCompleteRecord.Builder()
-                  .count(br.count)
-                  .design_type(br.design_type)
-                  .upgrade(br.building_id != null)
-                  .build())
-          val sitReports: MutableMap<Long, SituationReport.Builder> = Maps.newHashMap()
-          sitReports[planet.colony.empire_id] = sitReport
+          val sitReport = SituationReport(
+              empire_id = colony.id,
+              planet_index = planet.index,
+              star_id = mutableStar.id,
+              report_time = System.currentTimeMillis(),
+              build_complete_record = SituationReport.BuildCompleteRecord(
+                  count = br.count,
+                  design_type = br.designType,
+                  upgrade = br.buildingId != null))
+          val sitReports: MutableMap<Long, SituationReport> = Maps.newHashMap()
+          sitReports[colony.empireId] = sitReport
 
           if (design.design_kind == Design.DesignKind.BUILDING) {
-            if (br.building_id != null) {
+            if (br.buildingId != null) {
               // It's an existing building that we're upgrading.
-              starModifier.modifyStar(starBuilder,
-                  StarModification.Builder()
-                      .type(StarModification.MODIFICATION_TYPE.UPGRADE_BUILDING)
-                      .colony_id(planet.colony.id)
-                      .empire_id(planet.colony.empire_id)
-                      .building_id(br.building_id)
-                      .build(),
+              starModifier.modifyStar(mutableStar,
+                  StarModification(
+                      type = StarModification.Type.UPGRADE_BUILDING,
+                      colony_id = colony.id,
+                      empire_id = colony.empireId,
+                      building_id = br.buildingId),
                   sitReports = sitReports,
                   logHandler = logHandler)
             } else {
               // It's a new building that we're creating.
               starModifier.modifyStar(
-                  starBuilder,
-                  StarModification.Builder()
-                      .type(StarModification.MODIFICATION_TYPE.CREATE_BUILDING)
-                      .colony_id(planet.colony.id)
-                      .empire_id(planet.colony.empire_id)
-                      .design_type(br.design_type)
-                      .build(),
+                  mutableStar,
+                  StarModification(
+                      type = StarModification.Type.CREATE_BUILDING,
+                      colony_id = colony.id,
+                      empire_id = colony.empireId,
+                      design_type = br.designType),
                   sitReports = sitReports,
                   logHandler = logHandler)
             }
           } else {
             starModifier.modifyStar(
-                starBuilder,
-                StarModification.Builder()
-                    .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-                    .empire_id(planet.colony.empire_id)
-                    .design_type(br.design_type)
-                    .count(br.count)
-                    .build(),
+                mutableStar,
+                StarModification(
+                    type = StarModification.Type.CREATE_FLEET,
+                    empire_id = colony.empireId,
+                    design_type = br.designType,
+                    count = br.count),
                 sitReports = sitReports,
                 logHandler = logHandler)
           }
 
           // Subtract the minerals it used last turn (since that won't have happening in the
           // simulation)
-          val storageIndex = StarHelper.getStorageIndex(starBuilder, planet.colony.empire_id)
-          var minerals = starBuilder.empire_stores[storageIndex].total_minerals
-          minerals -= br.delta_minerals_per_hour * Time.HOUR / Simulation.STEP_TIME * br.progress_per_step
-          if (minerals < 0) {
-            minerals = 0f
+          val storageIndex = StarHelper.getStorageIndex(mutableStar, colony.empireId)
+          val empireStore = mutableStar.empireStores[storageIndex]
+          empireStore.totalMinerals -=
+              br.mineralsDeltaPerHour * Time.HOUR / Simulation.STEP_TIME * br.progressPerStep
+          if (empireStore.totalMinerals < 0) {
+            empireStore.totalMinerals = 0f
           }
-          starBuilder.empire_stores[storageIndex] =
-              starBuilder.empire_stores[storageIndex].newBuilder().total_minerals(minerals).build()
 
           // Save the situation reports to the data store.
-          DataStore.i.sitReports().save(sitReports.values.map { sr -> sr.build() })
+          DataStore.i.sitReports().save(sitReports.values)
         } else {
-          if (nextSimulateTime == null || nextSimulateTime > br.end_time) {
-            nextSimulateTime = br.end_time
+          if (nextSimulateTime == null || nextSimulateTime > br.endTime) {
+            nextSimulateTime = br.endTime
           }
           remainingBuildRequests.add(br)
         }
       }
-      val planetBuilder = starBuilder.planets[i].newBuilder()
-      planetBuilder.colony(planetBuilder.colony.newBuilder()
-          .build_requests(remainingBuildRequests)
-          .build())
-      starBuilder.planets[i] = planetBuilder.build()
+      colony.buildRequests = remainingBuildRequests
     }
 
     // Any fleets that have arrived, make sure we remove them here and add them to the destination.
     run {
       var i = 0
-      while (i < starBuilder.fleets.size) {
-        val fleet = starBuilder.fleets[i]
-        if (fleet.state != Fleet.FLEET_STATE.MOVING || fleet.eta > now) {
+      while (i < mutableStar.fleets.size) {
+        val fleet = mutableStar.fleets[i]
+        if (fleet.state != Fleet.FLEET_STATE.MOVING || fleet.eta!! > now) {
           i++
           continue
         }
 
         // First, grab the destination star and add it there.
-        val destStar = getStar(fleet.destination_star_id)
+        val destStar = getStar(fleet.destinationStarId!!)
         if (destStar == null) {
           // The star doesn't exist?! Just reset it to not-moving.
-          starBuilder.fleets[i] = fleet.newBuilder()
-              .state(Fleet.FLEET_STATE.IDLE)
-              .destination_star_id(null)
-              .eta(null)
-              .build()
+          fleet.state = Fleet.FLEET_STATE.IDLE
+          fleet.destinationStarId = null
+          fleet.eta = null
           i++
           continue
         }
 
         // Generate a sit report for the move-complete event.
-        val sitReport = SituationReport.Builder()
-            .empire_id(fleet.empire_id)
-            .star_id(destStar.get().id)
-            .report_time(System.currentTimeMillis())
-            .move_complete_record(SituationReport.MoveCompleteRecord.Builder()
-                .design_type(fleet.design_type)
-                .fleet_id(fleet.id)
-                .fuel_amount(fleet.fuel_amount)
-                .num_ships(fleet.num_ships)
-                .build())
-        val sitReports: MutableMap<Long, SituationReport.Builder> = Maps.newHashMap()
-        sitReports[fleet.empire_id] = sitReport
+        val sitReport = SituationReport(
+            empire_id = fleet.empireId,
+            star_id = destStar.get().id,
+            report_time = System.currentTimeMillis(),
+            move_complete_record = SituationReport.MoveCompleteRecord(
+                design_type = fleet.designType,
+                fleet_id = fleet.id,
+                fuel_amount = fleet.fuelAmount,
+                num_ships = fleet.numShips,
+                was_destroyed = false))
+        val sitReports: MutableMap<Long, SituationReport> = Maps.newHashMap()
+        sitReports[fleet.empireId] = sitReport
 
-        synchronized(destStar.lock) {
-          // TODO: this could deadlock, need to lock in the same order
-          val destStarBuilder = destStar.get().newBuilder()
-          starModifier.modifyStar(
-              destStarBuilder,
-              StarModification.Builder()
-                  .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-                  .empire_id(fleet.empire_id)
-                  .fleet(fleet)
-                  .build(),
-              sitReports = sitReports,
-              logHandler = logHandler)
-          destStar.set(destStarBuilder.build())
-        }
+        // Run this in a separate thread so we don't deadlock
+        TaskRunner.i.runTask({
+          modifyStar(
+            destStar,
+            listOf(
+              StarModification(
+                type = StarModification.Type.CREATE_FLEET,
+                empire_id = fleet.empireId,
+                fleet = fleet.build())),
+            logHandler)
+        }, Threads.BACKGROUND)
 
         // Save the situation reports to the data store.
-        DataStore.i.sitReports().save(sitReports.values.map { sr -> sr.build() })
+        DataStore.i.sitReports().save(sitReports.values)
 
         // Then remove it from our star.
-        starBuilder.fleets.removeAt(i)
+        mutableStar.fleets.removeAt(i)
         i--
         i++
       }
@@ -324,10 +299,10 @@ class StarManager private constructor() {
     // Any fleets that have been destroyed, destroy them.
     run {
       var i = 0
-      while (i < starBuilder.fleets.size) {
-        val fleet = starBuilder.fleets[i]
-        if (fleet.num_ships <= 0.01f) {
-          starBuilder.fleets.removeAt(i)
+      while (i < mutableStar.fleets.size) {
+        val fleet = mutableStar.fleets[i]
+        if (fleet.numShips <= 0.01f) {
+          mutableStar.fleets.removeAt(i)
           i--
         }
         i++
@@ -335,12 +310,12 @@ class StarManager private constructor() {
     }
 
     // Make sure we simulate at least when the next fleet arrives
-    for (i in starBuilder.fleets.indices) {
-      val fleet = starBuilder.fleets[i]
-      if (fleet.eta != null && (nextSimulateTime == null || nextSimulateTime > fleet.eta)) {
+    for (i in mutableStar.fleets.indices) {
+      val fleet = mutableStar.fleets[i]
+      if (fleet.eta != null && (nextSimulateTime == null || nextSimulateTime > fleet.eta!!)) {
         if (fleet.state != Fleet.FLEET_STATE.MOVING) {
           log.warning("Fleet has non-MOVING but non-null eta, resetting to null.")
-          starBuilder.fleets[i] = fleet.newBuilder().eta(null).build()
+          fleet.eta = null
         } else {
           nextSimulateTime = fleet.eta
         }
@@ -350,21 +325,22 @@ class StarManager private constructor() {
     // If the star has at least one non-native colony, make sure the sector is marked non-empty
     var nonEmpty = false
     for (planet in star.get().planets) {
-      if (planet.colony != null && planet.colony.empire_id != null) {
+      val colony = planet.colony
+      if (colony?.empire_id != null) {
         nonEmpty = true
         break
       }
     }
     if (nonEmpty) {
-      val coord = SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build()
+      val coord = SectorCoord(x = star.get().sector_x, y = star.get().sector_y)
       val sector: WatchableObject<Sector> = SectorManager.i.getSector(coord)
       if (sector.get().state == SectorState.Empty.value) {
         DataStore.i.sectors().updateSectorState(coord, SectorState.Empty, SectorState.NonEmpty)
-        sector.set(sector.get().newBuilder().state(SectorState.NonEmpty.value).build())
+        sector.set(sector.get().copy(state = SectorState.NonEmpty.value))
       }
     }
-    starBuilder.next_simulation(nextSimulateTime)
-    star.set(starBuilder.build())
+    mutableStar.nextSimulation = nextSimulateTime
+    star.set(mutableStar.build())
 
     // TODO: only ping if the next simulate time is in the next 10 minutes.
     StarSimulatorQueue.i.ping()

@@ -1,8 +1,6 @@
 package au.com.codeka.warworlds.common.sim
 
-import au.com.codeka.warworlds.common.proto.Colony
-import au.com.codeka.warworlds.common.proto.Design
-import au.com.codeka.warworlds.common.proto.Planet
+import au.com.codeka.warworlds.common.proto.*
 
 /** Helper for accessing information about a [Colony]. */
 object ColonyHelper {
@@ -12,7 +10,7 @@ object ColonyHelper {
     }
     var population: Int = planet.population_congeniality
     for (effect in findEffects(planet, Design.EffectType.POPULATION_BOOST)) {
-      val extraPopulation = effect.minimum.toFloat().coerceAtLeast(population * effect.bonus)
+      val extraPopulation = effect.minimum!!.toFloat().coerceAtLeast(population * effect.bonus!!)
       population += extraPopulation.toInt()
     }
     return population
@@ -25,7 +23,7 @@ object ColonyHelper {
   fun getFarmingCongeniality(planet: Planet): Int {
     var congeniality = planet.farming_congeniality
     for (effect in findEffects(planet, Design.EffectType.FARMING_BOOST)) {
-      val extraCongeniality = effect.minimum.coerceAtLeast((congeniality * effect.bonus).toInt())
+      val extraCongeniality = effect.minimum!!.coerceAtLeast((congeniality * effect.bonus!!).toInt())
       congeniality += extraCongeniality
     }
     return congeniality
@@ -38,7 +36,7 @@ object ColonyHelper {
   fun getMiningCongeniality(planet: Planet): Int {
     var congeniality = planet.mining_congeniality
     for (effect in findEffects(planet, Design.EffectType.MINING_BOOST)) {
-      val extraCongeniality = effect.minimum.coerceAtLeast((congeniality * effect.bonus).toInt())
+      val extraCongeniality = effect.minimum!!.coerceAtLeast((congeniality * effect.bonus!!).toInt())
       congeniality += extraCongeniality
     }
     return congeniality
@@ -51,10 +49,22 @@ object ColonyHelper {
   fun getEnergyCongeniality(planet: Planet): Int {
     var congeniality = planet.energy_congeniality
     for (effect in findEffects(planet, Design.EffectType.ENERGY_BOOST)) {
-      val extraCongeniality = effect.minimum.coerceAtLeast((congeniality * effect.bonus).toInt())
+      val extraCongeniality = effect.minimum!!.coerceAtLeast((congeniality * effect.bonus!!).toInt())
       congeniality += extraCongeniality
     }
     return congeniality
+  }
+
+  fun findBuildRequest(star: MutableStar, buildRequestId: Long): MutableBuildRequest? {
+    for (planet in star.planets) {
+      val colony = planet.colony ?: continue
+      val br = colony.buildRequests.find { it.id == buildRequestId }
+      if (br != null) {
+        return br
+      }
+    }
+
+    return null
   }
 
   private fun findEffects(planet: Planet, effectType: Design.EffectType): ArrayList<Design.Effect> {
@@ -82,10 +92,10 @@ object ColonyHelper {
    * by active build requests).
    */
   fun getDeltaMineralsPerHour(colony: Colony, now: Long): Float {
-    var delta: Float = colony.delta_minerals
+    var delta: Float = colony.delta_minerals!!
     for (br in colony.build_requests) {
-      if (br.start_time < now && br.end_time > now) {
-        delta += br.delta_minerals_per_hour
+      if (br.start_time!! < now && br.end_time!! > now) {
+        delta += br.delta_minerals_per_hour!!
       }
     }
     return delta

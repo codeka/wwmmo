@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.build
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.text.Html
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.TextView
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.common.proto.BuildRequest
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.BuildHelper
@@ -22,6 +24,7 @@ import kotlin.math.roundToInt
  * Bottom pane for an existing build. Shows the current progress, what we're blocked on (e.g. need
  * more minerals or population to go faster?) and allows you to cancel the build.
  */
+@SuppressLint("ViewConstructor") // Must be constructed in code.
 class ProgressBottomPane(
     context: Context,
     private var buildRequest: BuildRequest,
@@ -38,10 +41,8 @@ class ProgressBottomPane(
   override fun refresh(star: Star?) {
     // Get an updated build request
     for (planet in star!!.planets) {
-      if (planet.colony == null) {
-        continue
-      }
-      for (br in planet.colony.build_requests) {
+      val colony = planet.colony ?: continue
+      for (br in colony.build_requests) {
         if (br.id == buildRequest.id) {
           buildRequest = br
           break
@@ -57,13 +58,13 @@ class ProgressBottomPane(
 
     // These could be null if the star hasn't been simulated recently.
     if (buildRequest.population_efficiency != null) {
-      populationEfficiency.progress = (buildRequest.population_efficiency * 100).roundToInt()
+      populationEfficiency.progress = (buildRequest.population_efficiency!! * 100).roundToInt()
     }
     if (buildRequest.minerals_efficiency != null) {
-      miningEfficiency.progress = (buildRequest.minerals_efficiency * 100).roundToInt()
+      miningEfficiency.progress = (buildRequest.minerals_efficiency!! * 100).roundToInt()
     }
     val verb = "Building" // (buildRequest.build_request_id == null ? "Building" : "Upgrading");
-    timeRemaining.text = Html.fromHtml(String.format(Locale.ENGLISH,
+    timeRemaining.text = fromHtml(String.format(Locale.ENGLISH,
         "<font color=\"#0c6476\">%s:</font> %d %%, %s left",
         verb, progress,
         BuildHelper.formatTimeRemaining(buildRequest)))
@@ -71,14 +72,13 @@ class ProgressBottomPane(
 
   init {
     View.inflate(context, R.layout.build_progress_bottom_pane, this)
-    this.buildRequest = buildRequest
     val buildIcon = findViewById<ImageView>(R.id.build_icon)
     val buildName = findViewById<TextView>(R.id.build_name)
     timeRemaining = findViewById(R.id.build_time_remaining)
     buildProgress = findViewById(R.id.build_progress)
     populationEfficiency = findViewById(R.id.population_efficiency)
     miningEfficiency = findViewById(R.id.mining_efficiency)
-    findViewById<View>(R.id.cancel).setOnClickListener { view: View? -> callback.onCancelBuild() }
+    findViewById<View>(R.id.cancel).setOnClickListener { callback.onCancelBuild() }
     val design = DesignHelper.getDesign(buildRequest.design_type)
     BuildViewHelper.setDesignIcon(design, buildIcon)
     buildName.text = DesignHelper.getDesignName(design, false)

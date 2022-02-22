@@ -8,9 +8,9 @@ import com.google.common.base.Objects
  */
 class ComparablePair<E : Comparable<E>, F : Comparable<F>>(var one: E, var two: F) : Comparable<Pair<E, F>> {
   override fun compareTo(other: Pair<E, F>): Int {
-    var comp = one.compareTo(other.one!!)
+    var comp = one.compareTo(other.one)
     if (comp == 0) {
-      comp = two.compareTo(other.two!!)
+      comp = two.compareTo(other.two)
     }
     return comp
   }
@@ -19,11 +19,10 @@ class ComparablePair<E : Comparable<E>, F : Comparable<F>>(var one: E, var two: 
     return Objects.hashCode(one, two)
   }
 
-  override fun equals(obj: Any?): Boolean {
-    if (obj == null || obj !is Pair<*, *>) {
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other !is Pair<*, *>) {
       return false
     }
-    val other: Pair<E, F> = obj as Pair<E, F>
     return Objects.equal(other.one, one) && Objects.equal(other.two, two)
   }
 }

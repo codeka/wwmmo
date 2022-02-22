@@ -23,10 +23,11 @@ object ChatHelper {
    * @param autoTranslate Whether to show the auto-translated or not.
    * @return An HTML-formatted message.
    */
-  fun formatPlain(msg: ChatMessage?, autoTranslate: Boolean): String {
-    var text = msg!!.message
-    if (msg.message_en != null && autoTranslate) {
-      text = msg.message_en
+  private fun formatPlain(msg: ChatMessage, autoTranslate: Boolean): String {
+    var text = msg.message
+    val messageEn = msg.message_en
+    if (messageEn != null && autoTranslate) {
+      text = messageEn
     }
 
 //    int filterLevel = new GlobalOptions().chatProfanityFilterLevel().getValue();
@@ -46,12 +47,12 @@ object ChatHelper {
    * @return An HTML-formatted version of the message.
    */
   fun format(
-      msg: ChatMessage?,
+      msg: ChatMessage,
       isPublic: Boolean,
       messageOnly: Boolean,
       autoTranslate: Boolean): String {
     var text = formatPlain(msg, autoTranslate)
-    if (msg!!.message_en != null && autoTranslate) {
+    if (msg.message_en != null && autoTranslate) {
       text = "<i>‹" + msg.message_en + "›</i>"
     }
     var isEnemy = false
@@ -64,34 +65,34 @@ object ChatHelper {
         isFriendly = true
       }
       if (!messageOnly) {
-        val empire = EmpireManager.getEmpire(msg.empire_id)
+        val empire = EmpireManager.getEmpire(msg.empire_id!!)
         if (empire != null) {
           text = empire.display_name + " : " + text
         }
       }
-    } else if (msg.date_posted != null) {
-      isServer = true
-      if (!messageOnly) {
-        text = "[SERVER] : $text"
-      }
     }
-    if (msg.date_posted != null && !messageOnly) {
+    if (!messageOnly) {
       text = CHAT_DATE_FORMAT.format(Date(msg.date_posted)) + " : " + text
     }
     if (isPublic) {
-      if (isServer) {
-        text = "<font color=\"#00ffff\"><b>$text</b></font>"
-      } else if (msg.alliance_id != null) {
-        text = "[Alliance] $text"
-        text = if (isFriendly) {
-          "<font color=\"#99ff99\">$text</font>"
-        } else {
-          "<font color=\"#9999ff\">$text</font>"
+      when {
+        isServer -> {
+          text = "<font color=\"#00ffff\"><b>$text</b></font>"
         }
-      } else if (isEnemy) {
-        text = "<font color=\"#ff9999\">$text</font>"
-      } else if (isFriendly) {
-        text = "<font color=\"#99ff99\">$text</font>"
+        msg.alliance_id != null -> {
+          text = "[Alliance] $text"
+          text = if (isFriendly) {
+            "<font color=\"#99ff99\">$text</font>"
+          } else {
+            "<font color=\"#9999ff\">$text</font>"
+          }
+        }
+        isEnemy -> {
+          text = "<font color=\"#ff9999\">$text</font>"
+        }
+        isFriendly -> {
+          text = "<font color=\"#99ff99\">$text</font>"
+        }
       }
     } else { // !isPublic (e.g. alliance or private conversation)
       text = if (isFriendly) {
@@ -111,7 +112,7 @@ object ChatHelper {
     val matcher = MARKDOWN_STRING.matcher(markdown)
     while (matcher.find()) {
       val kind = matcher.group(2)
-      val text = matcher.group(3)
+      val text = matcher.group(3)!!
       when (kind) {
         "**" -> matcher.appendReplacement(output, String.format("<b>%s</b>", text))
         "*", "-", "_" -> matcher.appendReplacement(output, String.format("<i>%s</i>", text))
@@ -127,7 +128,7 @@ object ChatHelper {
     val output = StringBuffer()
     val matcher = URL_PATTERN.matcher(line)
     while (matcher.find()) {
-      var url = matcher.group(0)
+      var url = matcher.group(0)!!
       val display = url
       if (!url.startsWith("http://") && !url.startsWith("https://")) {
         url = "http://$url"

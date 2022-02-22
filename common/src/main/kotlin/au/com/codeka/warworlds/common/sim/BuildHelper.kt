@@ -20,8 +20,17 @@ object BuildHelper {
     return buildRequests
   }
 
+  fun getBuildRequests(star: MutableStar): List<MutableBuildRequest> {
+    val buildRequests = ArrayList<MutableBuildRequest>()
+    for (planet in star.planets) {
+      val colony = planet.colony ?: continue
+      buildRequests.addAll(colony.buildRequests)
+    }
+    return buildRequests
+  }
+
   fun formatTimeRemaining(buildRequest: BuildRequest): String {
-    val hours = (buildRequest.end_time - System.currentTimeMillis()).toFloat() / Time.HOUR
+    val hours = (buildRequest.end_time!! - System.currentTimeMillis()).toFloat() / Time.HOUR
     val minutes = hours * 60.0f
     return when {
       minutes < 10.0f -> {
@@ -47,19 +56,19 @@ object BuildHelper {
     // Update the progress percentages for partial steps while we're here.
     var brStartTime = SimulationHelper.trimTimeToStep(now)
     val brEndTime = brStartTime + Simulation.STEP_TIME
-    if (buildRequest.start_time > brStartTime) {
+    if (buildRequest.start_time!! > brStartTime) {
       brStartTime = buildRequest.start_time
     }
     if (now in (brStartTime + 1)..brEndTime) {
       val stepFraction = (now - brStartTime).toFloat() / Simulation.STEP_TIME.toFloat()
-      return 1.0f.coerceAtMost(buildRequest.progress + stepFraction * buildRequest.progress_per_step)
+      return 1.0f.coerceAtMost(buildRequest.progress!! + stepFraction * buildRequest.progress_per_step!!)
     }
-    return buildRequest.progress
+    return buildRequest.progress!!
   }
 
   fun getEmpireStorage(star: Star, empireId: Long): EmpireStorage? {
     for (storage in star.empire_stores) {
-      if (storage.empire_id != null && storage.empire_id == empireId) {
+      if (storage.empire_id == empireId) {
         return storage
       }
     }

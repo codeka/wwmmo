@@ -88,23 +88,24 @@ class ServerSocketManager {
    * normal connection.
    */
   private inner class PendingConnectionPacketHandler
-      internal constructor(private val socket: Socket,
-                           private val outs: OutputStream) : PacketDecoder.PacketHandler {
+      constructor(
+        private val socket: Socket, private val outs: OutputStream) : PacketDecoder.PacketHandler {
 
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
-      if (pkt.hello == null) {
+      val hello = pkt.hello
+      if (hello == null) {
         log.error("Expected 'hello' packet, but didn't get it.")
         return
       }
-      val pendingConnection = pendingConnections.remove(pkt.hello.empire_id)
+      val pendingConnection = pendingConnections.remove(hello.empire_id)
       if (pendingConnection == null) {
         log.error("Got 'hello' packet, but no pending connection for empire #%d",
-            pkt.hello.empire_id)
+            hello.empire_id)
         return
       }
       log.info("GameSocket connection received for empire #%d %s",
-          pkt.hello.empire_id, pendingConnection.empire.get().display_name)
-      connections[pkt.hello.empire_id] = pendingConnection.connect(pkt.hello, socket, decoder, outs)
+          hello.empire_id, pendingConnection.empire.get().display_name)
+      connections[hello.empire_id] = pendingConnection.connect(hello, socket, decoder, outs)
     }
 
     override fun onDisconnect() {

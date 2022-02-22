@@ -77,50 +77,37 @@ class SolarSystemLayout(
     val planet = star.planets[planetIndex]
     val planetCentre = sunAndPlanets.getPlanetCentre(planet)
     val name = star.name + " " + RomanNumeralFormatter.format(star.planets.indexOf(planet) + 1)
-    planetName.text = name
-    if (planetCentre == null) {
-      // this is probably because the SolarSystemView probably hasn't rendered yet. We'll
-      // just ignore this then cause it'll fire an onPlanetSelected when it finishes
-      // drawing.
-      congeniality.visibility = View.GONE
-    } else {
-      val pixelScale = context.resources.displayMetrics.density
-      val x = planetCentre.x
-      val y = planetCentre.y
+    val pixelScale = context.resources.displayMetrics.density
+    val x = planetCentre.x
+    val y = planetCentre.y
 
-      // hard-coded size of the congeniality container: 85x64 dp
-      var offsetX = (85 + 20) * pixelScale
-      var offsetY = (64 + 20) * pixelScale
-      if (x - offsetX < 0) {
-        offsetX = -(20 * pixelScale)
-      }
-      if (y - offsetY < 20) {
-        offsetY = -(20 * pixelScale)
-      }
-      val params = congeniality.layoutParams as LayoutParams
-      params.leftMargin = (x - offsetX).toInt()
-      params.topMargin = (y - offsetY).toInt()
-      if (params.topMargin < 40 * pixelScale) {
-        params.topMargin = (40 * pixelScale).toInt()
-      }
-      congeniality.layoutParams = params
-      congeniality.visibility = View.VISIBLE
+    // hard-coded size of the congeniality container: 85x64 dp
+    var offsetX = (85 + 20) * pixelScale
+    var offsetY = (64 + 20) * pixelScale
+    if (x - offsetX < 0) {
+      offsetX = -(20 * pixelScale)
     }
+    if (y - offsetY < 20) {
+      offsetY = -(20 * pixelScale)
+    }
+    val params = congeniality.layoutParams as LayoutParams
+    params.leftMargin = (x - offsetX).toInt()
+    params.topMargin = (y - offsetY).toInt()
+    if (params.topMargin < 40 * pixelScale) {
+      params.topMargin = (40 * pixelScale).toInt()
+    }
+    congeniality.layoutParams = params
+    congeniality.visibility = View.VISIBLE
+
+    planetName.text = name
     congeniality.setPlanet(planet)
-    planetSummary.setPlanet(star, planet)
+    planetSummary.setPlanet(planet)
   }
 
   companion object {
     private val log = Log("SolarSystemLayout")
   }
 
-  /**
-   * Constructs a new [SolarSystemLayout].
-   *
-   * @param context The [Context].
-   * @param star The [Star] to display initially.
-   * @param startPlanetIndex The index of the planet to have initially select (or -1 for no planet).
-   */
   init {
     View.inflate(context, R.layout.solarsystem, this)
     this.star = star
@@ -133,11 +120,7 @@ class SolarSystemLayout(
     fleetList = findViewById(R.id.fleet_list)
     sunAndPlanets.setPlanetSelectedHandler(object : SunAndPlanetsView.PlanetSelectedHandler {
       override fun onPlanetSelected(planet: Planet?) {
-        planetIndex = if (planet == null) {
-          -1
-        } else {
-          planet.index
-        }
+        planetIndex = planet?.index ?: -1
         refreshSelectedPlanet()
       }
     })
@@ -150,10 +133,10 @@ class SolarSystemLayout(
     val focusButton = findViewById<Button>(R.id.solarsystem_colony_focus)
     val sitrepButton = findViewById<Button>(R.id.sitrep_btn)
     val planetViewButton = findViewById<Button>(R.id.enemy_empire_view)
-    buildButton.setOnClickListener { v: View? -> callbacks.onBuildClick(planetIndex) }
-    focusButton.setOnClickListener { v: View? -> callbacks.onFocusClick(planetIndex) }
-    sitrepButton.setOnClickListener { v: View? -> callbacks.onSitrepClick() }
-    planetViewButton.setOnClickListener { v: View? -> callbacks.onViewColonyClick(planetIndex) }
+    buildButton.setOnClickListener { callbacks.onBuildClick(planetIndex) }
+    focusButton.setOnClickListener { callbacks.onFocusClick(planetIndex) }
+    sitrepButton.setOnClickListener { callbacks.onSitrepClick() }
+    planetViewButton.setOnClickListener { callbacks.onViewColonyClick(planetIndex) }
     fleetList.setFleetSelectedHandler(object : FleetSelectedHandler {
       override fun onFleetSelected(fleet: Fleet?) {
         if (fleet == null) {

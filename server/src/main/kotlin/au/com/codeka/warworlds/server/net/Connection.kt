@@ -56,11 +56,11 @@ class Connection internal constructor(
       log.debug("<< [%d %s] %s", empire.get().id, empire.get().display_name,
           PacketDebug.getPacketDebug(pkt, encodedSize))
     }
-    TaskRunner.i.runTask(Runnable { player.onPacket(pkt) }, Threads.BACKGROUND)
+    TaskRunner.i.runTask({ player.onPacket(pkt) }, Threads.BACKGROUND)
   }
 
   override fun onDisconnect() {
-    TaskRunner.i.runTask(Runnable { player.onDisconnect() }, Threads.BACKGROUND)
+    TaskRunner.i.runTask({ player.onDisconnect() }, Threads.BACKGROUND)
     manager.onDisconnect(empire.get().id)
   }
 

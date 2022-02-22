@@ -1,14 +1,3 @@
-buildscript {
-  repositories {
-    jcenter()
-  }
-
-  dependencies {
-    classpath 'org.ajoberstar.grgit:grgit-core:3.1.1'
-  }
-}
-
-import org.ajoberstar.grgit.Grgit
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -20,18 +9,29 @@ if (signingPropsFile.isFile()) {
   signingProps.load(new FileInputStream(signingPropsFile))
 }
 
+def getVersionCodeFromGit() {
+  // Same as running:
+  // git rev-list <checked out branch name> | wc -l
+  // TODO:
+  // return Grgit.open(dir: project.buildscript.sourceFile.parentFile.parent).log().size()
+  return 1020
+}
+
 android {
-  compileSdkVersion 29
-  buildToolsVersion '29.0.2'
+  compileSdkVersion 31
+  buildToolsVersion '31.0.0'
 
   defaultConfig {
     applicationId "au.com.codeka.warworlds2"
-    minSdkVersion 19
-    targetSdkVersion 29
+    minSdkVersion 21
+    targetSdkVersion 30
     versionCode getVersionCodeFromGit()
     versionName "2.0"
     multiDexEnabled true
     vectorDrawables.useSupportLibrary = true
+  }
+  buildFeatures {
+    viewBinding true
   }
   sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
@@ -65,7 +65,7 @@ android {
       buildConfigField "String", "DEFAULT_SERVER", "\"http://game2.war-worlds.com/\""
     }
     debug {
-      buildConfigField "String", "DEFAULT_SERVER", "\"http://game2.war-worlds.com/\""
+      buildConfigField "String", "DEFAULT_SERVER", "\"http://127.0.0.1:8080/\""
     }
   }
   packagingOptions {
@@ -75,54 +75,24 @@ android {
   }
 }
 
-def deployPath = file("${rootDir}/../deploy/${project.name}")
-
-def publish = project.tasks.create("publishAll")
-def deploy = project.tasks.create("deploy")
-
-android.applicationVariants.all { variant ->
-  variant.outputs.each { output ->
-    if (variant.versionName) {
-      version "${variant.versionName}.${variant.versionCode}"
-    } else {
-      version "${variant.versionCode}"
-    }
-
-    def task = project.tasks.create("publish${variant.name.capitalize()}", Copy)
-    task.from(output.outputFile)
-    task.into(deployPath)
-    task.rename('.*', "wwmmo2-${variant.name}-${version}.apk")
-    task.dependsOn variant.assemble
-    publish.dependsOn task
-    if (variant.name == "release") {
-      deploy.dependsOn task
-    }
-  }
-}
-
-def getVersionCodeFromGit() {
-  // Same as running:
-  // git rev-list <checked out branch name> | wc -l
-  return Grgit.open(dir: project.buildscript.sourceFile.parentFile.parent).log().size()
-}
-
 dependencies {
-  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
+  coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
-  implementation 'androidx.appcompat:appcompat:1.1.0'
-  implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
-  implementation 'androidx.core:core-ktx:1.2.0'
-  implementation 'androidx.preference:preference:1.1.1'
-  implementation 'androidx.transition:transition:1.3.1'
-  implementation 'com.google.android.material:material:1.2.0-alpha06'
-  implementation 'com.google.android.gms:play-services-base:17.2.1'
-  implementation 'com.google.android.gms:play-services-auth:18.0.0'
-  implementation 'com.google.firebase:firebase-core:17.4.1'
-  implementation 'com.google.firebase:firebase-messaging:20.1.7'
+  implementation 'androidx.appcompat:appcompat:1.4.0'
+  implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+  implementation 'androidx.core:core-ktx:1.7.0'
+  implementation 'androidx.preference:preference-ktx:1.1.1'
+  implementation 'androidx.transition:transition:1.4.1'
+  implementation 'com.google.android.material:material:1.6.0-alpha01'
+  implementation 'com.google.android.gms:play-services-base:18.0.0'
+  implementation 'com.google.android.gms:play-services-auth:20.0.0'
+  implementation 'com.google.firebase:firebase-core:20.0.1'
+  implementation 'com.google.firebase:firebase-messaging:23.0.0'
   implementation 'com.google.guava:guava:24.1-android'
   implementation 'com.squareup.picasso:picasso:2.71828'
-  implementation 'com.squareup.wire:wire-runtime:3.1.0'
+  implementation 'com.squareup.wire:wire-runtime:3.7.1'
   implementation 'com.android.support:multidex:1.0.3'
+  implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
   implementation project(':common')
 }

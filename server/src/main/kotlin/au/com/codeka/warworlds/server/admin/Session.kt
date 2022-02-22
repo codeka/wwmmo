@@ -10,7 +10,7 @@ import org.joda.time.DateTime
 class Session(val cookie: String, private val adminUser: AdminUser?, val loginTime: DateTime) {
 
   val email: String
-    get() = adminUser!!.email_addr
+    get() = adminUser!!.email_addr!!
 
   fun isInRole(role: AdminRole): Boolean {
     for (ar in adminUser!!.roles) {

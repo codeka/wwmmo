@@ -68,37 +68,25 @@ class PlanetListSimple : LinearLayout {
     val myEmpire = EmpireManager.getMyEmpire()
     val empires = HashSet<Long>()
     for (fleet in fleets!!) {
-      if (fleet.empire_id == null) {
+      val empireId = fleet.empire_id
+      if (empireId == 0L || empireId == myEmpire.id) {
         continue
       }
-      if (fleet.empire_id == myEmpire.id) {
-        continue
-      }
-      if (empires.contains(fleet.empire_id)) {
-        continue
-      }
-      empires.add(fleet.empire_id)
+      empires.add(empireId)
     }
     for (planet in planets!!) {
-      if (planet.colony == null) {
+      val colony = planet.colony ?: continue
+      val empireId = colony.empire_id
+      if (empireId == 0L || empireId == myEmpire.id) {
         continue
       }
-      if (planet.colony.empire_id == null) {
-        continue
-      }
-      if (planet.colony.empire_id == myEmpire.id) {
-        continue
-      }
-      if (empires.contains(planet.colony.empire_id)) {
-        continue
-      }
-      empires.add(planet.colony.empire_id)
+      empires.add(empireId)
     }
     for (empireID in empires) {
       val rowView = getEmpireRowView(inflater, empireID)
       addView(rowView)
     }
-    if (!empires.isEmpty()) {
+    if (empires.isNotEmpty()) {
       // add a spacer...
       var spacer = View(context)
       spacer.layoutParams = LayoutParams(10, 10)
@@ -125,7 +113,7 @@ class PlanetListSimple : LinearLayout {
     val colony = planet.colony
     val colonyTextView = view.findViewById<View>(R.id.starfield_planet_colony) as TextView
     if (colony != null) {
-      if (colony.empire_id == null) {
+      if (colony.empire_id == 0L) {
         colonyTextView.text = getContext().getString(R.string.native_colony)
       } else {
         val empire = EmpireManager.getEmpire(colony.empire_id)
@@ -148,7 +136,7 @@ class PlanetListSimple : LinearLayout {
     val view = inflater.inflate(R.layout.ctrl_planet_list_simple_row, this, false)
     val icon = view.findViewById<ImageView>(R.id.starfield_planet_icon)
     val empireName = view.findViewById<TextView>(R.id.starfield_planet_type)
-    val allianceName = view.findViewById<TextView>(R.id.starfield_planet_colony)
+//    val allianceName = view.findViewById<TextView>(R.id.starfield_planet_colony)
     val empire = EmpireManager.getEmpire(empireID)
     if (empire != null) {
       Picasso.get()

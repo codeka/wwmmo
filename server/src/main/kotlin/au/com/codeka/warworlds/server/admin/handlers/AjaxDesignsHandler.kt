@@ -8,6 +8,6 @@ import au.com.codeka.warworlds.common.sim.DesignHelper
  */
 class AjaxDesignsHandler : AdminHandler() {
   public override fun get() {
-    setResponseJson(Designs.Builder().designs(DesignHelper.designs).build())
+    setResponseJson(Designs(designs = DesignHelper.designs))
   }
 }

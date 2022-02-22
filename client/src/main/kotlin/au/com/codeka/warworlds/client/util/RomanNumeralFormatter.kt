@@ -4,9 +4,8 @@ package au.com.codeka.warworlds.client.util
  * Simple helper class that formats numbers as roman numerals.
  */
 object RomanNumeralFormatter {
-  @JvmStatic
-  fun format(n: Int): String {
-    var n = n
+  fun format(number: Int): String {
+    var n = number
     require(!(n < 0 || n >= 4000)) { "Cannot format numbers > 4000." }
     val sb = StringBuilder()
     while (n >= 1000) {

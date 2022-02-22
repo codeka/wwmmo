@@ -1,6 +1,8 @@
 package au.com.codeka.warworlds.server.store
 
+import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Star
+import au.com.codeka.warworlds.common.sim.MutableStar
 import au.com.codeka.warworlds.server.store.base.BaseStore
 import java.util.*
 
@@ -8,32 +10,33 @@ import java.util.*
  * A store for storing stars, including some extra indices for special queries that we can do.
  */
 class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
-  operator fun get(id: Long): Star? {
+  val log = Log("StarsStore")
+
+  fun get(id: Long): Star? {
     newReader().stmt("SELECT star FROM stars WHERE id = ?").param(0, id).query().use { res ->
       if (res.next()) {
         return processStar(Star.ADAPTER.decode(res.getBytes(0)))
       }
     }
 
-    // TODO: return null or throw exception?
     return null
   }
 
-  fun put(id: Long, star: Star?) {
+  fun put(id: Long, star: Star) {
     val empireIds: MutableSet<Long> = HashSet()
-    for (fleet in star!!.fleets) {
-      if (fleet.empire_id != null) {
-        empireIds.add(fleet.empire_id)
-      }
+    for (fleet in star.fleets) {
+      val empireId = fleet.empire_id
+      empireIds.add(empireId)
     }
     for (planet in star.planets) {
-      if (planet.colony != null && planet.colony.empire_id != null) {
-        empireIds.add(planet.colony.empire_id)
-      }
+      val colony = planet.colony ?: continue
+      val empireId = colony.empire_id
+      empireIds.add(empireId)
     }
     newTransaction().use { trans ->
       newWriter(trans)
-          .stmt("INSERT OR REPLACE INTO stars (id, sector_x, sector_y, next_simulation, star) VALUES (?, ?, ?, ?, ?)")
+          .stmt("INSERT OR REPLACE INTO stars (id, sector_x, sector_y, next_simulation, star)" +
+              " VALUES (?, ?, ?, ?, ?)")
           .param(0, id)
           .param(1, star.sector_x)
           .param(2, star.sector_y)
@@ -81,7 +84,8 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
    */
   fun fetchSimulationQueue(count: Int): ArrayList<Star> {
     newReader()
-        .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL ORDER BY next_simulation ASC")
+        .stmt("SELECT star FROM stars WHERE next_simulation IS NOT NULL" +
+            " ORDER BY next_simulation ASC")
         .query().use { res ->
           val stars = ArrayList<Star>()
           while (res.next() && stars.size < count) {
@@ -107,22 +111,9 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
 
   /** Do some pre-processing on the star.  */
   private fun processStar(s: Star): Star {
-    // TODO: after we've loaded all the stars at least once, remove this logic.
-    val sb = s.newBuilder()
-    for (i in sb.planets.indices) {
-      if (sb.planets[i].colony != null) {
-        val cb = sb.planets[i].colony.newBuilder()
-        for (j in cb.buildings.indices) {
-          val bb = cb.buildings[j].newBuilder()
-          if (bb.id == null || bb.id == 0L) {
-            bb.id(DataStore.i.seq().nextIdentifier())
-            cb.buildings[j] = bb.build()
-          }
-        }
-        sb.planets[i] = sb.planets[i].newBuilder().colony(cb.build()).build()
-      }
-    }
-    return sb.build()
+    // There's nothing here right now, but we can add logic as needed if we need to re-process
+    // stuff.
+    return s
   }
 
   fun getStarsForEmpire(empireId: Long): ArrayList<Long> {
@@ -168,6 +159,10 @@ class StarsStore internal constructor(fileName: String) : BaseStore(fileName) {
       newWriter()
           .stmt("CREATE INDEX IX_empire_stars ON star_empires (star_id, empire_id)")
           .execute()
+      version++
+    }
+    if (version == 2) {
+      // This version was temporary and not need if starting from scratch.
       version++
     }
     return version

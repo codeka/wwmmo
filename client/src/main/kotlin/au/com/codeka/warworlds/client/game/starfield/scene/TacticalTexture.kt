@@ -21,7 +21,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
   private var bitmap: Bitmap? = null
 
   init {
-    App.taskRunner.runTask(Runnable { bitmap = createBitmap(sectorCoord) }, Threads.BACKGROUND)
+    App.taskRunner.runTask({ bitmap = createBitmap(sectorCoord) }, Threads.BACKGROUND)
   }
 
   override fun bind() {
@@ -97,10 +97,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
         sectorCoord: SectorCoord, offsetX: Int, offsetY: Int, canvas: Canvas, paint: Paint) {
       val scaleFactor = TEXTURE_SIZE.toFloat() / 1024f
       StarManager.searchSectorStars(
-          sectorCoord.newBuilder()
-              .x(sectorCoord.x + offsetX)
-              .y(sectorCoord.y + offsetY)
-              .build()).use {
+          SectorCoord(x = sectorCoord.x + offsetX, y = sectorCoord.y + offsetY)).use {
         starCursor ->
           for (star in starCursor) {
             val x = (star.offset_x + offsetX * 1024.0f) * scaleFactor
@@ -155,8 +152,9 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
       // otherwise, pick the first colony we find to represent the star
       // TODO: what if the star is colonized by more than one empire?
       for (planet in star.planets) {
-        if (planet.colony?.empire_id != null) {
-          return planet.colony.empire_id
+        val colony = planet.colony
+        if (colony?.empire_id != null) {
+          return colony.empire_id
         }
       }
 
@@ -170,7 +168,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
     private fun getFleetOnlyEmpire(star: Star): Long? {
       // TODO: what if there is more than one fleet? Should try to mix the colors?
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null) {
+        if (fleet.empire_id != 0L) {
           return fleet.empire_id
         }
       }

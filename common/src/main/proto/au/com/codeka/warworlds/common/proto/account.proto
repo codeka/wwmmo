@@ -2,12 +2,13 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.common.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/design.proto";
-import "au/com/codeka/warworlds/common/proto/empire.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\design.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\empire.proto";
 
 message NewAccountRequest {
-  optional string empire_name = 1;
+  required string empire_name = 1;
 
   // If set, you've signed in with the given account. We'll want to associate the above empire with
   // the account specified here. If this is not specified we'll be creating an anonymous empire.
@@ -21,11 +22,11 @@ message NewAccountResponse {
 
 // The request for /accounts/associate requests to associate an email address with an account.
 message AccountAssociateRequest {
-  optional string cookie = 1;
-  optional string email_addr = 2;
+  required string cookie = 1;
+  required string email_addr = 2;
 
   // The idToken of the Google account that the above email_addr belongs to.
-  optional string id_token = 3;
+  required string id_token = 3;
 
   // If the email address is associated with another account, or the empire already has an email
   // associated with it, we'll return an error unless force is true, in which case we'll do it
@@ -64,7 +65,7 @@ message AccountAssociateResponse {
 // This is the account object that's stored in the data store. It links to your empire and other
 // details about your account.
 message Account {
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 
   // If this account is associated with an email address, this is the email address they actually
   // entered (and the one we should send email notifications to, etc.
@@ -88,10 +89,10 @@ message Account {
 // This is sent to the /login endpoint in order to log in to the server.
 message LoginRequest {
   // Your login cookie. Required.
-  optional string cookie = 1;
+  required string cookie = 1;
 
   // The DeviceInfo of the device you're logging in from.
-  optional DeviceInfo device_info = 2;
+  required DeviceInfo device_info = 2;
 
   // If you're logged in, this will be the idToken of the Google account.
   optional string id_token = 3;
@@ -168,17 +169,14 @@ message FcmDeviceInfo {
 // Contains the request parameters for /account/patreon-begin.
 message PatreonBeginRequest {
   // The EmpireID of the requesting empire. Must match who you're authenticated as.
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 }
 
 // Contains the response to a /account/patreon-begin request, that is, all the stuff needed to start
 // the Patreon OAuth handshake.
 message PatreonBeginResponse {
-  // Client ID. Required.
-  optional string client_id = 1;
-
-  // Redirect URI. Required.
-  optional string redirect_uri = 2;
+  required string client_id = 1;
+  required string redirect_uri = 2;
 
   // The state that we pass to Patreon, that'll get passed back to our Redirect URI.
   optional string state = 3;

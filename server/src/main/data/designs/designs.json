@@ -256,6 +256,10 @@
       "show_in_solar_system": true,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 500,
             "population": 500
@@ -292,6 +296,10 @@
       "show_in_solar_system": true,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 200,
             "population": 200
@@ -307,6 +315,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 200,
             "population": 200
@@ -322,6 +334,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 200,
             "population": 200
@@ -337,6 +353,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 200,
             "population": 200
@@ -369,6 +389,10 @@
       "show_in_solar_system": false,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 1500,
             "population": 2000
@@ -399,6 +423,10 @@
       "show_in_solar_system": true,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -417,6 +445,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -435,6 +467,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -453,6 +489,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -494,6 +534,10 @@
       "show_in_solar_system": true,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -508,6 +552,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -522,6 +570,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -559,6 +611,10 @@
       "show_in_solar_system": true,
       "upgrades":  [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -573,6 +629,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -587,6 +647,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -624,6 +688,10 @@
       "show_in_solar_system": true,
       "upgrades":  [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -638,6 +706,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -652,6 +724,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -689,6 +765,10 @@
       "show_in_solar_system": true,
       "upgrades":  [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -703,6 +783,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -717,6 +801,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 50,
             "population": 100
@@ -769,6 +857,10 @@
       "show_in_solar_system": true,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 100,
             "population": 200
@@ -782,6 +874,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 100,
             "population": 200
@@ -795,6 +891,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 100,
             "population": 200
@@ -813,6 +913,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 100,
             "population": 200
@@ -862,6 +966,10 @@
       "show_in_solar_system": true,
       "upgrades": [
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 74000,
             "population": 500
@@ -880,6 +988,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 74000,
             "population": 500
@@ -898,6 +1010,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 74000,
             "population": 500
@@ -916,6 +1032,10 @@
           ]
         },
         {
+          "type": "BUILDING_UPGRADE",
+          "display_name": "",
+          "description": "",
+          "image_url": "",
           "build_cost": {
             "minerals": 74000,
             "population": 500

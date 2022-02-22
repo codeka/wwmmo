@@ -53,11 +53,12 @@ class StarSimulatorQueue private constructor() {
           log.info("No stars to simulate, sleeping for a bit.")
           10 * Time.MINUTE
         } else {
-          if (star.next_simulation == null) {
+          val nextSimulation = star.next_simulation
+          if (nextSimulation == null) {
             log.warning("Star #%d (%s) next_simulation is null.", star.id, star.name)
             0
           } else {
-            star.next_simulation - System.currentTimeMillis()
+            nextSimulation - System.currentTimeMillis()
           }
         }
         if (waitTime <= 0) {

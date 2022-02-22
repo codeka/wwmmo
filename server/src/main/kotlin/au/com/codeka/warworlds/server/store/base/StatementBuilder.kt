@@ -21,8 +21,8 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   protected val conn: Connection =
       transaction?.conn ?: dataSource.pooledConnection.connection
 
-  private var sql: String? = null
-  private var params: ArrayList<Any?>? = null
+  private var sql = ""
+  private var params = ArrayList<Any?>()
 
   /**
    * We store any errors we get building the statement and throw it when it comes time to execute.
@@ -31,7 +31,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   protected var e: SQLException? = null
 
   fun stmt(sql: String): T {
-    this.sql = Preconditions.checkNotNull(sql)
+    this.sql = sql
     try {
       stmt = conn.prepareStatement(sql)
       params = ArrayList()
@@ -40,7 +40,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -57,7 +57,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -74,7 +74,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -91,7 +91,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -108,7 +108,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -125,7 +125,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       this.e = e
     }
 
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("unchecked_cast")
     return this as T
   }
 
@@ -138,7 +138,7 @@ open class StatementBuilder<T : StatementBuilder<T>>(
     }
 
     val startTime = System.nanoTime()
-    return try {
+    val count = try {
       if (!stmt.execute()) {
         stmt.updateCount
       } else {
@@ -146,10 +146,12 @@ open class StatementBuilder<T : StatementBuilder<T>>(
       }
     } catch (e: SQLException) {
       throw StoreException(e)
-    } finally {
-      val endTime = System.nanoTime()
-      log.debug("%.2fms %s", (endTime - startTime) / 1000000.0, debugSql(sql, params))
     }
+    val endTime = System.nanoTime()
+    if (enableDebug) {
+      log.debug("%.2fms %s = %d", (endTime - startTime) / 1000000.0, debugSql(sql, params), count)
+    }
+    return count
   }
 
   override fun close() {
@@ -163,27 +165,29 @@ open class StatementBuilder<T : StatementBuilder<T>>(
   }
 
   private fun saveParam(index: Int, value: Any?) {
-    while (params!!.size <= index) {
-      params!!.add(null)
+    while (params.size <= index) {
+      params.add(null)
     }
-    params!![index] = value
+    params[index] = value
   }
 
   companion object {
     private val log = Log("StatementBuilder")
 
-    private fun debugSql(sql: String?, params: ArrayList<Any?>?): String {
-      var sql = sql
-      sql = sql!!.replace("\n", " ")
-      sql = sql.replace(" +".toRegex(), " ")
-      if (sql.length > 70) {
-        sql = sql.substring(0, 68) + "..."
+    private const val enableDebug = false
+
+    private fun debugSql(sql: String, params: ArrayList<Any?>): String {
+      var str = sql
+      str = str.replace("\n", " ")
+      str = str.replace(" +".toRegex(), " ")
+      if (str.length > 70) {
+        str = str.substring(0, 68) + "..."
       }
-      for (i in params!!.indices) {
-        sql += " ; "
-        sql += params[i]
+      for (param in params) {
+        str += " ; "
+        str += param
       }
-      return sql
+      return str
     }
   }
 }

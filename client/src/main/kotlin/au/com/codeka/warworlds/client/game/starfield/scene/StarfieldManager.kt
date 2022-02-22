@@ -19,9 +19,9 @@ import au.com.codeka.warworlds.common.Vector2
 import au.com.codeka.warworlds.common.Vector3
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.Design.DesignType
-import au.com.codeka.warworlds.common.proto.Star.CLASSIFICATION
 import au.com.codeka.warworlds.common.sim.StarHelper
 import java.util.*
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 /**
@@ -228,11 +228,8 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   fun setSelectedFleet(star: Star?, fleet: Fleet?) {
     checkOnThread(Threads.UI)
     log.debug("setSelectedFleet(%d %s, %d %sx%.1f)",
-        if (star == null) 0 else star.id,
-        if (star == null) "?" else star.name,
-        if (fleet == null) 0 else fleet.id,
-        if (fleet == null) "?" else fleet.design_type,
-        if (fleet == null) 0 else fleet.num_ships)
+      star?.id ?: 0, star?.name ?: "?", fleet?.id ?: 0, fleet?.design_type ?: "?",
+      fleet?.num_ships ?: 0)
     if (fleet != null) {
       selectionIndicatorSceneObject.setSize(60f, 60f)
       val sceneObject = sceneObjects[fleet.id]
@@ -279,8 +276,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * star.
    */
   fun onConnected() {
-    // Shouldn't be null after we're connected to the server.
-    warpTo(EmpireManager.getMyEmpire().home_star)
+    warpTo(EmpireManager.getMyEmpire().home_star!!)
   }
 
   /**
@@ -351,23 +347,28 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
-    App.taskRunner.runTask(Runnable {
-      App.server.send(Packet.Builder()
-          .watch_sectors(WatchSectorsPacket.Builder()
-              .top(top).left(left).bottom(bottom).right(right).build())
-          .build())
+    App.taskRunner.runTask({
+      App.server.send(Packet(
+          watch_sectors = WatchSectorsPacket(
+              top = top, left = left, bottom = bottom, right = right)))
     }, Threads.BACKGROUND)
 
     // We'll wait at least one second before attempting to update the sector bounds again.
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runTask({
       sectorsUpdating = false
-      if (pendingSectorBottom != null) {
-        val left = pendingSectorLeft!! ; pendingSectorLeft = null
-        val top = pendingSectorTop!! ; pendingSectorTop = null
-        val right = pendingSectorRight!! ; pendingSectorRight = null
-        val bottom = pendingSectorBottom!! ; pendingSectorBottom = null
-        val removeAllSectors = pendingRemoveAllSectors!! ; pendingRemoveAllSectors = null
-        updateSectorBounds(left, top, right, bottom, removeAllSectors)
+      val pendingLeft = pendingSectorLeft
+      val pendingTop = pendingSectorTop
+      val pendingRight = pendingSectorRight
+      val pendingBottom = pendingSectorBottom
+      val pendingRemoveAll = pendingRemoveAllSectors
+      if (pendingLeft != null && pendingTop != null && pendingRight != null &&
+          pendingBottom != null && pendingRemoveAll != null) {
+        pendingSectorLeft = null
+        pendingSectorTop = null
+        pendingSectorRight = null
+        pendingSectorBottom = null
+        pendingRemoveAllSectors = null
+        updateSectorBounds(pendingLeft, pendingTop, pendingRight, pendingBottom, pendingRemoveAll)
       }
     }, Threads.UI, 1000)
   }
@@ -400,10 +401,10 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         .texture(scene.textureManager.loadTexture("stars/stars.png"))
         .uvTopLeft(uvTopLeft)
         .uvBottomRight(Vector2(
-            uvTopLeft.x + if (star.classification == CLASSIFICATION.NEUTRON) 0.5f else 0.25f,
-            uvTopLeft.y + if (star.classification == CLASSIFICATION.NEUTRON) 0.5f else 0.25f))
+            uvTopLeft.x + if (star.classification == Star.Classification.NEUTRON) 0.5f else 0.25f,
+            uvTopLeft.y + if (star.classification == Star.Classification.NEUTRON) 0.5f else 0.25f))
         .build(), "Star:${star.id}:${star.name}")
-    if (star.classification == CLASSIFICATION.NEUTRON) {
+    if (star.classification == Star.Classification.NEUTRON) {
       sprite.setSize(90.0f, 90.0f)
     } else {
       sprite.setSize(40.0f, 40.0f)
@@ -434,11 +435,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       val y = (star.sector_y - centerSectorY) * 1024.0f + (star.offset_y - 512.0f)
       container.translate(x, -y)
     } else {
-      oldStar = (container.tag as SceneObjectInfo?)!!.star
+      oldStar = (container.tag as SceneObjectInfo).star
 
       // Check to see that stuff we care about has actually changed. If any stuff hasn't changed
       // then don't update the star.
-      if (willRenderTheSame(oldStar, star)) {
+      if (!hasStarChanged(oldStar, star)) {
+        // Even if the star hasn't changed in a way we care about, we'll still want to save the
+        // new star in the container.
+        container.tag = SceneObjectInfo(star)
         return
       }
 
@@ -470,9 +474,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   /**
-   * Quick sanity check to see whether the two stars given will render exactly the same. Presumably
+   * Quick sanity check to see whether the two given star will render differently. Presumably
    * they're just different versions of the same star and often stuff that we don't care about
-   * rendering here will have changed (e.g. a building has completed building). In the case that
+   * rendering here will not have changed (e.g. a building has completed building). In the case that
    * they are going to render the same, we can save a lot of time by not changing the star.
    *
    * <p>We make a few assumptions here to simplify:
@@ -480,17 +484,17 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    *   2. Stars never change classification
    *   3. Stars with different IDs will always render differently
    */
-  private fun willRenderTheSame(lhs: Star, rhs: Star): Boolean {
+  private fun hasStarChanged(lhs: Star, rhs: Star): Boolean {
     // Obviously a different ID will be rendered differently.
     if (lhs.id != rhs.id) {
-      return false
+      return true
     }
 
     if (lhs.name != rhs.name) {
-      return false
+      return true
     }
 
-    // If the moving fleets have changed, tha counts as a difference we care about.
+    // If the moving fleets have changed, that counts as a difference we care about.
     for (lhsFleet in lhs.fleets) {
       // If it's moving in LHS and not in RHS then it's a difference
       if (lhsFleet.state != Fleet.FLEET_STATE.MOVING) {
@@ -505,7 +509,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         }
       }
       if (!movingInRhs) {
-        return false
+        return true
       }
     }
 
@@ -516,29 +520,30 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       }
 
       var movingInLhs = false
-      for (lhsFleet in rhs.fleets) {
+      for (lhsFleet in lhs.fleets) {
         if (rhsFleet.id == lhsFleet.id && lhsFleet.state == Fleet.FLEET_STATE.MOVING) {
           movingInLhs = true
           break
         }
       }
       if (!movingInLhs) {
-        return false
+        return true
       }
     }
 
-    // OK it's a difference we don't care about. They would render the same way
-    return true
+    // Nothing's changed that we care about, they would render the same.
+    return false
   }
 
   /** Attach the empire labels and fleet counts to the given sprite container for the given star. */
   private fun attachEmpireFleetIcons(container: SceneObject, star: Star) {
     val empires: MutableMap<Long, EmpireIconInfo> = TreeMap()
     for (planet in star.planets) {
-      if (planet.colony == null || planet.colony.empire_id == null) {
+      val colony = planet.colony ?: continue
+      if (colony.empire_id == 0L) {
         continue
       }
-      val empire = EmpireManager.getEmpire(planet.colony.empire_id)
+      val empire = EmpireManager.getEmpire(colony.empire_id)
       if (empire != null) {
         var iconInfo = empires[empire.id]
         if (iconInfo == null) {
@@ -549,7 +554,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       }
     }
     for (fleet in star.fleets) {
-      if (fleet.empire_id == null || fleet.state == Fleet.FLEET_STATE.MOVING) {
+      if (fleet.empire_id == 0L || fleet.state == Fleet.FLEET_STATE.MOVING) {
         // Ignore native fleets, and moving fleets, which we'll draw them separately.
         continue
       }
@@ -561,9 +566,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
           empires[empire.id] = iconInfo
         }
         if (fleet.design_type == DesignType.FIGHTER) {
-          iconInfo.numFighterShips += Math.ceil(fleet.num_ships.toDouble()).toInt()
+          iconInfo.numFighterShips += ceil(fleet.num_ships.toDouble()).toInt()
         } else {
-          iconInfo.numNonFighterShips += Math.ceil(fleet.num_ships.toDouble()).toInt()
+          iconInfo.numNonFighterShips += ceil(fleet.num_ships.toDouble()).toInt()
         }
       }
     }
@@ -576,7 +581,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
       val sprite = scene.createSprite(SpriteTemplate.Builder()
           .shader(scene.spriteShader)
           .texture(scene.textureManager.loadTextureUrl(
-              ImageHelper.getEmpireImageUrlExactDimens(context, iconInfo.empire, 64, 64)))
+              ImageHelper.getEmpireImageUrlExactDimens(iconInfo.empire, 64, 64)))
           .build(), "Empire:$empireId")
       sprite.translate(pt.x.toFloat() + 10.0f, pt.y.toFloat())
       sprite.setSize(20.0f, 20.0f)
@@ -610,7 +615,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   private fun attachMovingFleet(star: Star, fleet: Fleet) {
-    val destStar = StarManager.getStar(fleet.destination_star_id)
+    val destStar = StarManager.getStar(fleet.destination_star_id!!)
     if (destStar == null) {
       log.warning("Cannot attach moving fleet, destination star is null.")
       return
@@ -684,11 +689,11 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private fun detachNonMovingFleet(fleet: Fleet, sceneObject: SceneObject) {
     // If you had it selected, we'll need to un-select it.
     if (selectedFleet != null && selectedFleet!!.id == fleet.id) {
-      App.taskRunner.runTask(Runnable { setSelectedFleet(null, null) }, Threads.UI)
+      App.taskRunner.runTask({ setSelectedFleet(null, null) }, Threads.UI)
     }
 
     val soi: SceneObjectInfo = sceneObject.tag as SceneObjectInfo
-    val coord = Pair<Long, Long>(soi.star.sector_x, soi.star.sector_y)
+    val coord = Pair(soi.star.sector_x, soi.star.sector_y)
 
     synchronized(scene.lock) {
       removeSectorSceneObject(coord, sceneObject)
@@ -705,8 +710,8 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val dest = Vector2(
         ((destStar!!.sector_x - centerSectorX) * 1024.0f + (destStar.offset_x - 512.0f)).toDouble(),
         ((destStar.sector_y - centerSectorY) * 1024.0f + (destStar.offset_y - 512.0f)).toDouble())
-    val totalTime = fleet!!.eta - fleet.state_start_time
-    val elapsedTime = System.currentTimeMillis() - fleet.state_start_time
+    val totalTime = fleet?.eta!! - fleet.state_start_time!!
+    val elapsedTime = System.currentTimeMillis() - fleet.state_start_time!!
     val timeFraction: Double = elapsedTime.toFloat() / totalTime.toDouble()
 
     // Subtract 100, we'll add 50 after because we want the fleet to start offset from the star and
@@ -855,14 +860,14 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
   private fun getStarUvTopLeft(star: Star): Vector2 {
     return when (star.classification) {
-      CLASSIFICATION.BLACKHOLE -> Vector2(0.0, 0.5)
-      CLASSIFICATION.BLUE -> Vector2(0.25, 0.5)
-      CLASSIFICATION.NEUTRON -> Vector2(0.0, 0.0)
-      CLASSIFICATION.ORANGE -> Vector2(0.0, 0.75)
-      CLASSIFICATION.RED -> Vector2(0.25, 0.75)
-      CLASSIFICATION.WHITE -> Vector2(0.5, 0.75)
-      CLASSIFICATION.WORMHOLE -> Vector2(0.0, 0.0)
-      CLASSIFICATION.YELLOW -> Vector2(0.5, 0.5)
+      Star.Classification.BLACKHOLE -> Vector2(0.0, 0.5)
+      Star.Classification.BLUE -> Vector2(0.25, 0.5)
+      Star.Classification.NEUTRON -> Vector2(0.0, 0.0)
+      Star.Classification.ORANGE -> Vector2(0.0, 0.75)
+      Star.Classification.RED -> Vector2(0.25, 0.75)
+      Star.Classification.WHITE -> Vector2(0.5, 0.75)
+      Star.Classification.WORMHOLE -> Vector2(0.0, 0.0)
+      Star.Classification.YELLOW -> Vector2(0.5, 0.5)
       else ->         // Shouldn't happen!
         Vector2(0.5, 0.0)
     }
@@ -924,12 +929,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private val cameraUpdateListener: CameraUpdateListener = object : CameraUpdateListener {
     override fun onCameraTranslate(x: Float, y: Float, dx: Float, dy: Float) {
       App.taskRunner.runTask(
-          Runnable { onCameraTranslate(x, y) },
+          { onCameraTranslate(x, y) },
           Threads.BACKGROUND)
     }
   }
 
-  private class EmpireIconInfo internal constructor(val empire: Empire) {
+  private class EmpireIconInfo constructor(val empire: Empire) {
     var numColonies = 0
     var numFighterShips = 0
     var numNonFighterShips = 0
@@ -941,13 +946,13 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     val fleet: Fleet?
     val destStar: Star?
 
-    internal constructor(star: Star) {
+    constructor(star: Star) {
       this.star = star
       fleet = null
       destStar = null
     }
 
-    internal constructor(star: Star, fleet: Fleet?, destStar: Star?) {
+    constructor(star: Star, fleet: Fleet?, destStar: Star?) {
       this.star = star
       this.fleet = fleet
       this.destStar = destStar

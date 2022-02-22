@@ -18,11 +18,14 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
     db.execSQL(
         "CREATE TABLE $name ("
             + "  key INTEGER PRIMARY KEY,"
+            + "  sector_x INTEGER,"
+            + "  sector_y INTEGER,"
             + "  my_empire INTEGER," // 1 if my empire has something on this star, 0 if not.
             + "  last_simulation INTEGER,"
             + "  name TEXT,"
             + "  value BLOB)")
     db.execSQL("CREATE INDEX IX_${name}_my_empire_name ON $name (my_empire, name)")
+    db.execSQL("CREATE INDEX IX_${name}_sector ON $name (sector_x, sector_y)")
   }
 
   override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -154,14 +157,13 @@ class StarStore(private val name: String, private val helper: SQLiteOpenHelper)
   companion object {
     private fun isMyStar(star: Star, myEmpire: Empire): Boolean {
       for (planet in star.planets) {
-        if (planet.colony != null && planet.colony.empire_id != null) {
-          if (planet.colony.empire_id == myEmpire.id) {
-            return true
-          }
+        val colony = planet.colony
+        if (colony?.empire_id != null && colony.empire_id == myEmpire.id) {
+          return true
         }
       }
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null && fleet.empire_id == myEmpire.id) {
+        if (fleet.empire_id == myEmpire.id) {
           return true
         }
       }

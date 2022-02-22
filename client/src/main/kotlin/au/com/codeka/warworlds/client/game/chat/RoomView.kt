@@ -13,6 +13,7 @@ import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import au.com.codeka.warworlds.client.App
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.world.ChatManager
 import au.com.codeka.warworlds.client.game.world.ChatMessagesUpdatedEvent
 import au.com.codeka.warworlds.client.game.world.EmpireManager
@@ -22,7 +23,6 @@ import au.com.codeka.warworlds.common.proto.ChatMessage
 import au.com.codeka.warworlds.common.proto.ChatMessage.MessageAction
 import au.com.codeka.warworlds.common.proto.ChatRoom
 import au.com.codeka.warworlds.common.proto.Empire
-import com.google.common.base.Preconditions
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -52,8 +52,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
     val now = System.currentTimeMillis()
     val allMessages = ChatManager.i.getMessages(room, now, BATCH_SIZE)
     for (i in allMessages.indices) {
-      if (i == 0 || allMessages[i].date_posted > newestMessageTime) {
-        newestMessageTime = allMessages[i].date_posted
+      val datePosted = allMessages[i].date_posted
+      if (i == 0 || datePosted > newestMessageTime) {
+        newestMessageTime = datePosted
       }
     }
     chatAdapter.setMessages(allMessages)
@@ -66,8 +67,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
   private fun updateMessages() {
     val newerMessages = ChatManager.i.getMessagesAfter(room, newestMessageTime)
     for (i in newerMessages.indices) {
-      if (newerMessages[i].date_posted > newestMessageTime) {
-        newestMessageTime = newerMessages[i].date_posted
+      val datePosted = newerMessages[i].date_posted
+      if (datePosted > newestMessageTime) {
+        newestMessageTime = datePosted
       }
     }
     chatAdapter.appendMessages(newerMessages)
@@ -196,11 +198,12 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
       val entry = entries[position]
       var action = MessageAction.Normal
       if (entry.message != null && entry.message!!.action != null) {
-        action = entry.message!!.action
+        action = entry.message?.action!!
       }
-      var view = convertView ?: {
-        val inflater = Preconditions.checkNotNull(context.getSystemService(
-            Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+      var view = convertView ?: run {
+        val inflater = context.getSystemService(
+          Context.LAYOUT_INFLATER_SERVICE
+        ) as LayoutInflater
         if (entry.date == null && entry.message == null) {
           inflater.inflate(R.layout.chat_row_loading, parent, false)
         } else if (entry.date != null || action != MessageAction.Normal) {
@@ -208,7 +211,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         } else {
           inflater.inflate(R.layout.chat_row, parent, false)
         }
-      }()
+      }
       if (entry.date == null && entry.message == null) {
         // this implies we're at the end of the list, fetch the next bunch
         post { fetchChatItems() }
@@ -223,24 +226,24 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         message.gravity = Gravity.START
         var empire: Empire? = null
         if (entry.message!!.empire_id != null) {
-          empire = EmpireManager.getEmpire(entry.message!!.empire_id)
+          empire = EmpireManager.getEmpire(entry.message!!.empire_id!!)
         }
         val otherEmpire = EmpireManager.getEmpire(entry.message!!.message.toLong())
         if (action == MessageAction.ParticipantAdded) {
           if (empire != null && otherEmpire != null) {
             val content = String.format(Locale.ENGLISH, "%s has added %s to the conversation.",
                 empire.display_name, otherEmpire.display_name)
-            message.text = Html.fromHtml("<i>$content</i>")
+            message.text = fromHtml("<i>$content</i>")
           } else {
-            message.text = Html.fromHtml("<i>An empire has been added to the conversation.")
+            message.text = fromHtml("<i>An empire has been added to the conversation.")
           }
         } else if (action == MessageAction.ParticipantLeft) {
           if (empire != null && otherEmpire != null) {
             val content = String.format(Locale.ENGLISH, "%s has left the conversation.",
                 otherEmpire.display_name)
-            message.text = Html.fromHtml("<i>$content</i>")
+            message.text = fromHtml("<i>$content</i>")
           } else {
-            message.text = Html.fromHtml("<i>An empire has left the conversation.")
+            message.text = fromHtml("<i>An empire has left the conversation.")
           }
         }
       } else if (entry.message!!.empire_id == null) {
@@ -251,9 +254,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         empireName.text = ""
         empireIcon.setImageBitmap(null)
         msgTime.text = TIME_FORMAT.format(Date(entry.message!!.date_posted))
-        val html = ChatHelper.format(entry.message, true, true, false)
-        message.text = Html.fromHtml("<font color=\"#00ffff\"><b>[SERVER]</b></font> $html")
-        if (html!!.contains("<a ")) { // only if there's actually a link...
+        val html = ChatHelper.format(entry.message!!, true, true, false)
+        message.text = fromHtml("<font color=\"#00ffff\"><b>[SERVER]</b></font> $html")
+        if (html.contains("<a ")) { // only if there's actually a link...
           message.movementMethod = LinkMovementMethod.getInstance()
         }
       } else {
@@ -261,7 +264,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
         val empireName = view.findViewById<TextView>(R.id.empire_name)
         val msgTime = view.findViewById<TextView>(R.id.msg_time)
         val message = view.findViewById<TextView>(R.id.message)
-        val empire = EmpireManager.getEmpire(entry.message!!.empire_id)
+        val empire = EmpireManager.getEmpire(entry.message!!.empire_id!!)
         if (empire != null) {
           empireName.text = empire.display_name
           ImageHelper.bindEmpireShield(empireIcon, empire)
@@ -270,9 +273,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
           empireName.text = ""
         }
         msgTime.text = TIME_FORMAT.format(Date(entry.message!!.date_posted))
-        val html = ChatHelper.format(entry.message, room.id == null, true, autoTranslate)
-        message.text = Html.fromHtml(html)
-        if (html!!.contains("<a ")) { // only if there's actually a link...
+        val html = ChatHelper.format(entry.message!!, room.id == null, true, autoTranslate)
+        message.text = fromHtml(html)
+        if (html.contains("<a ")) { // only if there's actually a link...
           message.movementMethod = LinkMovementMethod.getInstance()
         }
       }
@@ -283,7 +286,8 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
       var message: ChatMessage? = null
       var date: Long? = null
 
-      constructor() {}
+      constructor()
+
       constructor(message: ChatMessage?) {
         this.message = message
       }
@@ -300,82 +304,9 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
 
   private fun setupGlobalChatHeader(v: View?) {
     val settingsBtn = v!!.findViewById<ImageButton>(R.id.settings_btn)
-    settingsBtn.setOnClickListener { v1: View? -> }
+    settingsBtn.setOnClickListener { }
     val newGroupBtn = v.findViewById<Button>(R.id.new_group_btn)
-    newGroupBtn.setOnClickListener { v12: View? -> }
-  }
-
-  private fun setupAllianceChatHeader(v: View) { /*
-    Alliance alliance = (Alliance) EmpireManager.i.getEmpire().getAlliance();
-    if (alliance == null) {
-      return; // should never happen...
-    }
-
-    TextView title = (TextView) v.findViewById(R.id.title);
-    title.setText(alliance.getName());
-
-    ImageView allianceIcon = (ImageView) v.findViewById(R.id.alliance_icon);
-    allianceIcon.setImageBitmap(AllianceShieldManager.i.getShield(getActivity(), alliance));
-  */
-  }
-
-  private fun setupPrivateChatHeader(v: View) { /*
-    // remove our own ID from the list...
-    ArrayList<Integer> empireIDs = new ArrayList<>();
-    for (BaseChatConversationParticipant participant : conversation.getParticipants()) {
-      if (participant.getEmpireID() != EmpireManager.i.getEmpire().getID()) {
-        empireIDs.add(participant.getEmpireID());
-      }
-    }
-
-    final LinearLayout empireIconContainer =
-        (LinearLayout) v.findViewById(R.id.empire_icon_container);
-    final TextView empireName = (TextView) v.findViewById(R.id.title);
-    final double pixelScale = getActivity().getResources().getDisplayMetrics().density;
-
-    ImageButton settingsBtn = (ImageButton) v.findViewById(R.id.settings_btn);
-    settingsBtn.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        ChatPrivateSettingsDialog dialog = new ChatPrivateSettingsDialog();
-        Bundle args = new Bundle();
-        Messages.ChatConversation.Builder chat_conversation_pb =
-            Messages.ChatConversation.newBuilder();
-        conversation.toProtocolBuffer(chat_conversation_pb);
-        args.putByteArray("au.com.codeka.warworlds.ChatConversation",
-            chat_conversation_pb.build().toByteArray());
-        dialog.setArguments(args);
-        dialog.show(getActivity().getSupportFragmentManager(), "");
-      }
-    });
-
-    if (empireIDs.size() == 0) {
-      empireName.setText("Empty Chat");
-    } else {
-      List<Empire> empires = EmpireManager.i.getEmpires(empireIDs);
-      Collections.sort(empires, new Comparator<Empire>() {
-        @Override
-        public int compare(Empire lhs, Empire rhs) {
-          return lhs.getDisplayName().compareTo(rhs.getDisplayName());
-        }
-      });
-
-      StringBuilder sb = new StringBuilder();
-      for (Empire empire : empires) {
-        if (sb.length() > 0) {
-          sb.append(", ");
-        }
-        sb.append(empire.getDisplayName());
-
-        ImageView icon = new ImageView(getActivity());
-        icon.setLayoutParams(
-            new LinearLayout.LayoutParams((int) (32 * pixelScale), (int) (32 * pixelScale)));
-        icon.setImageBitmap(EmpireShieldManager.i.getShield(getActivity(), empire));
-        empireIconContainer.addView(icon);
-      }
-      empireName.setText(sb.toString());
-    }
-  */
+    newGroupBtn.setOnClickListener { }
   }
 
   private fun refreshUnreadCountButton() {
@@ -402,7 +333,7 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
       numUnread += conversation.getUnreadCount();
     }*/
     private val totalUnreadCount: Int
-      private get() =/*for (ChatConversation conversation : ChatManager.i.getConversations()) {
+      get() =/*for (ChatConversation conversation : ChatManager.i.getConversations()) {
   numUnread += conversation.getUnreadCount();
 }*/0
   }
@@ -429,26 +360,26 @@ class RoomView(context: Context?, private val room: ChatRoom) : RelativeLayout(c
     unreadCountBtn = findViewById(R.id.unread_btn)
     if (unreadCountBtn != null) {
       refreshUnreadCountButton()
-      unreadCountBtn.setOnClickListener(OnClickListener { v: View? -> })
+      unreadCountBtn.setOnClickListener(OnClickListener { })
     }
-    chatOutput.onItemClickListener = OnItemClickListener { parent: AdapterView<*>?, view1: View?, position: Int, id: Long ->
+    chatOutput.onItemClickListener = OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
       val entry = chatAdapter.getItem(position) as ChatAdapter.ItemEntry
       if (entry.message == null) {
         return@OnItemClickListener
       }
-      val empire = EmpireManager.getEmpire(entry.message!!.empire_id)
-          ?: return@OnItemClickListener
+      //val empire = EmpireManager.getEmpire(entry.message!!.empire_id)
+      //    ?: return@OnItemClickListener
     }
   }
 
   private val eventHandler: Any = object : Any() {
     @EventHandler
-    fun onEmpireUpdated(empire: Empire?) {
+    fun onEmpireUpdated(@Suppress("unused_parameter") empire: Empire) {
       chatAdapter.notifyDataSetChanged()
     }
 
     @EventHandler
-    fun onChatMessagesUpdated(event: ChatMessagesUpdatedEvent?) {
+    fun onChatMessagesUpdated(@Suppress("unused_parameter") event: ChatMessagesUpdatedEvent) {
       updateMessages()
     } /*
     @EventHandler

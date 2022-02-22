@@ -7,6 +7,7 @@ import au.com.codeka.warworlds.planetrender.Template.*
 import au.com.codeka.warworlds.planetrender.Template.AtmosphereTemplate.InnerOuterTemplate
 import au.com.codeka.warworlds.planetrender.Template.AtmosphereTemplate.StarTemplate
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.acos
 
 /** This class will generate an atmosphere around a planet.  */
@@ -24,7 +25,6 @@ open class Atmosphere protected constructor() {
     return Colour(TRANSPARENT)
   }
 
-  fun updateUv(uv: Vector2?) {}
   class InnerAtmosphere(tmpl: InnerOuterTemplate?, rand: Random) : Atmosphere() {
     private val colourGradient: ColourGradient?
     private val sunShadowFactor: Double
@@ -85,12 +85,12 @@ open class Atmosphere protected constructor() {
     override fun getOuterPixelColour(u: Double, v: Double, normal: Vector3,
                                      distanceToSurface: Double, sunDirection: Vector3?,
                                      north: Vector3?): Colour {
-      var distanceToSurface = distanceToSurface
+      var dist = distanceToSurface
       if (colourGradient == null) {
         return Colour(TRANSPARENT)
       }
-      distanceToSurface /= atmosphereSize
-      val baseColour = colourGradient.getColour(distanceToSurface)
+      dist /= atmosphereSize
+      val baseColour = colourGradient.getColour(dist)
       val dot = dot(normal, sunDirection!!)
       val sunFactor = getSunShadowFactor(dot, sunStartShadow, sunShadowFactor)
       baseColour.reset(
@@ -175,27 +175,27 @@ open class Atmosphere protected constructor() {
 
     protected fun getSunShadowFactor(dot: Double, sunStartShadow: Double,
                                      sunFactor: Double): Double {
-      var dot = dot
-      if (dot < 0.0) {
-        dot = Math.abs(dot)
+      var d = dot
+      if (d < 0.0) {
+        d = abs(d)
 
         // normally, the dot product will be 1.0 if we're on the exact opposite side of
         // the planet to the sun, and 0.0 when we're 90 degrees to the sun. We want to swap
         // that around.
-        dot = 1.0 - dot
+        d = 1.0 - d
       } else {
         // if it's positive, then it's on the sun side of the planet. We'll still allow you to
         // start chopping off the atmosphere on the sun side of the planet if you want.
-        dot += 1.0
+        d += 1.0
       }
-      if (dot < sunStartShadow) {
+      if (d < sunStartShadow) {
         val min = sunStartShadow * sunFactor
-        dot = if (dot < min) {
+        d = if (d < min) {
           0.0
         } else {
-          (dot - min) / (sunStartShadow - min)
+          (d - min) / (sunStartShadow - min)
         }
-        return dot
+        return d
       }
       return 1.0
     }

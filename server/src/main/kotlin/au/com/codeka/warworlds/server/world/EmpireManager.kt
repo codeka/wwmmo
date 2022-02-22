@@ -14,7 +14,6 @@ import au.com.codeka.warworlds.server.store.SectorsStore.SectorState
 import au.com.codeka.warworlds.server.world.generator.NewStarFinder
 import com.google.common.collect.Lists
 import com.patreon.PatreonAPI
-import java.io.IOException
 import java.util.*
 
 /**
@@ -53,7 +52,7 @@ class EmpireManager private constructor() {
    *
    * @return The new empire, or null if there was an error creating the empire.
    */
-  fun createEmpire(name: String?): WatchableObject<Empire>? {
+  fun createEmpire(name: String): WatchableObject<Empire>? {
     log.info("Creating new empire %s", name)
     val newStarFinder = NewStarFinder()
     return if (!newStarFinder.findStarForNewEmpire()) {
@@ -70,9 +69,9 @@ class EmpireManager private constructor() {
    *
    * @return The new empire, or null if there was an error creating the empire.
    */
-  fun createEmpire(name: String?, newStarFinder: NewStarFinder): WatchableObject<Empire>? {
+  fun createEmpire(name: String, newStarFinder: NewStarFinder): WatchableObject<Empire>? {
     val id: Long = DataStore.i.seq().nextIdentifier()
-    val star: WatchableObject<Star>? = StarManager.i.getStar(newStarFinder.star!!.id)
+    val star: WatchableObject<Star>? = StarManager.i.getStar(newStarFinder.star.id)
     if (star == null) {
       // Shouldn't happen, NewStarFinder should actually find a star.
       log.error("Unknown star?")
@@ -80,9 +79,7 @@ class EmpireManager private constructor() {
     }
     try {
       StarManager.i.modifyStar(star, Lists.newArrayList(
-          StarModification.Builder()
-              .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
-              .build(),
+          StarModification(type = StarModification.Type.EMPTY_NATIVE),
           createFleet(id, DesignType.COLONY_SHIP, 11),
           createFleet(id, DesignType.FIGHTER, 100),
           createFleet(id, DesignType.FIGHTER, 100),
@@ -100,25 +97,24 @@ class EmpireManager private constructor() {
           createFleet(id, DesignType.TROOP_CARRIER, 250),
           createFleet(id, DesignType.SCOUT, 20),
           createFleet(id, DesignType.SCOUT, 0),
-          StarModification.Builder()
-              .empire_id(id)
-              .type(StarModification.MODIFICATION_TYPE.COLONIZE)
-              .planet_index(newStarFinder.planetIndex)
-              .build()
+          StarModification(
+              empire_id = id,
+              type = StarModification.Type.COLONIZE,
+              planet_index = newStarFinder.planetIndex)
       ), StarModifier.EMPTY_LOG_HANDLER)
     } catch (e: SuspiciousModificationException) {
       // Shouldn't happen, none of these should be suspicious...
       log.error("Unexpected suspicious modification.", e)
       return null
     }
-    val empire = Empire.Builder()
-        .display_name(name)
-        .id(id)
-        .home_star(newStarFinder.star)
-        .build()
-    DataStore.Companion.i.empires().put(id, empire)
-    DataStore.Companion.i.sectors().updateSectorState(
-        SectorCoord.Builder().x(star.get().sector_x).y(star.get().sector_y).build(),
+    val empire = Empire(
+        display_name = name,
+        id = id,
+        home_star = newStarFinder.star,
+        state = Empire.EmpireState.ACTIVE)
+    DataStore.i.empires().put(id, empire)
+    DataStore.i.sectors().updateSectorState(
+        SectorCoord(x = star.get().sector_x, y = star.get().sector_y),
         SectorState.Empty,
         SectorState.NonEmpty)
     return watchEmpire(empire)
@@ -128,10 +124,7 @@ class EmpireManager private constructor() {
    * Refreshes the Patreon data for the given [Empire], by making a request to Patreon's
    * server.
    */
-  @Throws(IOException::class)
-  fun refreshPatreonInfo(
-      empire: WatchableObject<Empire>?, patreonInfo: PatreonInfo) {
-    var patreonInfo: PatreonInfo = patreonInfo
+  fun refreshPatreonInfo(empire: WatchableObject<Empire>?, patreonInfo: PatreonInfo) {
     log.info("Refreshing Patreon pledges for %d (%s).",
         empire!!.get().id, empire.get().display_name)
     val apiClient = PatreonAPI(patreonInfo.access_token)
@@ -145,16 +138,17 @@ class EmpireManager private constructor() {
         }
       }
     }
-    patreonInfo = patreonInfo.newBuilder()
-        .full_name(user.fullName)
-        .about(user.about)
-        .discord_id(user.discordId)
-        .patreon_url(user.url)
-        .email(user.email)
-        .image_url(user.imageUrl)
-        .max_pledge(maxPledge)
-        .build()
-    DataStore.Companion.i.empires().savePatreonInfo(empire.get()!!.id, patreonInfo)
+
+    DataStore.i.empires().savePatreonInfo(
+      empire.get().id,
+      patreonInfo.copy(
+        full_name = user.fullName,
+        about = user.about,
+        discord_id = user.discordId,
+        patreon_url = user.url,
+        email = user.email,
+        image_url = user.imageUrl,
+        max_pledge = maxPledge))
   }
 
   private fun watchEmpire(empire: Empire): WatchableObject<Empire>? {
@@ -175,13 +169,12 @@ class EmpireManager private constructor() {
     private val log = Log("EmpireManager")
     val i = EmpireManager()
     private fun createFleet(empireId: Long, designType: DesignType, count: Int): StarModification {
-      return StarModification.Builder()
-          .type(StarModification.MODIFICATION_TYPE.CREATE_FLEET)
-          .empire_id(empireId)
-          .design_type(designType)
-          .count(count)
-          .full_fuel(true)
-          .build()
+      return StarModification(
+          type = StarModification.Type.CREATE_FLEET,
+          empire_id = empireId,
+          design_type = designType,
+          count = count,
+          full_fuel = true)
     }
   }
 

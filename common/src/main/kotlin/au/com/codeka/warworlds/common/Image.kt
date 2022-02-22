@@ -47,24 +47,24 @@ class Image @JvmOverloads constructor(width: Int, height: Int, fill: Colour = Co
    * Draws a line from the given (x1,y1) to (x2,y2) in the given colour.
    */
   fun drawLine(x1: Int, y1: Int, x2: Int, y2: Int, c: Colour) {
-    var x1 = x1
-    var y1 = y1
+    var x = x1
+    var y = y1
     val dx = abs(x2 - x1)
     val dy = abs(y2 - y1)
     val sx = if (x1 < x2) 1 else -1
     val sy = if (y1 < y2) 1 else -1
     var err = dx - dy
     while (true) {
-      setPixelColour(x1, y1, c)
-      if (x1 == x2 && y1 == y2) break
+      setPixelColour(x, y, c)
+      if (x == x2 && y == y2) break
       val e2 = 2 * err
       if (e2 > -dy) {
         err -= dy
-        x1 += sx
+        x += sx
       }
       if (e2 < dx) {
         err += dx
-        y1 += sy
+        y += sy
       }
     }
   }

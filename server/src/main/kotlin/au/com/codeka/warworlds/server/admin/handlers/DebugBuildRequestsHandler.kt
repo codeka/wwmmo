@@ -16,10 +16,8 @@ class DebugBuildRequestsHandler : AdminHandler() {
     val buildRequests = ArrayList<BuildRequest>()
     for (star in DataStore.i.stars().fetchSimulationQueue(100)) {
       for (planet in star.planets) {
-        if (planet.colony == null) {
-          continue
-        }
-        for (buildRequest in planet.colony.build_requests) {
+        val colony = planet.colony ?: continue
+        for (buildRequest in colony.build_requests) {
           buildRequestStars[buildRequest.id] = star
           buildRequests.add(buildRequest)
         }

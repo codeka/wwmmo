@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.client.concurrency.Threads
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.build.BuildViewHelper
 import au.com.codeka.warworlds.client.game.world.ImageHelper
 import au.com.codeka.warworlds.client.game.world.StarManager
@@ -137,41 +138,43 @@ class SitReportAdapter(private val layoutInflater: LayoutInflater)
       }
 
       val design: Design?
+      val buildCompleteReport = sitReport.build_complete_record
+      val moveCompleteReport = sitReport.move_complete_record
       when {
-        sitReport.build_complete_record != null -> {
-          design = DesignHelper.getDesign(sitReport.build_complete_record.design_type)
+        buildCompleteReport != null -> {
+          design = DesignHelper.getDesign(buildCompleteReport.design_type)
           reportTitleView.text =
-              Html.fromHtml(res.getString(R.string.build_complete, star?.name ?: "..."))
+              fromHtml(res.getString(R.string.build_complete, star?.name ?: "..."))
 
           if (design.design_kind == Design.DesignKind.SHIP) {
             // TODO: handle was_destroyed when we have it.
             reportDetailsView.text =
                 res.getString(
                     R.string.fleet_details_not_destroyed,
-                    sitReport.build_complete_record.count.toFloat(),
+                  buildCompleteReport.count.toFloat(),
                     design.display_name)
           } else {
             reportDetailsView.text = res.getString(R.string.build_details, design.display_name)
           }
         }
-        sitReport.move_complete_record != null -> {
-          design = DesignHelper.getDesign(sitReport.move_complete_record.design_type)
+        moveCompleteReport != null -> {
+          design = DesignHelper.getDesign(moveCompleteReport.design_type)
           reportTitleView.text =
-              Html.fromHtml(res.getString(R.string.fleet_move_complete, star?.name ?: "..."))
+              fromHtml(res.getString(R.string.fleet_move_complete, star?.name ?: "..."))
 
-          val resId = if (design.design_kind == Design.DesignKind.SHIP
-              && sitReport.move_complete_record.was_destroyed == true) {
-            R.string.fleet_details_destroyed
-          } else /* if (design.design_kind == Design.DesignKind.SHIP) */ {
-            R.string.fleet_details_not_destroyed
-          }
+          val resId =
+            if (design.design_kind == Design.DesignKind.SHIP && moveCompleteReport.was_destroyed) {
+              R.string.fleet_details_destroyed
+            } else /* if (design.design_kind == Design.DesignKind.SHIP) */ {
+              R.string.fleet_details_not_destroyed
+            }
           reportDetailsView.text =
-              res.getString(resId, sitReport.move_complete_record.num_ships, design.display_name)
+              res.getString(resId, moveCompleteReport.num_ships, design.display_name)
         }
         else -> {
           design = null
           reportTitleView.text =
-              Html.fromHtml(res.getString(R.string.attack_on_star, star?.name ?: "..."))
+              fromHtml(res.getString(R.string.attack_on_star, star?.name ?: "..."))
         }
       }
       if (design != null) {

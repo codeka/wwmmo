@@ -5,6 +5,7 @@ import au.com.codeka.warworlds.common.proto.EmpireStorage
 import au.com.codeka.warworlds.common.proto.Star
 import com.squareup.wire.get
 import java.util.*
+import kotlin.math.roundToInt
 
 /**
  * A helper for working with [Star]s.
@@ -15,7 +16,7 @@ object StarHelper {
    */
   fun getStorage(star: Star, empireId: Long): EmpireStorage? {
     for (empireStorage in star.empire_stores) {
-      if (empireStorage.empire_id != null && empireStorage.empire_id == empireId) {
+      if (empireStorage.empire_id == empireId) {
         return empireStorage
       }
     }
@@ -32,8 +33,8 @@ object StarHelper {
     for (planet in star.planets) {
       if (planet.colony?.empire_id != null && planet.colony.empire_id == empireId) {
         for (br in planet.colony.build_requests) {
-          if (br.start_time < now && br.end_time > now) {
-            delta += br.delta_minerals_per_hour
+          if (br.start_time!! < now && br.end_time!! > now) {
+            delta += br.delta_minerals_per_hour!!
           }
         }
       }
@@ -45,12 +46,24 @@ object StarHelper {
    * Gets the index of the [EmpireStorage] for the empire with the given ID, or -1 if there's
    * no [EmpireStorage] for that empire.
    */
-  fun getStorageIndex(star: Star.Builder, empireId: Long?): Int {
+  fun getStorageIndex(star: Star, empireId: Long?): Int {
     for (i in star.empire_stores.indices) {
-      if (star.empire_stores[i].empire_id != null
-          && star.empire_stores[i].empire_id == empireId) {
+      if (star.empire_stores[i].empire_id == empireId) {
         return i
-      } else if (star.empire_stores[i].empire_id == null && empireId == null) {
+      } else if (empireId == null) {
+        return i
+      }
+    }
+    return -1
+  }
+
+  /**
+   * Gets the index of the [EmpireStorage] for the empire with the given ID, or -1 if there's
+   * no [EmpireStorage] for that empire.
+   */
+  fun getStorageIndex(star: MutableStar, empireId: Long?): Int {
+    for (i in star.empireStores.indices) {
+      if (star.empireStores[i].empireId == empireId) {
         return i
       }
     }
@@ -63,8 +76,8 @@ object StarHelper {
   fun getCoordinateString(star: Star): String {
     return String.format(Locale.US,
         "[%d.%02d, %d.%02d]",
-        star.sector_x, Math.round(100 * star.offset_x / 1024.0f),
-        star.sector_y, Math.round(100 * star.offset_y / 1024.0f))
+        star.sector_x, (100 * star.offset_x / 1024.0f).roundToInt(),
+        star.sector_y, (100 * star.offset_y / 1024.0f).roundToInt())
   }
 
   /**
@@ -72,7 +85,7 @@ object StarHelper {
    *
    *
    * For practical reasons, we assume that the given stars are not *too* far away (that
-   * is, that the distance betwen them can be represented by a 32-bit floating point value).
+   * is, that the distance between them can be represented by a 32-bit floating point value).
    */
   fun directionBetween(from: Star, to: Star): Vector2 {
     val sdx = to.sector_x - from.sector_x
@@ -82,19 +95,19 @@ object StarHelper {
         (to.offset_y - from.offset_y + sdy * 1024.0f).toDouble())
   }
 
-  fun directionBetween(from: Star.Builder, to: Star): Vector2 {
-    val sdx = to.sector_x - from.sector_x
-    val sdy = to.sector_y - from.sector_y
+  fun directionBetween(from: MutableStar, to: Star): Vector2 {
+    val sdx = to.sector_x - from.sectorX
+    val sdy = to.sector_y - from.sectorY
     return Vector2(
-        (to.offset_x - from.offset_x + sdx * 1024.0f).toDouble(),
-        (to.offset_y - from.offset_y + sdy * 1024.0f).toDouble())
+        (to.offset_x - from.offsetX + sdx * 1024.0f).toDouble(),
+        (to.offset_y - from.offsetY + sdy * 1024.0f).toDouble())
   }
 
   fun distanceBetween(from: Star, to: Star): Double {
     return directionBetween(from, to).length()
   }
 
-  fun distanceBetween(from: Star.Builder, to: Star): Double {
+  fun distanceBetween(from: MutableStar, to: Star): Double {
     return directionBetween(from, to).length()
   }
 }

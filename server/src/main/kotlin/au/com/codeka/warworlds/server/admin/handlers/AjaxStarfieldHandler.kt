@@ -4,6 +4,7 @@ import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.SectorCoord
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.proto.StarModification
+import au.com.codeka.warworlds.common.sim.MutableStar
 import au.com.codeka.warworlds.common.sim.Simulation
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
 import au.com.codeka.warworlds.server.handlers.RequestException
@@ -73,7 +74,7 @@ class AjaxStarfieldHandler : AjaxHandler() {
   }
 
   private fun handleXyRequest(x: Long, y: Long) {
-    val sector = SectorManager.i.getSector(SectorCoord.Builder().x(x).y(y).build())
+    val sector = SectorManager.i.getSector(SectorCoord(x = x, y = y))
     SectorManager.i.verifyNativeColonies(sector)
     setResponseJson(sector.get())
   }
@@ -103,25 +104,23 @@ class AjaxStarfieldHandler : AjaxHandler() {
 
   private fun handleClearNativesRequest(starId: Long) {
     log.debug("delete star: %d", starId)
-    modifyAndSimulate(starId, StarModification.Builder()
-        .type(StarModification.MODIFICATION_TYPE.EMPTY_NATIVE)
-        .build())
+    modifyAndSimulate(starId, StarModification(
+        type = StarModification.Type.EMPTY_NATIVE))
   }
 
   private fun handleForceMoveComplete(starId: Long, fleetId: Long) {
     log.debug("force move complete (star: %d, fleet: %d)", starId, fleetId)
     val starWo: WatchableObject<Star> = StarManager.i.getStar(starId) ?: return
     synchronized(starWo.lock) {
-      val star = starWo.get().newBuilder()
+      var star = starWo.get()
       for (i in star.fleets.indices) {
         if (star.fleets[i].id == fleetId) {
-          // Set the ETA well in the past, so that the star manager thinks it should have arrived.
-          star.fleets[i] = star.fleets[i].newBuilder()
-              .eta(100L)
-              .build()
+          val fleets = ArrayList(star.fleets)
+          fleets[i] = fleets[i].copy(eta = 100L)
+          star = star.copy(fleets = fleets)
         }
       }
-      starWo.set(star.build())
+      starWo.set(star)
     }
 
     // Now just simulate to make sure it processes it.
@@ -132,24 +131,14 @@ class AjaxStarfieldHandler : AjaxHandler() {
     log.debug("force build request complete (star: %d, req: %d)", starId, buildRequestId)
     val starWo: WatchableObject<Star> = StarManager.i.getStar(starId) ?: return
     synchronized(starWo.lock) {
-      val star = starWo.get().newBuilder()
-      for (i in star.planets.indices) {
-        val planet = star.planets[i]
-        if (planet.colony == null) {
-          continue
-        }
-        for (j in planet.colony.build_requests.indices) {
-          val buildRequest = planet.colony.build_requests[j]
-          if (buildRequest.id == buildRequestId) {
+      val star = MutableStar.from(starWo.get())
+      for (planet in star.planets) {
+        val colony = planet.colony ?: continue
+        for (br in colony.buildRequests) {
+          if (br.id == buildRequestId) {
             // Set the end time well in the past, so that the star manager think it's done.
-            val colonyBuilder = planet.colony.newBuilder()
-            colonyBuilder.build_requests[j] = buildRequest.newBuilder()
-                .end_time(100L)
-                .progress(1.0f)
-                .build()
-            star.planets[i] = planet.newBuilder()
-                .colony(colonyBuilder.build())
-                .build()
+            br.endTime = 100L
+            br.progress = 1.0f
           }
         }
       }
@@ -187,7 +176,7 @@ class AjaxStarfieldHandler : AjaxHandler() {
   }
 
   private fun handleResetSector(x: Long, y: Long) {
-    SectorManager.i.resetSector(SectorCoord.Builder().x(x).y(y).build())
+    SectorManager.i.resetSector(SectorCoord(x = x, y = y))
   }
 
   private class LogHandler internal constructor(private val logMessages: StringBuilder)

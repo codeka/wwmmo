@@ -16,7 +16,6 @@ import au.com.codeka.warworlds.common.proto.Fleet
 import au.com.codeka.warworlds.common.proto.Star
 import au.com.codeka.warworlds.common.sim.DesignHelper
 import com.google.common.base.Preconditions
-import com.google.common.base.Predicate
 import com.squareup.picasso.Picasso
 import java.lang.RuntimeException
 import java.util.*
@@ -26,7 +25,9 @@ import java.util.*
  */
 class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars: StarCollection?)
   : ExpandableStarListAdapter<Fleet?>(stars!!) {
-  private val myEmpireId: Long
+
+  private val myEmpireId: Long = EmpireManager.getMyEmpire().id
+
   private var multiSelect = false
   var selectedFleetId: Long? = null
     private set
@@ -42,12 +43,12 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     private set
 
   /** A list of fleets that are currently selected, contains more than one in multi-select mode.  */
-  private val selectedFleetIds: MutableSet<Long?> = HashSet()
+  private val selectedFleetIds: MutableSet<Long> = HashSet()
 
   /** A list of fleets which are currently disabled (you can't select them).  */
   private val disabledFleetIds: MutableSet<Long> = HashSet()
 
-  fun getSelectedFleetIds(): Collection<Long?> {
+  fun getSelectedFleetIds(): Collection<Long> {
     return selectedFleetIds
   }
 
@@ -57,7 +58,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     for (i in 0 until groupCount) {
       val star = getStar(i)
       for (fleet in star.fleets) {
-        if (fleet.empire_id != null && fleet.empire_id == myEmpireId) {
+        if (fleet.empire_id == myEmpireId) {
           if (predicate(fleet)) {
             disabledFleetIds.add(fleet.id)
           }
@@ -84,12 +85,12 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     if (!multiSelect) {
       selectedFleetIds.clear()
       if (selectedFleetId != null) {
-        selectedFleetIds.add(selectedFleetId)
+        selectedFleetIds.add(selectedFleetId!!)
       }
     }
   }
 
-  fun setSelectedFleetId(star: Star?, fleetId: Long?) {
+  fun setSelectedFleetId(star: Star, fleetId: Long) {
     selectedFleetId = fleetId
     selectedStar = star
     if (multiSelect) {
@@ -125,7 +126,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     var numFleets = 0
     for (i in star!!.fleets.indices) {
       val empireID = star.fleets[i].empire_id
-      if (empireID != null && empireID == myEmpireId) {
+      if (empireID == myEmpireId) {
         numFleets++
       }
     }
@@ -136,7 +137,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     var fleetIndex = 0
     for (i in star!!.fleets.indices) {
       val empireID = star.fleets[i].empire_id
-      if (empireID != null && empireID == myEmpireId) {
+      if (empireID == myEmpireId) {
         if (fleetIndex == index) {
           return star.fleets[i]
         }
@@ -177,7 +178,7 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
       var numFighters = 0.0f
       var numNonFighters = 0.0f
       for (fleet in star.fleets) {
-        if (fleet.empire_id == null || fleet.empire_id != myEmpire.id) {
+        if (fleet.empire_id != myEmpire.id) {
           continue
         }
         if (fleet.design_type == Design.DesignType.FIGHTER) {
@@ -199,14 +200,16 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     }
     if (star != null) {
       val fleet = getChild(star, index)
-      if (fleet != null) {
-        FleetListHelper.populateFleetRow(
-            view as ViewGroup?, fleet, DesignHelper.getDesign(fleet.design_type))
-        if (disabledFleetIds.contains(fleet.id)) {
+      FleetListHelper.populateFleetRow(
+        view as ViewGroup?, fleet, DesignHelper.getDesign(fleet.design_type))
+      when {
+        disabledFleetIds.contains(fleet.id) -> {
           view!!.setBackgroundResource(R.color.list_item_disabled)
-        } else if (selectedFleetIds.contains(fleet.id)) {
+        }
+        selectedFleetIds.contains(fleet.id) -> {
           view!!.setBackgroundResource(R.color.list_item_selected)
-        } else {
+        }
+        else -> {
           view!!.setBackgroundResource(android.R.color.transparent)
         }
       }
@@ -214,7 +217,4 @@ class FleetExpandableStarListAdapter(private val inflater: LayoutInflater, stars
     return view!!
   }
 
-  init {
-    myEmpireId = Preconditions.checkNotNull(EmpireManager.getMyEmpire()).id
-  }
 }

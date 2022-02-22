@@ -1,29 +1,28 @@
-
-abbas abbatis : father /abbot.
-abbatia : abbey, monastery.
-abduco : to lead, or take away/ detach, withdraw. 
-abeo : to go away, retire /depart from life, die.
-abeo : to digress / change / vanish, disappear.
-abscido : to cut off, to separate, take away.
-absconditus : hidden, concealed.
-absens, absentis : (adj.) absent, missing, away, gone.
-absorbeo : to swallow, gulp down, carry away, engross.
-absque : (+ abl.) without.
-abstergo : to wipe off, clean away.
-absum : to be absent, be away, be missing.
-abundans : abundant, overflowing, abounding in.
-abundantia : abundance, bounty, plenty
-abutor : to make full use of, to abuse.
-abutor : to use abusive language / use a word incorrectly.
-ac : =atque and
-accedo : to approach, come near /(things) to be added. 
-accendo : to kindle, illuminate, inflame.
-acceptus : welcome, pleasant, agreeable.
-accipio : to consider oneself indebted, receive, learn, take.
-accommodo : to adjust, adapt, accommodate oneself.
-accusator : accusor, plaintiff.
-accuso : to accuse, blame, find fault with. 
-acer : sharp, keen, eager, severe, fierce. 
+abbas
+abbatis
+abbatia
+abduco
+abeo
+abscido
+absconditus
+absens
+absentis
+absorbeo
+absque
+abstergo
+absum
+abundans
+abundantia
+abutor
+abutor
+accedo
+accendo
+acceptus
+accipio
+accommodo
+accusator
+accuso
+acer
 acerbitas : harshness, bitterness.
 acerbus : bitter, gloomy, dark.
 acervus : a heap, mass.

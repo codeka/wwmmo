@@ -143,9 +143,8 @@ class AppContent : JPanel() {
     toolBar.add(imageSizeCombo)
     toolBar.add(JLabel(" Background: "))
     backgroundColourCombo = JComboBox()
-    backgroundColourCombo!!.addActionListener { ae: ActionEvent? ->
-      val sel = backgroundColourCombo!!.selectedItem as String
-      when (sel) {
+    backgroundColourCombo!!.addActionListener {
+      when (backgroundColourCombo!!.selectedItem as String) {
         "Transparent" -> contentPanel!!.setBackgroundColour(null)
         "Black" -> contentPanel!!.setBackgroundColour(BLACK)
         "White" -> contentPanel!!.setBackgroundColour(WHITE)

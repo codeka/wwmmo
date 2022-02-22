@@ -16,21 +16,39 @@ object EmpireHelper {
     } else lhs == rhs
   }
 
-  /** Gets the [EmpireStorage.Builder] for the given empire.  */
-  fun getStore(star: Star.Builder, empireId: Long?): EmpireStorage.Builder? {
+  /** Gets the [EmpireStorage] for the given empire.  */
+  fun getStore(star: Star, empireId: Long?): EmpireStorage? {
     val index = getStoreIndex(star, empireId)
     return if (index < 0) {
       null
-    } else star.empire_stores.get(index).newBuilder()
+    } else star.empire_stores[index]
   }
 
-  fun getStoreIndex(star: Star.Builder, empireId: Long?): Int {
-    for (i in 0 until star.empire_stores.size) {
-      val store: EmpireStorage = star.empire_stores[i]
-      if (store.empire_id == null && empireId == null) {
+  /** Gets the [EmpireStorage] for the given empire.  */
+  fun getStore(star: MutableStar, empireId: Long): MutableEmpireStorage? {
+    val index = getStoreIndex(star, empireId)
+    return if (index < 0) {
+      null
+    } else star.empireStores[index]
+  }
+
+  fun getStoreIndex(star: MutableStar, empireId: Long): Int {
+    star.empireStores.indices.forEach { i ->
+      val store = star.empireStores[i]
+      if (store.empireId == empireId) {
         return i
       }
-      if (store.empire_id != null && store.empire_id == empireId) {
+    }
+    return -1
+  }
+
+  fun getStoreIndex(star: Star, empireId: Long?): Int {
+    star.empire_stores.indices.forEach { i ->
+      val store = star.empire_stores[i]
+      if (empireId == null) {
+        return i
+      }
+      if (store.empire_id == empireId) {
         return i
       }
     }

@@ -90,10 +90,10 @@ open class PerlinNoise {
 
   protected class CosineInterpolator : Interpolator {
     override fun interpolate(a: Double, b: Double, n: Double): Double {
-      var n = n
-      val radians = n * Math.PI
-      n = (1 - cos(radians)) * 0.5
-      return a + n * (b - a)
+      var amount = n
+      val radians = amount * Math.PI
+      amount = (1 - cos(radians)) * 0.5
+      return a + amount * (b - a)
     }
   }
 }

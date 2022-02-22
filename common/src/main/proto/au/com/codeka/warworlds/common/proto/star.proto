@@ -2,10 +2,11 @@ syntax = "proto2";
 
 package au.com.codeka.warworlds.common.proto;
 
-import "au/com/codeka/warworlds/common/proto/common.proto";
-import "au/com/codeka/warworlds/common/proto/design.proto";
-import "au/com/codeka/warworlds/common/proto/colony.proto";
-import "au/com/codeka/warworlds/common/proto/fleet.proto";
+// https://github.com/square/wire/issues/1325 We need to swap these when switching between Win/Linux
+import "au\\com\\codeka\\warworlds\\common\\proto\\common.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\design.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\colony.proto";
+import "au\\com\\codeka\\warworlds\\common\\proto\\fleet.proto";
 
 //
 // Represents a "sector" of space, containing a number of stars and whatnot.
@@ -13,22 +14,22 @@ import "au/com/codeka/warworlds/common/proto/fleet.proto";
 message Sector {
   // these are the (x,y) coordinates of the sector. (0,0) is the "centre" of the universe,
   // (1,1) is one sector up and to the right, and so on.
-  optional int64 x = 1;
-  optional int64 y = 2;
+  required int64 x = 1;
+  required int64 y = 2;
 
   // number of colonies in this sector
-  optional int32 num_colonies = 5;
+  required int32 num_colonies = 5;
 
   // the collection of stars in this sector.
   repeated Star stars = 3;
 
   // the state of this sector, see SectorsStore.SectorState for possible values.
-  optional int32 state = 4;
+  required int32 state = 4;
 }
 
 message SectorCoord {
-  optional int64 x = 1;
-  optional int64 y = 2;
+  required int64 x = 1;
+  required int64 y = 2;
 }
 
 // An array of (x,y) coordinates. This is used to store the list of empty sectors, as well
@@ -43,18 +44,18 @@ message SectorCoordArray {
 //
 message Star {
   // the identifier of the star, unique throughout the universe.
-  optional int64 id = 1;
+  required int64 id = 1;
 
   // the sector this star is contained within
-  optional int64 sector_x = 11;
-  optional int64 sector_y = 12;
+  required int64 sector_x = 11;
+  required int64 sector_y = 12;
 
   // the name of the star
-  optional string name = 2;
+  required string name = 2;
 
   // the classification of this star. The order of these enum values
   // must correspond to the order of the StarTypes defined in sector.py
-  enum CLASSIFICATION {
+  enum Classification {
     BLUE = 0;
     WHITE = 1;
     YELLOW = 2;
@@ -65,16 +66,16 @@ message Star {
     MARKER = 7;
     WORMHOLE = 8;
   }
-  optional CLASSIFICATION classification = 3;
+  required Classification classification = 3;
 
   // the apparent "size" of the star (which is really just a display thing)
-  optional int32 size = 5;
+  required int32 size = 5;
 
   // the offset from the left edge of the sector, in pixels
-  optional int32 offset_x = 6;
+  required int32 offset_x = 6;
 
   // the offset from the bottom edge of the sector, in pixels
-  optional int32 offset_y = 7;
+  required int32 offset_y = 7;
 
   // the collection of planets orbiting this star (may be empty, for example in the list
   // of stars in a sector)
@@ -102,7 +103,7 @@ message Star {
     optional int64 dest_star_id = 1;
     optional int64 tune_complete_time = 2;
     repeated int64 tune_history = 3;
-    optional int64 empire_id = 4;
+    required int64 empire_id = 4;
   }
   optional Wormhole wormhole = 20;
 
@@ -135,13 +136,13 @@ message CombatReport {
 // if the scout is destroyed. A star will have exactly zero or one scout report per empire.
 message ScoutReport {
   // The ID of the star this report is for.
-  optional int64 star_id = 1;
+  required int64 star_id = 1;
 
   // The ID of the empire this report is for.
-  optional int64 empire_id = 2;
+  required int64 empire_id = 2;
 
   // The date/time this report was generated.
-  optional int64 report_time = 3;
+  required int64 report_time = 3;
 
   // A snapshot of the bits of the star we care about, at the time this report was generated.
   repeated Fleet fleets = 4;
@@ -153,11 +154,11 @@ message ScoutReport {
 message Planet {
   // The "index" of the planet represents how far it is from the sun. Planets are always
   // in monotonically increasing order of distance (0, 1, 2, 3, etc)
-  optional int32 index = 2;
+  required int32 index = 2;
 
   // The various different "kinds" of planets. Planets are spawned in increasing order
   // of probability (so "terran" is most likely, "gas giant" least likely).
-  enum PLANET_TYPE {
+  enum Type {
     GASGIANT = 1;
     RADIATED = 2;
     INFERNO = 3;
@@ -168,19 +169,19 @@ message Planet {
     SWAMP = 8;
     TERRAN = 9;
   }
-  optional PLANET_TYPE planet_type = 3;
+  required Type planet_type = 3;
 
   // How "congenial" is this planet to supporting population
-  optional int32 population_congeniality = 4;
+  required int32 population_congeniality = 4;
 
   // How "congenial" is this planet to supporting farming
-  optional int32 farming_congeniality = 5;
+  required int32 farming_congeniality = 5;
 
   // How "congenial" is this planet to supporting mining
-  optional int32 mining_congeniality = 6;
+  required int32 mining_congeniality = 6;
 
   // How "congenial" is this planet to the production of energy?
-  optional int32 energy_congeniality = 7;
+  required int32 energy_congeniality = 7;
 
   // Colony on this planet (if there is one).
   optional Colony colony = 8;
@@ -189,19 +190,19 @@ message Planet {
 // Represents the details of an empire's stored goods in a star. For example, keeps track of stored
 // food, energy, minerals, etc, etc.
 message EmpireStorage {
-  optional int64 empire_id = 1;
+  required int64 empire_id = 1;
 
-  optional float total_goods = 2;
-  optional float total_minerals = 3;
-  optional float total_energy = 4;
+  required float total_goods = 2;
+  required float total_minerals = 3;
+  required float total_energy = 4;
 
   optional float goods_delta_per_hour = 5;
   optional float minerals_delta_per_hour = 6;
   optional float energy_delta_per_hour = 7;
 
-  optional float max_goods = 8;
-  optional float max_minerals = 9;
-  optional float max_energy = 10;
+  required float max_goods = 8;
+  required float max_minerals = 9;
+  required float max_energy = 10;
 
   optional int64 goods_zero_time = 11;
 }
@@ -210,9 +211,9 @@ message EmpireStorage {
 // of a colony, etc. This is to ensure edits happen in a deterministic fashion and we can control
 // the locking and synchronization better.
 message StarModification {
-  enum MODIFICATION_TYPE {
+  enum Type {
     // Do not use.
-    UNKNOWN = 0;
+    UNKNOWN_TYPE = 0;
 
     // Colonize a planet on the star.
     // empire_id and planet_index are required.
@@ -271,7 +272,7 @@ message StarModification {
     // empire_id and colony_id are required.
     ATTACK_COLONY = 12;
   }
-  optional MODIFICATION_TYPE type = 1;
+  required Type type = 1;
 
   optional int64 empire_id = 2;
   optional int32 planet_index = 3;

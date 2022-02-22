@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import au.com.codeka.warworlds.client.R
 import au.com.codeka.warworlds.common.proto.SituationReport
 import au.com.codeka.warworlds.common.proto.Star
+import com.google.common.base.Preconditions
 
 class SitReportLayout(context: Context, callback: Callback) : RelativeLayout(context) {
   interface Callback {
@@ -19,6 +20,10 @@ class SitReportLayout(context: Context, callback: Callback) : RelativeLayout(con
 
   init {
     View.inflate(context, R.layout.sitreport, this)
+    // TODO: actually do something with this.
+    Preconditions.checkNotNull(callback)
+
+    @Suppress("deprecation") // We need to support API level 21
     setBackgroundColor(context.resources.getColor(R.color.default_background))
     val rv = findViewById<RecyclerView>(R.id.sit_reports)
     adapter = SitReportAdapter(LayoutInflater.from(context))

@@ -6,10 +6,11 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.squareup.wire.Message
 
 /** Class for storing protos in a sqlite key-value store, keyed by a long id.  */
-class ProtobufStore<M : Message<*, *>?>(
+class ProtobufStore<M : Message<*, *>>(
     private val name: String, protoClass: Class<M>, private val helper: SQLiteOpenHelper)
   : BaseStore(name, helper) {
-  private val serializer: ProtobufSerializer<M>
+  private val serializer: ProtobufSerializer<M> = ProtobufSerializer(protoClass)
+
   override fun onCreate(db: SQLiteDatabase) {
     db.execSQL(
         "CREATE TABLE " + name + " ("
@@ -23,7 +24,7 @@ class ProtobufStore<M : Message<*, *>?>(
   operator fun get(key: Long): M? {
     val db = helper.readableDatabase
     db.query(false, name, arrayOf("value"),
-        "key = ?", arrayOf(java.lang.Long.toString(key)),
+        "key = ?", arrayOf(key.toString()),
         null, null, null, null).use { cursor ->
       if (cursor.moveToFirst()) {
         return serializer.deserialize(cursor.getBlob(0))
@@ -60,7 +61,4 @@ class ProtobufStore<M : Message<*, *>?>(
     }
   }
 
-  init {
-    serializer = ProtobufSerializer(protoClass)
-  }
 }

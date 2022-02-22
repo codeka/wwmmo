@@ -13,7 +13,7 @@
 // And makes the tabs clickable and stuff.
 //
 
-var tabs = (function() {
+const tabs = (function() {
  function refreshVisibleTabs(tabs) {
     $("a", tabs).each(function(i, tab) {
       var tabId = $(tab).data("tab");

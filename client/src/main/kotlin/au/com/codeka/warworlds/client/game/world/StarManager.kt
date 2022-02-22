@@ -6,6 +6,7 @@ import au.com.codeka.warworlds.client.store.StarCursor
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.*
+import au.com.codeka.warworlds.common.sim.MutableStar
 import au.com.codeka.warworlds.common.sim.Simulation
 import au.com.codeka.warworlds.common.sim.StarModifier
 import au.com.codeka.warworlds.common.sim.SuspiciousModificationException
@@ -63,35 +64,33 @@ object StarManager {
    * Simulate the star on the current thread.
    */
   fun simulateStarSync(star: Star) {
-    val starBuilder = star.newBuilder()
-    Simulation().simulate(starBuilder)
+    val mutableStar = MutableStar.from(star)
+    Simulation().simulate(mutableStar)
 
     // No need to save the star, it's just a simulation, but publish it to the event bus so
     // clients can see it.
-    App.eventBus.publish(starBuilder.build())
+    App.eventBus.publish(mutableStar.build())
   }
 
-  fun updateStar(star: Star, modificationBuilder: StarModification.Builder) {
+  fun updateStar(star: Star, m: StarModification) {
     // Be sure to record our empire_id in the request.
-    val modification = modificationBuilder
-        .empire_id(EmpireManager.getMyEmpire().id)
-        .build()
+    val modification = m.copy(empire_id = EmpireManager.getMyEmpire().id)
     App.taskRunner.runTask(Runnable {
 
       // If there's any auxiliary stars, grab them now, too.
       var auxiliaryStars: MutableList<Star>? = null
       if (modification.star_id != null) {
         auxiliaryStars = ArrayList()
-        val s = stars[modification.star_id]
+        val s = stars[modification.star_id!!]
         if (s != null) {
           auxiliaryStars.add(s)
         }
       }
 
       // Modify the star.
-      val starBuilder = star.newBuilder()
+      val mutableStar = MutableStar.from(star)
       try {
-        starModifier.modifyStar(starBuilder, Lists.newArrayList(modification), auxiliaryStars)
+        starModifier.modifyStar(mutableStar, Lists.newArrayList(modification), auxiliaryStars)
       } catch (e: SuspiciousModificationException) {
         // Mostly we don't care about these on the client, but it'll be good to log them.
         log.error("Unexpected suspicious modification.", e)
@@ -99,17 +98,15 @@ object StarManager {
       }
 
       // Save the now-modified star.
-      val newStar = starBuilder.build()
+      val newStar = mutableStar.build()
       stars.put(star.id, newStar, EmpireManager.getMyEmpire())
       App.eventBus.publish(newStar)
 
       // Send the modification to the server as well.
-      App.server.send(Packet.Builder()
-          .modify_star(ModifyStarPacket.Builder()
-              .star_id(star.id)
-              .modification(Lists.newArrayList(modification))
-              .build())
-          .build())
+      App.server.send(Packet(
+        modify_star = ModifyStarPacket(
+          star_id = star.id,
+          modification = Lists.newArrayList(modification))))
     }, Threads.BACKGROUND)
   }
 

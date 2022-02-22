@@ -15,8 +15,7 @@ import au.com.codeka.warworlds.common.net.PacketEncoder
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.proto.LoginResponse.LoginStatus
 import au.com.codeka.warworlds.common.sim.DesignDefinitions
-import com.google.firebase.iid.FirebaseInstanceId
-import com.google.firebase.iid.InstanceIdResult
+import com.google.firebase.messaging.FirebaseMessaging
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.Socket
@@ -31,20 +30,6 @@ class Server {
     private val log = Log("Server")
     private const val DEFAULT_RECONNECT_TIME_MS = 1000
     private const val MAX_RECONNECT_TIME_MS = 30000
-
-    private fun populateDeviceInfo(instanceIdResult: InstanceIdResult): DeviceInfo {
-      return DeviceInfo.Builder()
-          .device_build(Build.ID)
-          .device_id(GameSettings.getString(GameSettings.Key.INSTANCE_ID))
-          .device_manufacturer(Build.MANUFACTURER)
-          .device_model(Build.MODEL)
-          .device_version(Build.VERSION.RELEASE)
-          .fcm_device_info(FcmDeviceInfo.Builder()
-              .token(instanceIdResult.token)
-              .device_id(instanceIdResult.id)
-              .build())
-          .build()
-    }
   }
 
   var currState = ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED, null)
@@ -117,11 +102,21 @@ class Server {
     login(cookie)
   }
 
+  private fun populateDeviceInfo(fcmToken: String): DeviceInfo {
+    return DeviceInfo(
+      device_build = Build.ID,
+      device_id = GameSettings.getString(GameSettings.Key.INSTANCE_ID),
+      device_manufacturer = Build.MANUFACTURER,
+      device_model = Build.MODEL,
+      device_version = Build.VERSION.RELEASE,
+      fcm_device_info = FcmDeviceInfo(token = fcmToken))
+  }
+
   private fun login(cookie: String) {
     log.info("Fetching firebase instance ID...")
-    App.taskRunner.runTask(FirebaseInstanceId.getInstance().instanceId)
-        .then(object : RunnableTask.RunnableP<InstanceIdResult> {
-          override fun run(instanceIdResult: InstanceIdResult) {
+    App.taskRunner.runTask(FirebaseMessaging.getInstance().token)
+        .then(object : RunnableTask.RunnableP<String> {
+          override fun run(param: String) {
             // Make sure we have the GoogleSignInAccount (if you've signed in) before sending it
             // to the server.
             val googleAccount = App.auth.futureAccount().get()
@@ -130,11 +125,11 @@ class Server {
             val request = HttpRequest.Builder()
                 .url(ServerUrl.getUrl("/login"))
                 .method(HttpRequest.Method.POST)
-                .body(LoginRequest.Builder()
-                    .cookie(cookie)
-                    .device_info(populateDeviceInfo(instanceIdResult))
-                    .id_token(googleAccount?.idToken)
-                    .build().encode())
+                .body(LoginRequest(
+                    cookie = cookie,
+                    device_info = populateDeviceInfo(param),
+                    id_token = googleAccount?.idToken)
+                  .encode())
                 .build()
             if (request.responseCode != 200) {
               if (request.responseCode in 401..499) {
@@ -149,8 +144,8 @@ class Server {
                   request.exception)
               disconnect()
             } else {
-              val loginResponse = request.getBody(LoginResponse::class.java)
-              if (loginResponse!!.status != LoginStatus.SUCCESS) {
+              val loginResponse = request.getBody(LoginResponse::class.java)!!
+              if (loginResponse.status != LoginStatus.SUCCESS) {
                 updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status)
                 log.error("Error logging in, got login status: %s", loginResponse.status)
                 disconnect()
@@ -165,7 +160,7 @@ class Server {
   private fun connectGameSocket(loginResponse: LoginResponse) {
     try {
       // Make sure we update our copy of the design definitions.
-      DesignDefinitions.init(loginResponse.designs)
+      DesignDefinitions.init(loginResponse.designs!!)
 
       val s = Socket()
       gameSocket = s
@@ -173,19 +168,17 @@ class Server {
       if (host == null) {
         host = ServerUrl.host
       }
-      s.connect(InetSocketAddress(host, loginResponse.port))
+      s.connect(InetSocketAddress(host, loginResponse.port!!))
       packetEncoder = PacketEncoder(s.getOutputStream(), packetEncodeHandler)
       packetDecoder = PacketDecoder(s.getInputStream(), packetDecodeHandler)
       val oldQueuedPackets = queuedPackets
       queuedPackets = null
-      send(Packet.Builder()
-          .hello(HelloPacket.Builder()
-              .empire_id(loginResponse.empire.id)
-              .our_star_last_simulation(StarManager.lastSimulationOfOurStar)
-              .last_chat_time(ChatManager.i.lastChatTime)
-              .build())
-          .build())
-      EmpireManager.onHello(loginResponse.empire)
+      send(Packet(
+          hello = HelloPacket(
+              empire_id = loginResponse.empire!!.id,
+              our_star_last_simulation = StarManager.lastSimulationOfOurStar,
+              last_chat_time = ChatManager.i.lastChatTime)))
+      EmpireManager.onHello(loginResponse.empire!!)
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
       updateState(ServerStateEvent.ConnectionState.CONNECTED, loginResponse.status)
       while (oldQueuedPackets != null && !oldQueuedPackets.isEmpty()) {
@@ -234,9 +227,7 @@ class Server {
     val pendingRpc = PendingRpc(id)
     pendingRpcs[id] = pendingRpc
 
-    send(Packet.Builder()
-        .rpc(rpc.newBuilder().id(id).build())
-        .build())
+    send(Packet(rpc = rpc.copy(id = id)))
 
     synchronized(pendingRpc.lock) {
       pendingRpc.lock.wait()
@@ -274,7 +265,7 @@ class Server {
       synchronized(lock) {
         if (!reconnectPending) {
           reconnectPending = true
-          App.taskRunner.runTask(Runnable {
+          App.taskRunner.runTask({
             reconnectTimeMs *= 2
             if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
               reconnectTimeMs = MAX_RECONNECT_TIME_MS
@@ -295,6 +286,7 @@ class Server {
       log.debug(">> %s", packetDebug)
     }
   }
+
   private val packetDecodeHandler: PacketDecoder.PacketHandler =
       object : PacketDecoder.PacketHandler {
     override fun onPacket(decoder: PacketDecoder, pkt: Packet, encodedSize: Int) {
@@ -305,7 +297,7 @@ class Server {
 
       if (pkt.rpc != null) {
         // We do some special-casing for RPCs
-        handleRpcResponse(pkt.rpc)
+        handleRpcResponse(pkt.rpc!!)
       } else {
         packetDispatcher.dispatch(pkt)
       }

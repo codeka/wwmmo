@@ -1,14 +1,13 @@
 package au.com.codeka.warworlds.server.handlers
 
 import au.com.codeka.warworlds.common.Log
+import au.com.codeka.warworlds.server.json.WireTypeAdapterFactory
 import com.google.common.hash.Hashing
 import com.google.common.io.BaseEncoding
 import com.google.gson.GsonBuilder
 import com.squareup.wire.Message
-import com.squareup.wire.WireTypeAdapterFactory
 import java.io.IOException
 import java.net.URI
-import java.net.URISyntaxException
 import java.nio.charset.Charset
 import java.util.*
 import java.util.regex.Matcher

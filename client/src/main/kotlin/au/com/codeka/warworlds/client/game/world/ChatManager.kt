@@ -44,10 +44,7 @@ class ChatManager private constructor() {
   /** Get the list of rooms that we're in.  */
   val rooms: List<ChatRoom>
     get() =// TODO: get all the rooms, not just the global one.
-      Lists.newArrayList(ChatRoom.Builder()
-          .id(null)
-          .name("Global")
-          .build())
+      Lists.newArrayList(ChatRoom(id = null, name = "Global"))
 
   /** Gets count messages starting from startTime and going back in time.  */
   fun getMessages(room: ChatRoom, startTime: Long, count: Int): List<ChatMessage> {
@@ -68,12 +65,8 @@ class ChatManager private constructor() {
 
   /** Send the given [ChatMessage] to the server.  */
   fun sendMessage(msg: ChatMessage) {
-    App.taskRunner.runTask(Runnable {
-      App.server.send(Packet.Builder()
-          .chat_msgs(ChatMessagesPacket.Builder()
-              .messages(Lists.newArrayList(msg))
-              .build())
-          .build())
+    App.taskRunner.runTask({
+      App.server.send(Packet(chat_msgs = ChatMessagesPacket(messages = Lists.newArrayList(msg))))
     }, Threads.BACKGROUND)
   }
 

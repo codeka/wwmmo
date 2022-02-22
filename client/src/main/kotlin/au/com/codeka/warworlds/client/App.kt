@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client
 
 import android.app.Application
 import android.os.Handler
+import android.os.Looper
 import au.com.codeka.warworlds.client.concurrency.TaskRunner
 import au.com.codeka.warworlds.client.concurrency.Threads
 import au.com.codeka.warworlds.client.game.world.ChatManager
@@ -11,6 +12,7 @@ import au.com.codeka.warworlds.client.net.auth.AuthHelper
 import au.com.codeka.warworlds.client.store.DataStore
 import au.com.codeka.warworlds.client.util.eventbus.EventBus
 import au.com.codeka.warworlds.common.Log
+import com.google.firebase.FirebaseApp
 import com.squareup.picasso.Picasso
 
 /**
@@ -30,11 +32,12 @@ class MyApp : Application() {
         Picasso.Builder(this)
             .loggingEnabled(true)
             .build())
-    Threads.UI.setThread(Thread.currentThread(), Handler())
+    Threads.UI.setThread(Thread.currentThread(), Handler(Looper.getMainLooper()))
     server.setup()
     dataStore.open(this)
     create()
     ChatManager.i.create()
+    FirebaseApp.initializeApp(this)
     log.info("App.onCreate() complete.")
   }
 

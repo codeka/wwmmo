@@ -10,7 +10,6 @@ import au.com.codeka.warworlds.common.proto.Empire
 import au.com.codeka.warworlds.common.proto.EmpireDetailsPacket
 import au.com.codeka.warworlds.common.proto.Packet
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket
-import com.google.common.base.Preconditions
 import com.google.common.collect.Lists
 import java.util.*
 
@@ -39,9 +38,10 @@ object EmpireManager {
   private var myEmpire: Empire? = null
 
   /** A placeholder [Empire] for native empires.  */
-  private val nativeEmpire = Empire.Builder()
-      .display_name(App.getString(R.string.native_colony))
-      .build()
+  private val nativeEmpire = Empire(
+    id = 0,
+    display_name = App.getString(R.string.native_colony),
+    state = Empire.EmpireState.ACTIVE)
 
   private val eventListener: Any = object : Any() {
     @EventHandler(thread = Threads.BACKGROUND)
@@ -81,7 +81,7 @@ object EmpireManager {
   /** @return true if the given empire is mine.
    */
   fun isMyEmpire(empire: Empire?): Boolean {
-    return if (empire == null || empire.id == null) {
+    return if (empire?.id == null) {
       false
     } else empire.id == getMyEmpire().id
   }
@@ -92,20 +92,15 @@ object EmpireManager {
     if (empire == null) {
       return false
     }
-    if (empire.id == null) {
-      return true
-    }
-    return if (myEmpire != null && empire.id != myEmpire!!.id) {
-      true
-    } else false
+    return myEmpire != null && empire.id != myEmpire!!.id
   }
 
   /**
-   * Gets the [Empire] with the given id. If the id is null, returns a pseudo-Empire that
+   * Gets the [Empire] with the given id. If the id is 0, returns a pseudo-Empire that
    * can be used for native colonies/fleets.
    */
-  fun getEmpire(id: Long?): Empire? {
-    if (id == null) {
+  fun getEmpire(id: Long): Empire? {
+    if (id == 0L) {
       return nativeEmpire
     }
     if (myEmpire != null && myEmpire!!.id == id) {
@@ -127,7 +122,7 @@ object EmpireManager {
     synchronized(pendingRequestLock) {
       pendingEmpireRequests.add(id)
       if (!requestPending) {
-        App.taskRunner.runTask(Runnable { sendPendingEmpireRequests() },
+        App.taskRunner.runTask({ sendPendingEmpireRequests() },
             Threads.BACKGROUND,
             EMPIRE_REQUEST_DELAY_MS)
       }
@@ -136,16 +131,12 @@ object EmpireManager {
 
   /** Called on a background thread to actually send the request empire request to the server.  */
   private fun sendPendingEmpireRequests() {
-    var empireIds: List<Long>?
+    var empireIds: List<Long>
     synchronized(pendingRequestLock) {
       empireIds = Lists.newArrayList(pendingEmpireRequests)
       pendingEmpireRequests.clear()
       requestPending = false
     }
-    App.server.send(Packet.Builder()
-        .request_empire(RequestEmpirePacket.Builder()
-            .empire_id(empireIds)
-            .build())
-        .build())
+    App.server.send(Packet(request_empire = RequestEmpirePacket(empire_id = empireIds)))
   }
 }

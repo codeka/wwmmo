@@ -1,5 +1,6 @@
 package au.com.codeka.warworlds.client.game.build
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.text.Html
@@ -10,6 +11,7 @@ import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
 import au.com.codeka.warworlds.client.R
+import au.com.codeka.warworlds.client.ctrl.fromHtml
 import au.com.codeka.warworlds.client.game.fleets.FleetListHelper
 import au.com.codeka.warworlds.client.game.world.EmpireManager
 import au.com.codeka.warworlds.common.proto.*
@@ -19,6 +21,7 @@ import com.google.common.base.Preconditions
 import java.util.*
 import kotlin.math.roundToInt
 
+@SuppressLint("ViewConstructor") // Must be constructed in code.
 class ShipsView(
     context: Context, star: Star, private val colony: Colony, buildLayout: BuildLayout)
   : ListView(context), TabContentView {
@@ -30,11 +33,11 @@ class ShipsView(
 
   private val shipListAdapter: ShipListAdapter
 
-  override fun refresh(star: Star?, colony: Colony?) {
+  override fun refresh(star: Star, colony: Colony) {
     val myEmpire = Preconditions.checkNotNull(EmpireManager.getMyEmpire())
     val fleets = ArrayList<Fleet>()
-    for (fleet in star!!.fleets) {
-      if (fleet.empire_id != null && myEmpire.id == fleet.empire_id) {
+    for (fleet in star.fleets) {
+      if (myEmpire.id == fleet.empire_id) {
         fleets.add(fleet)
       }
     }
@@ -99,7 +102,9 @@ class ShipsView(
 
     override fun getItemViewType(position: Int): Int {
       if (entries[position].heading != null) return Companion.HEADING_TYPE
-      return if (entries[position].design != null) Companion.NEW_SHIP_TYPE else Companion.EXISTING_SHIP_TYPE
+      return (
+        if (entries[position].design != null) Companion.NEW_SHIP_TYPE
+        else Companion.EXISTING_SHIP_TYPE)
     }
 
     override fun getItem(position: Int): Any {
@@ -132,8 +137,7 @@ class ShipsView(
         val notes = view.findViewById<TextView>(R.id.notes)
         val fleet = entry.fleet
         val buildRequest = entry.buildRequest
-        val design = DesignHelper.getDesign(
-            if (fleet != null) fleet.design_type else buildRequest!!.design_type)
+        val design = DesignHelper.getDesign(fleet?.design_type ?: buildRequest?.design_type!!)
         BuildViewHelper.setDesignIcon(design, icon)
         val numUpgrades = design.upgrades.size
         if (numUpgrades == 0 || fleet == null) {
@@ -152,13 +156,13 @@ class ShipsView(
         }
         if (buildRequest != null) {
           val verb = if (fleet == null) "Building" else "Upgrading"
-          row2.text = Html.fromHtml(String.format(Locale.ENGLISH,
+          row2.text = fromHtml(String.format(Locale.ENGLISH,
               "<font color=\"#0c6476\">%s:</font> %d %%, %s left", verb,
-              Math.round(buildRequest.progress * 100.0f),
+            (buildRequest.progress!! * 100.0f).roundToInt(),
               BuildHelper.formatTimeRemaining(buildRequest)))
           row3.visibility = View.GONE
           progress.visibility = View.VISIBLE
-          progress.progress = (buildRequest.progress * 100.0f).roundToInt()
+          progress.progress = (buildRequest.progress!! * 100.0f).roundToInt()
         } else {
           val upgrades = ""
           for (upgrade in design.upgrades) {
@@ -171,13 +175,13 @@ class ShipsView(
           }
           progress.visibility = View.GONE
           if (upgrades.isEmpty()) {
-            row2.text = Html.fromHtml("Upgrades: <i>none</i>")
+            row2.text = fromHtml("Upgrades: <i>none</i>")
           } else {
             row2.text = String.format(Locale.US, "Upgrades: %s", upgrades)
           }
           val requiredHtml = DesignHelper.getDependenciesHtml(colony, design)
           row3.visibility = View.VISIBLE
-          row3.text = Html.fromHtml(requiredHtml)
+          row3.text = fromHtml(requiredHtml)
         }
         if (fleet?.notes != null) {
           notes.text = fleet.notes
@@ -203,7 +207,7 @@ class ShipsView(
         BuildViewHelper.setDesignIcon(design!!, icon)
         row1.text = FleetListHelper.getFleetName(null as Fleet?, design)
         val requiredHtml = DesignHelper.getDependenciesHtml(colony, design)
-        row2.text = Html.fromHtml(requiredHtml)
+        row2.text = fromHtml(requiredHtml)
         row3.visibility = View.GONE
       }
       return view
@@ -246,11 +250,11 @@ class ShipsView(
         // TODO: upgrade
         buildLayout.showBuildSheet(entry.design)
       } else {
-        buildLayout.showProgressSheet(null, entry.buildRequest!!)
+        buildLayout.showProgressSheet(entry.buildRequest!!)
       }
     }
-    onItemLongClickListener = OnItemLongClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-      val entry = shipListAdapter.getItem(position) as ItemEntry
+    onItemLongClickListener = OnItemLongClickListener { _: AdapterView<*>?, _: View?, _: Int, _: Long ->
+     // val entry = shipListAdapter.getItem(position) as ItemEntry
       true
     }
   }

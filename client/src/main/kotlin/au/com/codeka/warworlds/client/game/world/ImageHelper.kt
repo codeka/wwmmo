@@ -64,8 +64,7 @@ object ImageHelper {
   }
 
   /** Gets the URL for fetching an empire's logo, with exact pixel dimensions (a.k.a. mdpi).  */
-  fun getEmpireImageUrlExactDimens(
-      context: Context?, empire: Empire, width: Int, height: Int): String {
+  fun getEmpireImageUrlExactDimens(empire: Empire, width: Int, height: Int): String {
     return String.format(Locale.ENGLISH, "%srender/empire/%d/%dx%d/mdpi.png",
         url, empire.id, width, height)
   }
@@ -123,13 +122,6 @@ object ImageHelper {
     val width = resolver.px2dp(view.layoutParams.width.toFloat()).toInt()
     val height = resolver.px2dp(view.layoutParams.height.toFloat()).toInt()
     bindImage(view, getEmpireImageUrl(view.context, empire, width, height))
-  }
-
-  /**
-   * Bind a building's image to the given [ImageView].
-   */
-  fun bindBuildingImage(view: ImageView, building: Building) {
-
   }
 
   /**

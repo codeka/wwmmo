@@ -50,9 +50,7 @@ class EmpireDetailsHandler : AdminHandler() {
     }
 
     // TODO: send it
-    NotificationManager.i.sendNotification(empire, Notification.Builder()
-        .debug_message(msg)
-        .build())
+    NotificationManager.i.sendNotification(empire, Notification(debug_message = msg))
     redirect("/admin/empires/$id")
   }
 

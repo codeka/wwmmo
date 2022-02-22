@@ -43,37 +43,42 @@ class LoginHandler : ProtobufRequestHandler() {
 
     // If they've given us an id_token, then verify that it's valid and that it's associated with
     // this empire.
-    if (req.id_token != null) {
-      val tokenInfo = TokenVerifier.verify(req.id_token)
-      if (tokenInfo.email != account.email) {
-        log.warning("User us signed in to an email address that is not associated with this " +
-            " account. (token email=${tokenInfo.email}, account email=${account.email})")
-        response.status = 400
+    val idToken = req.id_token
+    when {
+      idToken != null -> {
+        val tokenInfo = TokenVerifier.verify(idToken)
+        if (tokenInfo.email != account.email) {
+          log.warning("User us signed in to an email address that is not associated with this " +
+              " account. (token email=${tokenInfo.email}, account email=${account.email})")
+          response.status = 400
+          return
+        }
+
+        log.info("Account for \"${empire.get().display_name}\", email \"${account.email}\" " +
+            "successfully authenticated (${tokenInfo.displayName}).")
+      }
+      account.email_status == Account.EmailStatus.VERIFIED -> {
+        // If the account has an email address associated with it, and the user isn't signed in with
+        // that email address, then that's a problem.
+        log.warning("Account is associated with email address ${account.email} but user is not " +
+            "signed in with that email address.")
+        response.status = 401
         return
       }
-
-      log.info("Account for \"${empire.get().display_name}\", email \"${account.email}\" " +
-          "successfully authenticated (${tokenInfo.displayName}).")
-    } else if (account.email_status == Account.EmailStatus.VERIFIED) {
-      // If the account has an email address associated with it, and the user isn't signed in with
-      // that email address, then that's a problem.
-      log.warning("Account is associated with email address ${account.email} but user is not " +
-          "signed in with that email address.")
-      response.status = 401
-      return
-    } else {
-      log.info("Account for \"${empire.get().display_name}\" is anonymous.")
+      else -> {
+        log.info("Account for \"${empire.get().display_name}\" is anonymous.")
+      }
     }
 
     DataStore.i.empires().saveDevice(empire.get(), req.device_info)
     DataStore.i.stats().addLoginEvent(req, account)
-    val resp = LoginResponse.Builder().status(LoginResponse.LoginStatus.SUCCESS)
     // Tell the server socket to expect a connection from this client.
     ServerSocketManager.i.addPendingConnection(account, empire, null /* encryptionKey */)
-    resp
-        .port(8081)
-        .empire(empire.get())
-        .designs(DesignDefinitions.designs)
-    writeProtobuf(resp.build())
+    val resp = LoginResponse(
+      status = LoginResponse.LoginStatus.SUCCESS,
+      port = 8081,
+      empire = empire.get(),
+      designs = DesignDefinitions.designs)
+    writeProtobuf(resp)
   }
 }

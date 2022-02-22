@@ -1,7 +1,7 @@
 
 function setupTab(tabId) {
   $("#" + tabId).on("tab:show", function() {
-    var content = $("#" + tabId);
+    const content = $("#" + tabId);
     if (content.hasClass("loaded")) {
       return;
     }

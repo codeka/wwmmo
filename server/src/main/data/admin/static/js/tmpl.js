@@ -8,7 +8,7 @@
 (function($){
   $.fn.applyTemplate = function(data) {
     if (this.data("applyTemplate-cache") == null) {
-      var tmpl = this.html();
+      const tmpl = this.html();
 
       this.data("applyTemplate-cache", new Function("obj",
         "var p=[],print=function(){p.push.apply(p,arguments);};" +
@@ -27,8 +27,6 @@
           + "');}return p.join('');")
          );
     }
-    fn = this.data("applyTemplate-cache");
-
-    return fn(data);
+    return this.data("applyTemplate-cache")(data);
   };
 })(jQuery);
