@@ -4,7 +4,7 @@
 {% block header %}{{pm.html_header(resource_version)}}{% endblock %}
 {% block pagetitle %}Development Blog{% endblock %}
 {% block title %}Development Blog{% endblock %}
-{% block headerlinks %}<a href="/blog/rss" class="rss-btn"><img src="/img/rss.png" alt="RSS" width="32" height="32" title="RSS Feed" /></a>{% endblock %}
+{% block headerlinks %}<a href="/blog/rss" class="rss-btn"><img src="{{url_for('static', filename='img/rss.png')}}" alt="RSS" width="32" height="32" title="RSS Feed" /></a>{% endblock %}
 
 {% block maincontent %}
   <section class="content">

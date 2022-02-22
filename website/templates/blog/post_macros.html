@@ -16,16 +16,16 @@
 {%- endmacro %}
 
 {% macro html_header(resource_version) -%}
-  <link rel="stylesheet" href="/css/v{{resource_version}}/blog.css">
-  <link rel="stylesheet" href="/css/v{{resource_version}}/lightbox.css">
-  <link href="/css/v{{resource_version}}/highlight/shCore.css" rel="stylesheet" />
-  <link href="/css/v{{resource_version}}/highlight/shThemeDefault.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{url_for('static', filename='css/blog.css')}}">
+  <link rel="stylesheet" href="{{url_for('static', filename='css/lightbox.css')}}">
+  <link href="{{url_for('static', filename='css/highlight/shCore.css')}}" rel="stylesheet" />
+  <link href="{{url_for('static', filename='css/highlight/shThemeDefault.css')}}" rel="stylesheet" />
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/blog/rss" />
 
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script src="/js/v{{resource_version}}/lightbox.js"></script>
-  <script src="/js/v{{resource_version}}/highlight/shCore.js"></script>
-  <script src="/js/v{{resource_version}}/highlight/shAutoloader.js"></script>
+  <script src="{{url_for('static', filename='js/lightbox.js')}}"></script>
+  <script src="{{url_for('static', filename='js/highlight/shCore.js')}}"></script>
+  <script src="{{url_for('static', filename='js/highlight/shAutoloader.js')}}"></script>
 {%- endmacro %}
 
 
@@ -34,7 +34,7 @@
   function path() {
     var args = arguments, result = [];
     for(var i = 0; i < args.length; i++) {
-      result.push(args[i].replace('@', '/js/v{{resource_version}}/highlight/'));
+      result.push(args[i].replace('@', '{{url_for('static', filename='js/highlight/')}}'));
     }
     return result;
   }
