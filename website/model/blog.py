@@ -19,8 +19,7 @@ class Post(yaml.YAMLObject):
 
 
 def _rootPath():
-  #return os.path.join(current_app.config['DATA_PATH'], 'posts')
-  return '/home/dean/src/wwmmo/website-data/posts'
+  return os.path.join(current_app.config['DATA_PATH'], 'posts')
 
 
 def listPosts():
