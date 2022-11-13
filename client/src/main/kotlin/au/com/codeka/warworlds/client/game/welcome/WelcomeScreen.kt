@@ -257,6 +257,6 @@ class WelcomeScreen : Screen() {
     private val log = Log("WelcomeScreen")
 
     /** URL of RSS content to fetch and display in the motd view.  */
-    private const val MOTD_RSS = "http://www.war-worlds.com/forum/announcements/rss"
+    private const val MOTD_RSS = "https://www.war-worlds.com/forum/announcements/rss"
   }
 }

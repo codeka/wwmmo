@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "809181406384-2n80afd29gvlfpire5iib9m89tk4hvtb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "au.com.codeka.warworlds2",
+            "certificate_hash": "4ffd144b51ca331f789626a9756b6d1da419b379"
+          }
+        },
+        {
           "client_id": "809181406384-5vvsp7umsbcggaj6lrbn15uekep2hpvs.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

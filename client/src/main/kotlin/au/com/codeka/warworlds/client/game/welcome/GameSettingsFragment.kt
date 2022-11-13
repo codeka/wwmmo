@@ -21,24 +21,20 @@ import au.com.codeka.warworlds.client.util.GameSettings.getString
 import com.google.common.collect.ImmutableMap
 
 class GameSettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-  }
-
   override fun onCreateRecyclerView(
-      inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle): RecyclerView {
+      inflater: LayoutInflater, parent: ViewGroup, savedInstanceState: Bundle?): RecyclerView {
     val recyclerView = super.onCreateRecyclerView(inflater, parent, savedInstanceState)
     // Add a margin to allow for the action bar.
     (recyclerView.layoutParams as FrameLayout.LayoutParams).topMargin = (48 * requireContext().resources.displayMetrics.density).toInt()
     return recyclerView
   }
 
-  override fun onCreatePreferences(bundle: Bundle, rootKey: String) {
-    preferenceScreen = preferenceManager.createPreferenceScreen(context)
-    var category = PreferenceCategory(context, null)
+  override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
+    preferenceScreen = preferenceManager.createPreferenceScreen(requireContext())
+    var category = PreferenceCategory(requireContext(), null)
     category.setTitle(R.string.pref_category_chat)
     preferenceManager.preferenceScreen.addPreference(category)
-    val chatProfanityFilterPref = ListPreference(context)
+    val chatProfanityFilterPref = ListPreference(requireContext())
     chatProfanityFilterPref.key = GameSettings.Key.CHAT_PROFANITY_FILTER.toString()
     chatProfanityFilterPref.setTitle(R.string.pref_chat_profanity_filter)
     populateListPreference(
@@ -47,10 +43,10 @@ class GameSettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChang
         CHAT_PROFANITY_FILTER_DISPLAY)
     category.addPreference(chatProfanityFilterPref)
     if (BuildConfig.DEBUG) {
-      category = PreferenceCategory(context, null)
+      category = PreferenceCategory(requireContext(), null)
       category.setTitle(R.string.pref_category_debug)
       preferenceManager.preferenceScreen.addPreference(category)
-      val serverUrlPref = ListPreference(context)
+      val serverUrlPref = ListPreference(requireContext())
       serverUrlPref.key = GameSettings.Key.SERVER.toString()
       serverUrlPref.setTitle(R.string.pref_server_url)
       val urls = arrayOf(
@@ -79,14 +75,14 @@ class GameSettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChang
       actionBar.setDisplayHomeAsUpEnabled(true)
     }
     preferenceManager.sharedPreferences
-        .registerOnSharedPreferenceChangeListener(this)
+        ?.registerOnSharedPreferenceChangeListener(this)
     refreshPreferenceSummaries()
   }
 
   override fun onStop() {
     super.onStop()
     preferenceManager.sharedPreferences
-        .unregisterOnSharedPreferenceChangeListener(this)
+        ?.unregisterOnSharedPreferenceChangeListener(this)
     val actionBar = (activity as AppCompatActivity?)!!.supportActionBar
     actionBar?.hide()
   }

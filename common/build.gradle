@@ -1,10 +1,8 @@
 
 plugins {
+  id 'kotlin'
   id 'com.squareup.wire'
 }
-
-apply plugin: 'java'
-apply plugin: 'kotlin'
 
 repositories {
   mavenCentral()
@@ -36,7 +34,7 @@ test {
 
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-  implementation 'com.squareup.wire:wire-runtime:3.7.1'
+  implementation 'com.squareup.wire:wire-runtime:4.4.1'
   implementation 'com.google.code.findbugs:jsr305:3.0.2'
   implementation 'com.google.guava:guava:24.1-android'
 
