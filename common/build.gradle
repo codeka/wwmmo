@@ -32,6 +32,12 @@ test {
   useJUnitPlatform()
 }
 
+// See https://github.com/square/wire/issues/1123
+// Wire does not add the generated file to the source set, so we do it manually.0
+sourceSets {
+  main.java.srcDirs += "$buildDir/generated/source/wire"
+}
+
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
   implementation 'com.squareup.wire:wire-runtime:4.4.1'

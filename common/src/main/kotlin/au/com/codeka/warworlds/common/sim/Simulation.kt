@@ -12,11 +12,8 @@ import au.com.codeka.warworlds.common.sim.FleetHelper.hasEffect
 import au.com.codeka.warworlds.common.sim.FleetHelper.isFriendly
 import au.com.codeka.warworlds.common.sim.SimulationHelper.isInvalid
 import au.com.codeka.warworlds.common.sim.SimulationHelper.trimTimeToStep
-import com.google.common.collect.Lists
 import java.util.*
 import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 /** This class is used to simulate a [Star].  */

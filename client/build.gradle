@@ -68,12 +68,12 @@ android {
       buildConfigField "String", "DEFAULT_SERVER", "\"http://127.0.0.1:8080/\""
     }
   }
-    packagingOptions {
-        resources {
-            excludes += ['LICENSE-EPL-1.0.txt', 'LICENSE-EDL-1.0.txt']
-        }
-    }
-    namespace 'au.com.codeka.warworlds.client'
+  packagingOptions {
+      resources {
+          excludes += ['LICENSE-EPL-1.0.txt', 'LICENSE-EDL-1.0.txt']
+      }
+  }
+  namespace 'au.com.codeka.warworlds.client'
 }
 
 dependencies {
