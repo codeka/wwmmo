@@ -15,10 +15,13 @@ if (signingPropsFile.isFile()) {
 
 fun getVersionCodeFromGit(): Int {
   // Same as running:
-  // git rev-list <checked out branch name> | wc -l
-  // TODO:
-  // return Grgit.open(dir: project.buildscript.sourceFile.parentFile.parent).log().size()
-  return 1020
+  // git rev-list HEAD | wc -l
+  val proc = ProcessBuilder("git", "rev-list", "HEAD")
+    .redirectOutput(ProcessBuilder.Redirect.PIPE)
+    .redirectError(ProcessBuilder.Redirect.PIPE)
+    .start()
+  //proc.waitFor(60, TimeUnit.SECONDS)
+  return proc.inputStream.bufferedReader().readText().split("\n").size
 }
 
 android {
