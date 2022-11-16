@@ -4,7 +4,6 @@ import java.util.Properties
 plugins {
   id("com.android.application")
   id("kotlin-android")
-  id("kotlin-android-extensions")
   id("com.google.gms.google-services")
 }
 
@@ -28,8 +27,8 @@ android {
 
   defaultConfig {
     applicationId = "au.com.codeka.warworlds2"
-    minSdkVersion(21)
-    targetSdkVersion(33)
+    minSdk = 21
+    targetSdk = 33
     versionCode = getVersionCodeFromGit()
     versionName = "2.0"
     multiDexEnabled = true
@@ -74,11 +73,6 @@ android {
     debug {
       buildConfigField("String", "DEFAULT_SERVER", "\"http://127.0.0.1:8080/\"")
     }
-  }
-  packagingOptions {
-//      resources {
-//          excludes += ['LICENSE-EPL-1.0.txt', 'LICENSE-EDL-1.0.txt']
-//      }
   }
   namespace = "au.com.codeka.warworlds.client"
 }

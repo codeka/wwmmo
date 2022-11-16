@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
     (fragmentContainer!!.layoutParams as FrameLayout.LayoutParams).topMargin = marginSize
   }
 
+  @Deprecated("Deprecated in Java")
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     @Suppress("DEPRECATION")
     super.onActivityResult(requestCode, resultCode, data)
@@ -122,6 +123,7 @@ class MainActivity : AppCompatActivity() {
     return false
   }
 
+  @Deprecated("Deprecated in Java")
   override fun onBackPressed() {
     if (!screenStack!!.backTo(StarfieldScreen::class.java)) {
       super.onBackPressed()

@@ -119,6 +119,7 @@ object ViewBackgroundGenerator {
       return bitmap!!.height
     }
 
+    @Deprecated("deprecated in Drawable", replaceWith = ReplaceWith("?"))
     override fun getOpacity(): Int {
       return PixelFormat.TRANSLUCENT
     }
