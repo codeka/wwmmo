@@ -35,7 +35,9 @@ tasks.test {
 // See https://github.com/square/wire/issues/1123
 // Wire does not add the generated file to the source set, so we do it manually.0
 sourceSets {
-  getByName("main").java.srcDirs.add(File("$buildDir/generated/source/wire"))
+  all {
+    kotlin.srcDir("$buildDir/generated/source/wire")
+  }
 }
 
 dependencies {

@@ -20,7 +20,6 @@ fun getVersionCodeFromGit(): Int {
     .redirectOutput(ProcessBuilder.Redirect.PIPE)
     .redirectError(ProcessBuilder.Redirect.PIPE)
     .start()
-  //proc.waitFor(60, TimeUnit.SECONDS)
   return proc.inputStream.bufferedReader().readText().split("\n").size
 }
 
