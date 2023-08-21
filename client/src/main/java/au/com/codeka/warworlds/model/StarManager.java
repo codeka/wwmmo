@@ -186,7 +186,7 @@ public class StarManager extends BaseManager {
         Messages.StarRenameRequest.newBuilder().setStarKey(star.getKey())
             .setOldName(star.getName()).setNewName(newName);
     if (purchase != null) {
-      pb.setPurchaseInfo(PurchaseManager.i.toProtobuf(purchase.getSku(), purchase));
+      pb.setPurchaseInfo(PurchaseManager.i.toProtobuf(purchase.getProducts().get(0), purchase));
     }
 
     ApiRequest request =

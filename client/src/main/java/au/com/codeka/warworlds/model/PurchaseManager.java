@@ -12,7 +12,9 @@ import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
+import com.android.billingclient.api.QueryPurchasesParams;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
@@ -123,10 +125,12 @@ public class PurchaseManager implements PurchasesUpdatedListener {
     }
 
     for (Purchase purchase : purchases) {
-      log.info("  purchase sku=%s %s", purchase.getSku(), purchase.toString());
-      if (pendingPurchase != null && pendingPurchase.sku.equals(purchase.getSku())) {
-        pendingPurchase.handler.onPurchaseComplete(purchase);
-        pendingPurchase = null;
+      for (String sku : purchase.getProducts()) {
+        log.info("  purchase sku=%s %s", sku, purchase.toString());
+        if (pendingPurchase != null && pendingPurchase.sku.equals(sku)) {
+          pendingPurchase.handler.onPurchaseComplete(purchase);
+          pendingPurchase = null;
+        }
       }
     }
   }
@@ -152,46 +156,46 @@ public class PurchaseManager implements PurchasesUpdatedListener {
     }
 
     // check if we already own it
-    Purchase.PurchasesResult alreadyOwned =
-        billingClient.queryPurchases(BillingClient.SkuType.INAPP);
-    if (alreadyOwned.getPurchasesList() != null) {
-      for (Purchase purchase : alreadyOwned.getPurchasesList()) {
-        if (purchase.getSku().equals(sku)) {
-          log.info("Purchase already owned: %s", purchase);
-          pendingPurchase = null;
-          handler.onPurchaseComplete(purchase);
-          return;
-        }
-      }
-    }
-    log.info("Fetching SKU details.");
+    billingClient.queryPurchasesAsync(
+        QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
+        (res, alreadyOwned) -> {
+          for (Purchase purchase : alreadyOwned) {
+            if (purchase.getProducts().contains(sku)) {
+              log.info("Purchase already owned: %s", purchase);
+              pendingPurchase = null;
+              handler.onPurchaseComplete(purchase);
+              return;
+            }
+          }
+          log.info("Fetching SKU details.");
 
-    SkuDetailsParams params = SkuDetailsParams.newBuilder()
-        .setSkusList(Lists.newArrayList(sku))
-        .setType(BillingClient.SkuType.INAPP)
-        .build();
-    billingClient.querySkuDetailsAsync(params, (billingResult, skuDetailsList) -> {
-      log.info(
-          "querySkuDetails responseCode=%d debugMsg=%s",
-          billingResult.getResponseCode(),
-          billingResult.getDebugMessage());
-      if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
-        // TODO: some kind of error, handle it.
-        pendingPurchase = null;
-        return;
-      }
-      if (skuDetailsList == null) {
-        // Some other weird kind of error...
-        pendingPurchase = null;
-        return;
-      }
+          SkuDetailsParams params = SkuDetailsParams.newBuilder()
+              .setSkusList(Lists.newArrayList(sku))
+              .setType(BillingClient.SkuType.INAPP)
+              .build();
+          billingClient.querySkuDetailsAsync(params, (billingResult, skuDetailsList) -> {
+            log.info(
+                "querySkuDetails responseCode=%d debugMsg=%s",
+                billingResult.getResponseCode(),
+                billingResult.getDebugMessage());
+            if (billingResult.getResponseCode() != BillingClient.BillingResponseCode.OK) {
+              // TODO: some kind of error, handle it.
+              pendingPurchase = null;
+              return;
+            }
+            if (skuDetailsList == null) {
+              // Some other weird kind of error...
+              pendingPurchase = null;
+              return;
+            }
 
-      SkuDetails skuDetails = skuDetailsList.get(0);
-      BillingFlowParams purchaseParams = BillingFlowParams.newBuilder()
-          .setSkuDetails(skuDetails)
-          .build();
-      billingClient.launchBillingFlow(activity, purchaseParams);
-    });
+            SkuDetails skuDetails = skuDetailsList.get(0);
+            BillingFlowParams purchaseParams = BillingFlowParams.newBuilder()
+                .setSkuDetails(skuDetails)
+                .build();
+            billingClient.launchBillingFlow(activity, purchaseParams);
+          });
+        });
   }
 
   /**

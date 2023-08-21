@@ -4,7 +4,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 Properties props = new Properties()
 props.load(new FileInputStream(file('signing.properties')))
@@ -12,46 +11,43 @@ props.load(new FileInputStream(file('signing.properties')))
 dependencies {
   implementation fileTree(include: '*.jar', dir: 'libs')
   implementation fileTree(include: '*.aar', dir: 'libs')
-  implementation 'androidx.appcompat:appcompat:1.2.0'
+  implementation 'androidx.appcompat:appcompat:1.6.1'
   implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-  implementation "androidx.navigation:navigation-fragment:2.3.5"
-  implementation "androidx.navigation:navigation-ui:2.3.5"
-  implementation 'androidx.preference:preference:1.1.1'
+  implementation "androidx.navigation:navigation-fragment-ktx:2.7.0"
+  implementation "androidx.navigation:navigation-ui-ktx:2.7.0"
+  implementation 'androidx.preference:preference-ktx:1.2.1'
   implementation 'androidx.vectordrawable:vectordrawable:1.1.0'
-  implementation 'com.android.billingclient:billing:3.0.3'
-  implementation 'com.google.android.gms:play-services-auth:19.0.0'
-  implementation 'com.google.android.gms:play-services-base:17.6.0'
-  implementation 'com.google.android.gms:play-services-safetynet:17.0.0'
-  implementation 'com.google.android.material:material:1.4.0-alpha02'
-  implementation 'com.google.code.gson:gson:2.8.6'
+  implementation 'com.android.billingclient:billing:6.0.1'
+  implementation 'com.google.android.gms:play-services-auth:20.6.0'
+  implementation 'com.google.android.gms:play-services-base:18.2.0'
+  implementation 'com.google.android.gms:play-services-safetynet:18.0.1'
+  implementation 'com.google.android.material:material:1.11.0-alpha02'
+  implementation 'com.google.code.gson:gson:2.9.0'
   implementation 'com.google.firebase:firebase-analytics'
   implementation platform('com.google.firebase:firebase-bom:26.1.0')
-  implementation "com.google.firebase:firebase-messaging:21.1.0"
+  implementation "com.google.firebase:firebase-messaging:23.2.1"
   implementation 'com.google.guava:guava:24.1-android'
-  implementation 'com.google.protobuf:protobuf-java:3.12.2'
+  implementation 'com.google.protobuf:protobuf-java:3.19.3'
   implementation 'com.squareup.picasso:picasso:2.71828'
-  implementation 'com.squareup.okhttp3:okhttp:4.6.0'
+  implementation 'com.squareup.okhttp3:okhttp:4.9.3'
   implementation 'joda-time:joda-time:2.9.9'
   implementation project(':common')
   implementation project(':planet-render')
 }
 
 android {
-  compileSdkVersion 30
-  buildToolsVersion '30.0.2'
-
-  // TODO: remove the dependency on this.
+    // TODO: remove the dependency on this.
   useLibrary 'org.apache.http.legacy'
 
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+  java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
   }
 
   defaultConfig {
+    compileSdk 34
     multiDexEnabled true
     minSdkVersion 21
-    targetSdkVersion 30
+    targetSdkVersion 34
     vectorDrawables.useSupportLibrary = true
   }
 
@@ -98,6 +94,15 @@ android {
       signingConfig signingConfigs.release
     }
   }
+    buildFeatures {
+        aidl true
+    }
+    namespace 'au.com.codeka.warworlds'
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+  buildToolsVersion '34.0.0'
 }
 
 // This task copies the buildings.xml and ships.xml file from the server directory so that we don't

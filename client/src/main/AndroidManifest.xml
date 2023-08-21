@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="au.com.codeka.warworlds"
-  android:installLocation="auto"
+        android:installLocation="auto"
   android:largeHeap="@bool/largeHeap"
   android:versionCode="1045"
   android:versionName="1.0.1045">
@@ -50,7 +49,8 @@
     <!-- Main activity -->
     <activity
       android:name="au.com.codeka.warworlds.MainActivity"
-      android:launchMode="singleTop">
+      android:launchMode="singleTop"
+      android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <action android:name="android.intent.action.VIEW" />
