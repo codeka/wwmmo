@@ -42,6 +42,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
     if (this.isInEditMode) {
       return
     }
+
     App.eventBus.register(eventHandler)
     refreshMessages()
   }

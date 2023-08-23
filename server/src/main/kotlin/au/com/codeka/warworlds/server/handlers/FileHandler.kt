@@ -16,17 +16,23 @@ open class FileHandler(private val basePath: String) : RequestHandler() {
   }
 
   override fun get() {
-    val contentType = when {
-      path.endsWith(".css") -> "text/css"
-      path.endsWith(".js") -> "text/javascript"
-      path.endsWith(".png") -> "image/png"
-      path.endsWith(".ico") -> "image/x-icon"
+    var file = File(basePath + path)
+    if (file.isDirectory) {
+      file = File(file, "index.html")
+    }
+
+    val contentType = when (file.extension) {
+      "css" -> "text/css"
+      "js" -> "text/javascript"
+      "png" -> "image/png"
+      "ico" -> "image/x-icon"
+      "html" -> "text/html"
       else -> "text/plain"
     }
     response.contentType = contentType
     response.setHeader("Content-Type", contentType)
     try {
-      val ins = FileInputStream(File(basePath + path))
+      val ins = FileInputStream(file)
       val outs = response.outputStream
       ByteStreams.copy(ins, outs)
       ins.close()
