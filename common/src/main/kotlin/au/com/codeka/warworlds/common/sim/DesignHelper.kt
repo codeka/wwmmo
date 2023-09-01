@@ -31,7 +31,7 @@ object DesignHelper {
 
   /** Gets the display name of the given design, correctly pluralized.  */
   fun getDesignName(design: Design, plural: Boolean): String {
-    return design.display_name.toString() + if (plural) "s" else ""
+    return design.display_name + if (plural) "s" else ""
   }
 
   fun getDependenciesHtml(colony: Colony, design: Design): String {

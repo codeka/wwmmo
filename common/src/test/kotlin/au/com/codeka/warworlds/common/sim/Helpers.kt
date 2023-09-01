@@ -1,8 +1,10 @@
 package au.com.codeka.warworlds.common.sim
 
+import au.com.codeka.warworlds.common.Vector2
 import au.com.codeka.warworlds.common.proto.*
 import com.google.common.collect.Lists
 import java.util.ArrayList
+import java.util.Locale
 
 
 /**
@@ -22,9 +24,17 @@ fun makeStar(
     fleets = fleets, empire_stores = empire_stores)
 }
 
-/**
- * Initializes some designs.
- */
+/** Helper for making a planet. */
+fun makePlanet(
+  index: Int, planetType: Planet.Type = Planet.Type.TERRAN,
+  populationCongeniality: Int = 50, farmingCongeniality: Int = 50, miningCongeniality: Int = 50,
+  energyCongeniality: Int = 50, colony: Colony? = null): Planet {
+  return Planet(index, planet_type = planetType, population_congeniality = populationCongeniality,
+    farming_congeniality = farmingCongeniality, mining_congeniality = miningCongeniality,
+    energy_congeniality = energyCongeniality, colony = colony)
+}
+
+/** Initializes some designs. */
 fun initDesign() {
   DesignDefinitions.init(
     Designs(
@@ -51,4 +61,17 @@ fun initDesign() {
           population = 12f))
     ))
   )
+}
+
+class ReportingLogHandler : Simulation.BasicLogHandler() {
+  var errors = ArrayList<String>()
+
+  override fun error(format: String, vararg args: Any?) {
+    errors.add(String.format(Locale.US, format, args))
+    super.error(format, *args)
+  }
+
+  override fun write(message: String) {
+    super.write(message)
+  }
 }

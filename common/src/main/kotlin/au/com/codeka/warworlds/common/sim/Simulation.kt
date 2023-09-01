@@ -913,18 +913,39 @@ class Simulation constructor(
    * of debug log messages during the simulation process.
    */
   interface LogHandler {
+    /** Called to set the name of the star we are simulating. */
     fun setStarName(starName: String?)
-    fun log(message: String)
+
+    /** Log a debug message. */
+    fun log(format: String, vararg args: Any?)
+
+    /**
+     * Log an error message. In production, this is usually just logged as well, but can be used
+     * to detect errors in tests.
+     */
+    fun error(format: String, vararg args: Any?)
   }
 
-  private class BasicLogHandler : LogHandler {
+  /**
+   * A default implementation of LogHandler that you can use to just override the write() method.
+   */
+  open class BasicLogHandler : LogHandler {
     private var starName: String? = null
+
+    open fun write(message: String) {
+      log.info(message)
+    }
+
     override fun setStarName(starName: String?) {
       this.starName = starName
     }
 
-    override fun log(message: String) {
-      log.info("$starName - $message")
+    override fun log(format: String, vararg args: Any?) {
+      write("$starName - ${String.format(Locale.US, format, args)}")
+    }
+
+    override fun error(format: String, vararg args: Any?) {
+      write("$starName - ERROR - ${String.format(Locale.US, format, args)}")
     }
 
     companion object {

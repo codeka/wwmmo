@@ -81,7 +81,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       StarModification.Type.UPGRADE_BUILDING -> applyUpgradeBuilding(star, modification, logHandler)
       StarModification.Type.ATTACK_COLONY -> applyAttackColony(star, modification, logHandler)
       else -> {
-        logHandler.log("Unknown or unexpected modification type: ${modification.type}")
+        logHandler.error("Unknown or unexpected modification type: ${modification.type}")
         log.error("Unknown or unexpected modification type: ${modification.type}")
       }
     }
@@ -92,8 +92,12 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.Type.COLONIZE)
-    modification.empire_id!!
     logHandler.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
+
+    if (modification.empire_id == null || modification.planet_index == null) {
+      logHandler.error("Invalid request: $modification")
+      return
+    }
 
     // When we destroy the colonyship, we'll take it's energy and add it to the star's supply.
     var remainingFuel = 0f
@@ -124,11 +128,11 @@ class StarModifier(private val identifierGenerator: () -> Long) {
         }
       }
       if (!found) {
-        logHandler.log("  no colonyship, cannot colonize.")
+        logHandler.error("  no colonyship, cannot colonize.")
         return
       }
     }
-    star.planets[modification.planet_index!!].colony = MutableColony(Colony(
+    star.planets[modification.planet_index].colony = MutableColony(Colony(
             cooldown_end_time = System.currentTimeMillis() + 15 * Time.MINUTE,
             empire_id = modification.empire_id,
             focus = ColonyFocus(
@@ -754,9 +758,8 @@ class StarModifier(private val identifierGenerator: () -> Long) {
     private val log = Log("StarModifier")
     private const val HOURS_MS = 3600000L
 
-    val EMPTY_LOG_HANDLER: Simulation.LogHandler = object : Simulation.LogHandler {
-      override fun setStarName(starName: String?) {}
-      override fun log(message: String) {}
+    val EMPTY_LOG_HANDLER: Simulation.LogHandler = object : Simulation.BasicLogHandler() {
+      override fun write(message: String) {}
     }
   }
 }

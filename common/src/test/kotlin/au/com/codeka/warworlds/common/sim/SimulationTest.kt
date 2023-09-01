@@ -39,15 +39,9 @@ fun beCloseTo(expected: Float, decimalPlaces: Int) = object : Matcher<Float> {
 
 /** Tests for [Simulation]. */
 class SimulationTest {
-  private val logHandler: Simulation.LogHandler = object : Simulation.LogHandler {
-    private var starName: String? = null
-
-    override fun setStarName(starName: String?) {
-      this.starName = starName
-    }
-
-    override fun log(message: String) {
-      println(String.format("%s : %s", starName, message))
+  private val logHandler: Simulation.LogHandler = object : Simulation.BasicLogHandler() {
+    override fun write(message: String) {
+      println(String.format(message))
     }
   }
 
