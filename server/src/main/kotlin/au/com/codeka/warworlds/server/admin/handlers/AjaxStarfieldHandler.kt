@@ -179,14 +179,19 @@ class AjaxStarfieldHandler : AjaxHandler() {
     SectorManager.i.resetSector(SectorCoord(x = x, y = y))
   }
 
-  private class LogHandler internal constructor(private val logMessages: StringBuilder)
+  private class LogHandler constructor(private val logMessages: StringBuilder)
       : Simulation.LogHandler {
     override fun setStarName(starName: String?) {
       // ignore.
     }
 
-    override fun log(message: String) {
-      logMessages.append(message)
+    override fun error(message: String, vararg args: Any?) {
+      logMessages.append(String.format(message, args))
+      logMessages.append("\n")
+    }
+
+    override fun log(message: String, vararg args: Any?) {
+      logMessages.append(String.format(message, args))
       logMessages.append("\n")
     }
   }

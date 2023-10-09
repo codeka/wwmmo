@@ -132,7 +132,7 @@ class StarManager private constructor() {
       logHandler: Simulation.LogHandler) {
     synchronized(star.lock) {
       val mutableStar = MutableStar.from(star.get())
-      starModifier.modifyStar(mutableStar, modifications, auxStars, logHandler = logHandler)
+      starModifier.withLog(logHandler).modifyStar(mutableStar, modifications, auxStars)
       completeActions(star, mutableStar, logHandler)
       star.set(mutableStar.build())
     }
@@ -185,36 +185,33 @@ class StarManager private constructor() {
           if (design.design_kind == Design.DesignKind.BUILDING) {
             if (br.buildingId != null) {
               // It's an existing building that we're upgrading.
-              starModifier.modifyStar(mutableStar,
+              starModifier.withLog(logHandler).modifyStar(mutableStar,
                   StarModification(
                       type = StarModification.Type.UPGRADE_BUILDING,
                       colony_id = colony.id,
                       empire_id = colony.empireId,
                       building_id = br.buildingId),
-                  sitReports = sitReports,
-                  logHandler = logHandler)
+                  sitReports = sitReports)
             } else {
               // It's a new building that we're creating.
-              starModifier.modifyStar(
+              starModifier.withLog(logHandler).modifyStar(
                   mutableStar,
                   StarModification(
                       type = StarModification.Type.CREATE_BUILDING,
                       colony_id = colony.id,
                       empire_id = colony.empireId,
                       design_type = br.designType),
-                  sitReports = sitReports,
-                  logHandler = logHandler)
+                  sitReports = sitReports)
             }
           } else {
-            starModifier.modifyStar(
+            starModifier.withLog(logHandler).modifyStar(
                 mutableStar,
                 StarModification(
                     type = StarModification.Type.CREATE_FLEET,
                     empire_id = colony.empireId,
                     design_type = br.designType,
                     count = br.count),
-                sitReports = sitReports,
-                logHandler = logHandler)
+                sitReports = sitReports)
           }
 
           // Subtract the minerals it used last turn (since that won't have happening in the simulation)

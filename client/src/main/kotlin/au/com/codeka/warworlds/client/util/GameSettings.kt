@@ -100,7 +100,11 @@ object GameSettings {
   private val settingChangeHandlers = ArrayList<(Key) -> Unit>()
 
   private val onPrefChangedListener = object : SharedPreferences.OnSharedPreferenceChangeListener {
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, keyName: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, keyName: String?) {
+      if (keyName == null) {
+        return
+      }
+
       val key: Key
       try {
         key = Key.valueOf(keyName)

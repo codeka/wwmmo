@@ -87,7 +87,7 @@ class GameSettingsFragment : PreferenceFragmentCompat(), OnSharedPreferenceChang
     actionBar?.hide()
   }
 
-  override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+  override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String?) {
     refreshPreferenceSummaries()
   }
 

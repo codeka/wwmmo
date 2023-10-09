@@ -1,6 +1,6 @@
 package au.com.codeka.warworlds.client.game.starfield
 
-import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.SimpleOnScaleGestureListener
@@ -8,7 +8,6 @@ import android.view.View
 import android.view.View.OnTouchListener
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.ScaleGestureDetectorCompat
-import com.google.common.base.Preconditions
 
 /**
  * Wraps both a [GestureDetectorCompat] and a [ScaleGestureDetector] and combines them into one set
@@ -74,14 +73,14 @@ class StarfieldGestureDetector(private val view: View, private val callback: Cal
     true
   }
 
-  private val gestureListener: SimpleOnGestureListener = object : SimpleOnGestureListener() {
+  private val gestureListener: GestureDetector.SimpleOnGestureListener = object : GestureDetector.SimpleOnGestureListener() {
     override fun onScroll(
-        event1: MotionEvent, event2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+        event1: MotionEvent?, event2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
       callback.onScroll(distanceX, distanceY)
       return true
     }
 
-    override fun onFling(event1: MotionEvent, event2: MotionEvent,
+    override fun onFling(event1: MotionEvent?, event2: MotionEvent,
                          velocityX: Float, velocityY: Float): Boolean {
       callback.onFling(velocityX, velocityY)
       return true

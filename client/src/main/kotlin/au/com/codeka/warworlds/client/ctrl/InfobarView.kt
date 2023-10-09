@@ -27,6 +27,7 @@ class InfobarView(context: Context?, attrs: AttributeSet?) : FrameLayout(context
   private val disconnectedIcon: ImageView
   private var lastConnectionState: ServerStateEvent.ConnectionState? = null
   private var lastPacketTime: Long = 0
+
   fun hideEmpireName() {
     empireName.visibility = View.GONE
   }

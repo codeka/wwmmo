@@ -34,6 +34,16 @@ fun makePlanet(
     energy_congeniality = energyCongeniality, colony = colony)
 }
 
+fun makeFleet(
+  id: Long, empire_id: Long = 0, design_type: Design.DesignType = Design.DesignType.FIGHTER,
+  fuel_amount: Float = 500.0f, num_ships: Float = 10.0f,
+  stance: Fleet.FLEET_STANCE = Fleet.FLEET_STANCE.AGGRESSIVE,
+  state: Fleet.FLEET_STATE = Fleet.FLEET_STATE.IDLE): Fleet {
+  return Fleet(id, empire_id = empire_id, design_type = design_type, fuel_amount = fuel_amount,
+    num_ships = num_ships, stance = stance, state = state)
+}
+
+
 /** Initializes some designs. */
 fun initDesign() {
   DesignDefinitions.init(
@@ -63,15 +73,11 @@ fun initDesign() {
   )
 }
 
-class ReportingLogHandler : Simulation.BasicLogHandler() {
-  var errors = ArrayList<String>()
+class ErrorWhileSimulatingException(msg: String) : Exception(msg)
 
+/** A log handler that throws an exception when an error is logged. */
+class ExceptionLogHandler : Simulation.BasicLogHandler() {
   override fun error(format: String, vararg args: Any?) {
-    errors.add(String.format(Locale.US, format, args))
-    super.error(format, *args)
-  }
-
-  override fun write(message: String) {
-    super.write(message)
+    throw ErrorWhileSimulatingException(String.format(Locale.US, format, args))
   }
 }

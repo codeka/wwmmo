@@ -17,7 +17,15 @@ import kotlin.math.ceil
 import kotlin.math.max
 
 /** Class for handling modifications to a star. */
-class StarModifier(private val identifierGenerator: () -> Long) {
+class StarModifier(
+  private val identifierGenerator: () -> Long) {
+  private var log: Simulation.LogHandler = EMPTY_LOG_HANDLER
+
+  fun withLog(log: Simulation.LogHandler): StarModifier {
+    this.log = log
+    return this
+  }
+
   /**
    * Modify a star, and possibly other auxiliary stars.
    */
@@ -25,9 +33,8 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modification: StarModification,
       auxStars: Collection<Star>? = null,
-      sitReports: MutableMap<Long, SituationReport>? = null,
-      logHandler: Simulation.LogHandler? = null) {
-    modifyStar(star, Lists.newArrayList(modification), auxStars, sitReports, logHandler)
+      sitReports: MutableMap<Long, SituationReport>? = null) {
+    modifyStar(star, Lists.newArrayList(modification), auxStars, sitReports)
   }
 
   /**
@@ -40,8 +47,6 @@ class StarModifier(private val identifierGenerator: () -> Long) {
    * @param modifications The list of [StarModification]s to apply.
    * @param sitReports If specified, we'll populate the situation reports whenever something report-
    *        worthy happens (usually combat).
-   * @param logHandler An optional [Simulation.LogHandler] that we'll pass through all log
-   *        messages to.
    * @throws SuspiciousModificationException when the modification seems suspicious, or isn't
    *         otherwise allowed (e.g. you're trying to modify another empire's star, for example).
    */
@@ -49,9 +54,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
       star: MutableStar,
       modifications: Collection<StarModification>,
       auxStars: Collection<Star>? = null,
-      sitReports: MutableMap<Long, SituationReport>? = null,
-      logHandler: Simulation.LogHandler? = null) {
-    val log = logHandler ?: EMPTY_LOG_HANDLER
+      sitReports: MutableMap<Long, SituationReport>? = null) {
     log.log("Applying " + modifications.size + " modifications.")
     if (modifications.isNotEmpty()) {
       Simulation(false).simulate(star)
@@ -128,7 +131,7 @@ class StarModifier(private val identifierGenerator: () -> Long) {
         }
       }
       if (!found) {
-        logHandler.error("  no colonyship, cannot colonize.")
+        logHandler.error("no colonyship, cannot colonize")
         return
       }
     }

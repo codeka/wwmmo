@@ -41,7 +41,7 @@ sourceSets {
 }
 
 dependencies {
-  implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.20")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.21")
   implementation("com.squareup.wire:wire-runtime:4.4.1")
   implementation("com.google.code.findbugs:jsr305:3.0.2")
   implementation("com.google.guava:guava:24.1-android")
@@ -49,4 +49,5 @@ dependencies {
   testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
   testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.1")
   testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.1")
+  testImplementation(kotlin("test"))
 }
