@@ -26,9 +26,7 @@ class StarModifier(
     return this
   }
 
-  /**
-   * Modify a star, and possibly other auxiliary stars.
-   */
+  /** Modify a star, and possibly other auxiliary stars. */
   fun modifyStar(
       star: MutableStar,
       modification: StarModification,
@@ -95,7 +93,7 @@ class StarModifier(
       modification: StarModification,
       logHandler: Simulation.LogHandler) {
     Preconditions.checkArgument(modification.type == StarModification.Type.COLONIZE)
-    logHandler.log(String.format(Locale.US, "- colonizing planet #%d", modification.planet_index))
+    logHandler.log("- colonizing planet #%d", modification.planet_index)
 
     if (modification.empire_id == null || modification.planet_index == null) {
       logHandler.error("Invalid request: $modification")
@@ -146,9 +144,7 @@ class StarModifier(
             id = identifierGenerator(),
             population = 100.0f,
             defence_bonus = 1.0f))
-    logHandler.log(String.format(Locale.US,
-        "  colonized: colony_id=%d",
-        star.planets[modification.planet_index].colony?.id))
+    logHandler.log("  colonized: colony_id=%d", star.planets[modification.planet_index].colony?.id)
 
     // if there's no storage for this empire, add one with some defaults now (only for non-natives)
     val empireId = modification.empire_id
@@ -222,9 +218,9 @@ class StarModifier(
     }
 
     // Now add the fleet itself.
-    logHandler.log(String.format(Locale.US, "- creating fleet (%s) numAttacking=%d fuel=%.2f",
+    logHandler.log("- creating fleet (%s) numAttacking=%d fuel=%.2f",
         if (attack) "attacking" else "not attacking",
-        numAttacking, fuelAmount))
+        numAttacking, fuelAmount)
     if (modification.fleet != null) {
       val fleet = MutableFleet(modification.fleet)
       fleet.id = identifierGenerator()
@@ -546,8 +542,7 @@ class StarModifier(
     val fleet = getFleet(star, modification)
     if (fleet.state != Fleet.FLEET_STATE.IDLE) {
       // Can't merge, but this isn't particularly suspicious.
-      logHandler.log(String.format(Locale.US,
-          "  main fleet %d is %s, cannot merge.", fleet.id, fleet.state))
+      logHandler.log("  main fleet %d is %s, cannot merge.", fleet.id, fleet.state)
     }
 
     var i = 0
@@ -576,8 +571,7 @@ class StarModifier(
         }
         if (thisFleet.state != Fleet.FLEET_STATE.IDLE) {
           // Again, not particularly suspicious, we'll just skip it.
-          logHandler.log(String.format(Locale.US,
-              "  fleet %d is %s, cannot merge.", thisFleet.id, thisFleet.state))
+          logHandler.log("  fleet %d is %s, cannot merge.", thisFleet.id, thisFleet.state)
           i++
           continue
         }
@@ -585,8 +579,7 @@ class StarModifier(
         // TODO: make sure it has the same upgrades, otherwise we have to remove it.
         fleet.numShips = fleet.numShips + thisFleet.numShips
         fleet.fuelAmount = fleet.fuelAmount + thisFleet.fuelAmount
-        logHandler.log(String.format(Locale.US,
-            "  removing fleet %d (num_ships=%.2f)", thisFleet.id, thisFleet.numShips))
+        logHandler.log("  removing fleet %d (num_ships=%.2f)", thisFleet.id, thisFleet.numShips)
 
         // Remove this fleet, and keep going.
         star.fleets.removeAt(i)
@@ -596,8 +589,7 @@ class StarModifier(
     }
 
     // fleetIndex might've changed since we've been deleting fleets.
-    logHandler.log(String.format(Locale.US,
-        "  updated fleet count of main fleet: %.2f", fleet.numShips))
+    logHandler.log("  updated fleet count of main fleet: %.2f", fleet.numShips)
   }
 
   private fun applyMoveFleet(
@@ -616,8 +608,8 @@ class StarModifier(
     }
     if (targetStar == null) {
       // Not suspicious, the caller made a mistake not the user.
-      logHandler.log(String.format(Locale.US,
-          "  target star #%d was not included in the auxiliary star list.", modification.star_id))
+      logHandler.log(
+        "  target star #%d was not included in the auxiliary star list.", modification.star_id)
       return
     }
 
@@ -633,13 +625,11 @@ class StarModifier(
     val fuel = design.fuel_cost_per_px!! * distance * fleet.numShips
     if (fleet.fuelAmount < fuel) {
       // Not enough fuel. We won't count it as suspicious, maybe a race condition.
-      logHandler.log(String.format(
-          Locale.US,
-          "  not enough fuel in the fleet (needed %.2f, have %.2f",
-          fuel, fleet.fuelAmount))
+      logHandler.log(
+          "  not enough fuel in the fleet (needed %.2f, have %.2f", fuel, fleet.fuelAmount)
       return
     }
-    logHandler.log(String.format(Locale.US, "  cost=%.2f", fuel))
+    logHandler.log("  cost=%.2f", fuel)
     fleet.destinationStarId = targetStar.id
     fleet.state = Fleet.FLEET_STATE.MOVING
     fleet.fuelAmount = fleet.fuelAmount - fuel.toFloat()

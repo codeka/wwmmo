@@ -31,6 +31,10 @@
     <item name="android:background">@drawable/top_pane_bg</item>
   </style>
 
+  <style name="TopSubPane">
+    <item name="android:background">@drawable/top_sub_pane_bg</item>
+  </style>
+
   <style name="ActionBar" parent="Base.Widget.AppCompat.ActionBar">
     <item name="android:background">@drawable/top_pane_bg</item>
     <item name="background">@drawable/top_pane_bg</item>

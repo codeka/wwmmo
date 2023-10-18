@@ -12,8 +12,7 @@ import au.com.codeka.warworlds.common.proto.Colony
 import au.com.codeka.warworlds.common.proto.Star
 
 /**
- * A [PagerAdapter] used by the [BuildLayout] to allow you to quickly swipe between your
- * colonies.
+ * A [PagerAdapter] used by the [BuildLayout] to allow you to quickly swipe between your colonies.
  */
 class ColonyPagerAdapter(
     private val context: Context,
@@ -35,10 +34,7 @@ class ColonyPagerAdapter(
     }
   }
 
-  /**
-   * Gets the [ColonyView] at the specified position (or null if it hasn't been created
-   * yet).
-   */
+  /** Gets the [ColonyView] at the specified position (or null if it hasn't been created yet). */
   fun getView(position: Int): ColonyView? {
     return views[position]
   }

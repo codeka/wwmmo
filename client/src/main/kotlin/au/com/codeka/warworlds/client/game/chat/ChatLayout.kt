@@ -23,6 +23,7 @@ class ChatLayout(context: Context, private val callbacks: Callbacks) : RelativeL
   private val viewPager: ViewPager
   private val bottomPane: FrameLayout
   private val adapter: ChatPagerAdapter
+
   fun refresh(rooms: List<ChatRoom>?) {
     adapter.refresh(rooms)
   }
@@ -41,6 +42,7 @@ class ChatLayout(context: Context, private val callbacks: Callbacks) : RelativeL
 
   inner class ChatPagerAdapter : PagerAdapter() {
     private val rooms: MutableList<ChatRoom> = ArrayList()
+
     fun refresh(rooms: List<ChatRoom>?) {
       this.rooms.clear()
       this.rooms.addAll(rooms!!)
