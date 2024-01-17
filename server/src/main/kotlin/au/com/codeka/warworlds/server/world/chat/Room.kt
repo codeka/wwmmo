@@ -31,7 +31,7 @@ class Room(room: ChatRoom) {
     synchronized(lock) { history.add(msg) }
     synchronized(participants) {
       for (participant in participants) {
-        participant!!.onMessage(msg)
+        participant?.onMessage(msg)
       }
     }
     DataStore.i.chat().send(chatRoom, msg)

@@ -26,9 +26,7 @@ class Participant(private val empireId: Long) {
   }
 
   fun onMessage(msg: ChatMessage) {
-    if (callback != null) {
-      callback!!.onChatMessage(Lists.newArrayList(msg))
-    }
+    callback?.onChatMessage(Lists.newArrayList(msg))
   }
 
 }

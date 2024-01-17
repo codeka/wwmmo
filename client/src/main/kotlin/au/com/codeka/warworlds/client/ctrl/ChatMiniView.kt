@@ -30,7 +30,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
   private val scrollView: ScrollView
   private val msgsContainer: LinearLayout
   private val unreadMsgCount: Button
-  private lateinit var callback: Callback
+  private var callback: Callback? = null
   private val autoTranslate = false
 
   fun setCallback(callback: Callback) {
@@ -110,7 +110,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
       //mAutoTranslate = new GlobalOptions().autoTranslateChatMessages();
       refreshUnreadCountButton()
       msgsContainer.setOnClickListener {
-        callback.showChat(null /* conversationId */)
+        callback?.showChat(null /* conversationId */)
       }
       msgsContainer.isClickable = true
       unreadMsgCount.setOnClickListener {
@@ -123,7 +123,7 @@ class ChatMiniView(context: Context?, attrs: AttributeSet?) : RelativeLayout(con
         //         break;
         //       }
         //     }
-        callback.showChat(null /* TODO: conversationId */)
+        callback?.showChat(null /* TODO: conversationId */)
       }
     }
   }

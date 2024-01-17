@@ -65,9 +65,7 @@ class ChatManager private constructor() {
 
   /** Send the given [ChatMessage] to the server.  */
   fun sendMessage(msg: ChatMessage) {
-    App.taskRunner.runTask({
-      App.server.send(Packet(chat_msgs = ChatMessagesPacket(messages = Lists.newArrayList(msg))))
-    }, Threads.BACKGROUND)
+    App.server.sendAsync(Packet(chat_msgs = ChatMessagesPacket(messages = Lists.newArrayList(msg))))
   }
 
   private val eventListener: Any = object : Any() {

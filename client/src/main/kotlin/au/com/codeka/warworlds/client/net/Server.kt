@@ -181,7 +181,7 @@ class Server {
       EmpireManager.onHello(loginResponse.empire!!)
       reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
       updateState(ServerStateEvent.ConnectionState.CONNECTED, loginResponse.status)
-      while (oldQueuedPackets != null && !oldQueuedPackets.isEmpty()) {
+      while (!oldQueuedPackets.isNullOrEmpty()) {
         send(oldQueuedPackets.remove())
       }
       var waitingForHello: ArrayList<Runnable>?
@@ -203,16 +203,26 @@ class Server {
 
   fun send(pkt: Packet) {
     synchronized(lock) {
-      if (queuedPackets != null) {
-        queuedPackets!!.add(pkt)
-      } else {
-        try {
-          packetEncoder!!.send(pkt)
-        } catch (e: IOException) {
-          log.warning("Error encoding and sending packet.", e)
-          disconnect()
-        }
+      // Exactly one of these will be null.
+      val qp = queuedPackets
+      val pe = packetEncoder
+
+      qp?.add(pkt)
+      try {
+        pe?.send(pkt)
+      } catch (e: IOException) {
+        log.warning("Error encoding and sending packet.", e)
+        disconnect()
       }
+    }
+  }
+
+  /** Helper function to send a packet on the background thread. */
+  fun sendAsync(pkt: Packet) {
+    if (Threads.BACKGROUND.isCurrentThread) {
+      send(pkt)
+    } else {
+      App.taskRunner.runTask({ send(pkt) }, Threads.BACKGROUND)
     }
   }
 
