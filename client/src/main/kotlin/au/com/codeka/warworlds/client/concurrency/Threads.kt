@@ -65,7 +65,7 @@ enum class Threads {
           thread === Thread.currentThread()
         }
         threadPool != null -> {
-          threadPool!!.isThread(this)
+          threadPool!!.ownsThread(Thread.currentThread())
         }
         else -> {
           throw IllegalStateException("thread is null and threadPool is null")
