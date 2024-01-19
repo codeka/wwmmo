@@ -3,6 +3,7 @@ package au.com.codeka.warworlds.common.sim
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.Time
 import au.com.codeka.warworlds.common.Time.toHours
+import au.com.codeka.warworlds.common.format
 import au.com.codeka.warworlds.common.proto.*
 import au.com.codeka.warworlds.common.sim.ColonyHelper.getMaxPopulation
 import au.com.codeka.warworlds.common.sim.DesignHelper.getDesign
@@ -203,9 +204,9 @@ class Simulation constructor(
   }
 
   private fun simulateStepForAllEmpires(now: Long, star: MutableStar, empireIds: Set<Long>) {
-    log("- Step [now=%d]", now)
+    log("- Step [now=$now]")
     for (empireId in empireIds) {
-      log(String.format("-- Empire [%d]", empireId))
+      log("-- Empire [${empireId}]")
       simulateStep(now, star, empireId)
     }
 
@@ -285,8 +286,8 @@ class Simulation constructor(
         colony.focus.mining = 0.25f
         colony.focus.energy = 0.25f
       }
-      log("--- Colony [planetIndex=%d] [population=%.2f / %d]",
-          planet.index, colony.population, getMaxPopulation(planet.proto))
+      log("--- Colony [planetIndex=${planet.index}]" +
+          " [population=${colony.population.format(2)} / ${getMaxPopulation(planet.proto)}]")
 
       // Calculate the output from farming this turn and add it to the star global
       val goods =
@@ -295,8 +296,8 @@ class Simulation constructor(
       colony.deltaGoods = goods
       storage.totalGoods = 0f.coerceAtLeast(storage.totalGoods + goods * dt)
       goodsDeltaPerHour += goods
-      log("    Goods: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
-          storage.totalGoods, goods, goods * dt)
+      log("    Goods: [total=${storage.totalGoods.format(2)}]" +
+          " [delta=${goods.format(2)} / hr] [this turn=${(goods * dt).format(2)}]")
 
       // calculate the output from mining this turn and add it to the star global
       val mineralsPerHour =
@@ -305,8 +306,8 @@ class Simulation constructor(
       colony.deltaMinerals = mineralsPerHour
       storage.totalMinerals = 0f.coerceAtLeast(storage.totalMinerals + mineralsPerHour * dt)
       mineralsDeltaPerHour += mineralsPerHour
-      log("    Minerals: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
-          storage.totalMinerals, mineralsPerHour, mineralsPerHour * dt)
+      log("    Minerals: [total=${storage.totalMinerals.format(2)}]" +
+          " [delta=${mineralsPerHour.format(2)} / hr] [this turn=${(mineralsPerHour * dt).format(2)}]")
 
       // calculate the output from energy this turn and add it to the star global
       val energy =
@@ -315,8 +316,8 @@ class Simulation constructor(
       colony.deltaEnergy = energy
       storage.totalEnergy = 0f.coerceAtLeast(storage.totalEnergy + energy * dt)
       energyDeltaPerHour += energy
-      log("    Energy: [total=%.2f] [delta=%.2f / hr] [this turn=%.2f]",
-          storage.totalEnergy, energy, energy * dt)
+      log("    Energy: [total=${storage.totalEnergy.format(2)}]" +
+          " [delta=${energy.format(2)} / hr] [this turn=${(energy * dt).format(2)}]")
       totalPopulation += colony.population
     }
 
@@ -347,8 +348,11 @@ class Simulation constructor(
         val totalWorkers = colony.population * colony.focus.construction
         var workersPerBuildRequest = totalWorkers / numValidBuildRequests
         val mineralsPerBuildRequest = storage.totalMinerals / numValidBuildRequests
-        log("--- Building [buildRequests=%d] [planetIndex=%d] [totalWorker=%.2f] [totalMinerals=%.2f]",
-            numValidBuildRequests, planet.index, totalWorkers, storage.totalMinerals)
+        log("--- Building" +
+            " [buildRequests=${numValidBuildRequests}]" +
+            " [planetIndex=${planet.index}]" +
+            " [totalWorker=${totalWorkers.format(2)}]" +
+            " [totalMinerals=${storage.totalMinerals.format(2)}]")
 
         // OK, we can spare at least ONE population
         if (workersPerBuildRequest < 1.0f) {
@@ -383,9 +387,13 @@ class Simulation constructor(
           //  ShipDesign.Upgrade upgrade = shipDesign.getUpgrade(br.getUpgradeID());
           //  buildCost = upgrade.getBuildCost();
           //}
-          log("---- Building [id=%d] [design=%s %s] [count=%d] cost [workers=%.2f]" +
-              " [minerals=%.2f] [start-time=%d]",  br.id, design.design_kind, design.type, br.count,
-              buildCost.population, buildCost.minerals, br.startTime)
+          log("---- Building" +
+              " [id=${br.id}]" +
+              " [design=${design.design_kind} ${design.type}]" +
+              " [count=${br.count}]" +
+              " cost [workers=${buildCost.population.format(2)}]" +
+              " [minerals=${buildCost.minerals.format(2)}]" +
+              " [start-time=br.startTime]")
 
           // The total amount of time to build something is based on the number of workers it
           // requires, if you have the right number of workers and the right amount of minerals,
@@ -393,10 +401,12 @@ class Simulation constructor(
           // available, then that fraction of progress will be made.
           val totalWorkersRequired = buildCost.population * br.count
           val totalMineralsRequired = buildCost.minerals * br.count
-          log("     Required: [population=%.2f] [minerals=%.2f]",
-              totalWorkersRequired, totalMineralsRequired)
-          log("     Available: [population=%.2f] [minerals=%.2f]",
-              workersPerBuildRequest, mineralsPerBuildRequest)
+          log("     Required:" +
+              " [population=${totalWorkersRequired.format(2)}]" +
+              " [minerals=${totalMineralsRequired.format(2)}]")
+          log("     Available:" +
+              " [population=${workersPerBuildRequest.format(2)}]" +
+              " [minerals=${mineralsPerBuildRequest.format(2)}]")
 
           // The amount of work we can do this turn is based on how much population we have (if
           // we have enough minerals) or based the min of population/minerals if we don't.
@@ -405,17 +415,18 @@ class Simulation constructor(
           var progressThisTurn =
               if (mineralsProgressThisTurn >= 1.0) populationProgressThisTurn
               else populationProgressThisTurn.coerceAtMost(mineralsProgressThisTurn)
-          log("     Progress: [this turn=%.4f (minerals=%.4f pop=%.4f] [total=%.4f]",
-              progressThisTurn,
-              mineralsProgressThisTurn,
-              populationProgressThisTurn,
-              br.progress + progressThisTurn)
+          log("     Progress:" +
+              " [this turn=${progressThisTurn.format(4)}" +
+              " (minerals=${mineralsProgressThisTurn.format(4)}" +
+              " pop=${populationProgressThisTurn.format(4)})" +
+              " [total=${(br.progress + progressThisTurn).format(4)}]")
 
           // If it started half way through this step, the progress is lessened.
           if (br.startTime > now) {
             val fraction = (startTime.toFloat() - now) / STEP_TIME
             progressThisTurn *= fraction
-            log("     Reduced progress: %.2f (fraction=%.2f)", progressThisTurn, fraction)
+            log("     Reduced progress:" +
+                " ${progressThisTurn.format(2)} (fraction=${fraction.format(2)})")
           }
           var mineralsUsedThisTurn = totalMineralsRequired.coerceAtMost(mineralsPerBuildRequest)
           if (populationProgressThisTurn < mineralsProgressThisTurn) {
@@ -426,7 +437,7 @@ class Simulation constructor(
           storage.totalMinerals = 0f.coerceAtLeast(storage.totalMinerals - mineralsUsedThisTurn)
           br.mineralsDeltaPerHour = -mineralsUsedThisTurn * STEP_TIME / Time.HOUR
           mineralsDeltaPerHour -= mineralsUsedThisTurn * STEP_TIME / Time.HOUR
-          log("     Used: [minerals=%.4f]", mineralsUsedThisTurn)
+          log("     Used: [minerals=${mineralsUsedThisTurn.format(4)}]")
 
           // what is the current amount of time we have now as a percentage of the total build
           // time?
@@ -439,8 +450,10 @@ class Simulation constructor(
               endTime = br.startTime
             }
             endTime += (STEP_TIME * fractionProgress).toLong()
-            log("     FINISHED! progress-this-turn: %.2f fraction-progress = %.2f, end-time=%d",
-                progressThisTurn, fractionProgress, endTime)
+            log("     FINISHED!" +
+                " progress-this-turn: ${progressThisTurn.format(2)}" +
+                " fraction-progress = ${fractionProgress.format(2)}" +
+                " end-time=${endTime}")
             br.progress = 1.0f
             br.progressPerStep = progressThisTurn
             br.endTime = endTime
@@ -456,15 +469,13 @@ class Simulation constructor(
           val timeForPopulationSteps = remainingWorkersRequired / workersPerBuildRequest
           val timeForMineralsHours = timeForMineralsSteps * STEP_TIME / Time.HOUR
           val timeForPopulationHours = timeForPopulationSteps * STEP_TIME / Time.HOUR
-          log("     Remaining: [minerals=%.2f hrs %.2f steps] [population=%.2f hrs %.2f steps]",
-              timeForMineralsHours,
-              timeForMineralsSteps,
-              timeForPopulationHours,
-              timeForPopulationSteps)
+          log("     Remaining:" +
+              " [minerals=${timeForMineralsHours.format(2)} hrs ${timeForMineralsSteps.format(2)} steps]" +
+              " [population=${timeForPopulationHours.format(2)} hrs ${timeForPopulationSteps.format(2)} steps]")
           val endTime =
               now + (timeForMineralsHours.coerceAtLeast(timeForPopulationHours) * Time.HOUR)
           br.endTime = endTime.roundToLong()
-          log("     Finish time: %f (now=%d)", endTime, now)
+          log("     Finish time: ${endTime.format(2)} (now=${now})")
           br.progress = br.progress + progressThisTurn
           br.progressPerStep = progressThisTurn
 
@@ -474,8 +485,7 @@ class Simulation constructor(
           val populationEfficiency = 1 - timeForPopulationHours / sumTimeInHours
           br.mineralsEfficiency = mineralsEfficiency
           br.populationEfficiency = populationEfficiency
-          log("     Efficiency: [minerals=%.3f] [population=%.3f]",
-              mineralsEfficiency, populationEfficiency)
+          log("     Efficiency: [minerals=${mineralsEfficiency}] [population=${populationEfficiency}]")
         }
       }
     }
@@ -492,8 +502,10 @@ class Simulation constructor(
     if (totalGoodsRequired > storage.totalGoods && totalGoodsRequired > 0) {
       goodsEfficiency = storage.totalGoods / totalGoodsRequired
     }
-    log("--- Updating population [goods required=%.2f] [goods available=%.2f] [efficiency=%.2f]",
-        totalGoodsRequired, storage.totalGoods, goodsEfficiency)
+    log("--- Updating population" +
+        " [goods required=${totalGoodsRequired.format(2)}]" +
+        " [goods available=${storage.totalGoods.format(2)}]" +
+        " [efficiency=${goodsEfficiency.format(2)}]")
 
     // subtract all the goods we'll need
     storage.totalGoods -= totalGoodsRequired
@@ -540,8 +552,10 @@ class Simulation constructor(
       if (newPopulation < 100.0f && colony.cooldownEndTime != null) {
         newPopulation = 100.0f
       }
-      log("    Colony[%d]: [delta=%.2f] [new=%.2f] [max=%d]",
-          planet.index, populationIncrease, newPopulation, maxPopulation)
+      log("    Colony[${planet.index}]:" +
+          " [delta=${populationIncrease}]" +
+          " [new=${newPopulation}]" +
+          " [max=${maxPopulation}]")
       colony.population = newPopulation
     }
     storage.totalGoods = storage.totalGoods.coerceAtMost(storage.maxGoods)
@@ -550,11 +564,10 @@ class Simulation constructor(
     storage.goodsDeltaPerHour = goodsDeltaPerHour
     storage.mineralsDeltaPerHour = mineralsDeltaPerHour
     storage.energyDeltaPerHour = energyDeltaPerHour
-    log(String.format(Locale.ENGLISH,
-        "-- Store: goods=%.2f (%.2f/hr) minerals=%.2f (%.2f/hr) energy=%.2f (%.2f/h)",
-        storage.totalGoods, storage.goodsDeltaPerHour,
-        storage.totalMinerals, storage.mineralsDeltaPerHour,
-        storage.totalEnergy, storage.energyDeltaPerHour))
+    log("-- Store:" +
+        " goods=${storage.totalGoods} (${storage.goodsDeltaPerHour}/hr)" +
+        " minerals=${storage.totalMinerals} (${storage.mineralsDeltaPerHour}/hr)" +
+        " energy=${storage.totalEnergy} (${storage.energyDeltaPerHour}/hr)")
   }
 
   /**
@@ -582,10 +595,10 @@ class Simulation constructor(
     val combatReport = MutableCombatReport(CombatReport(time = now))
     combatReport.fleetsBefore = star.fleets.map { it.build() }
 
-    log("Begin combat for '%s'", star.name)
+    log("Begin combat for '${star.name}'")
     var roundNumber = 1
     do {
-      log(" - Combat round %d", roundNumber)
+      log(" - Combat round ${roundNumber}")
       simulateCombatRound(star, now)
       roundNumber++
     } while (anyFleetsAttacking(star))
@@ -622,7 +635,7 @@ class Simulation constructor(
         // Work out how much attacking power this fleet has.
         val design = getDesign(fleet.designType)
         var attack = fleet.numShips * design.base_attack!!.toDouble()
-        log("   - Fleet=[%d %s] numShips=%.2f", fleet.id, design.display_name, fleet.numShips)
+        log("   - Fleet=[${fleet.id} ${design.display_name}] numShips=${fleet.numShips}")
         while (attack > 0.0) {
           val target = findTarget(star, fleet, damageCounter)
           if (target == null) {
@@ -640,8 +653,8 @@ class Simulation constructor(
               previousDamage = damageCounter[target.id]!!
               numShips -= previousDamage
             }
-            log("      Target=[%d %s] numShips=%.4f * %.2f <-- attack=%.4f",
-                target.id, targetDesign.display_name, numShips, design.base_defence!!, attack)
+            log("      Target=[${target.id} ${targetDesign.display_name}]" +
+                " numShips=${numShips} * ${design.base_defence} <-- attack=${attack}")
             numShips *= targetDesign.base_defence!!.toDouble()
             if (numShips >= attack) {
               // If there's more ships than we have attack capability, just apply the damage.
@@ -662,18 +675,16 @@ class Simulation constructor(
       for (fleet in star.fleets) {
         val damage = damageCounter[fleet.id] ?: continue
         if (fleet.numShips - damage <= EPSILON) {
-          log("      Fleet=%d destroyed (num_ships=%.4f <= damage=%.4f).",
-              fleet.id, fleet.numShips, damage)
+          log("      Fleet=${fleet.id} destroyed (num_ships=${fleet.numShips} <= damage=${damage})")
           fleet.isDestroyed = true
           fleet.numShips = 0f
         } else {
           // They'll be attacking next round (unless their stance is passive).
-          var state: Fleet.FLEET_STATE? = Fleet.FLEET_STATE.ATTACKING
+          var state: Fleet.FLEET_STATE = Fleet.FLEET_STATE.ATTACKING
           if (fleet.stance == Fleet.FLEET_STANCE.PASSIVE) {
             state = fleet.state
           }
-          log("      Fleet=%d numShips=%.8f damage=%.8f state=%s.",
-              fleet.id, fleet.numShips, damage, state!!)
+          log("      Fleet=${fleet.id} numShips=${fleet.numShips} damage=${damage} state=${state}")
           fleet.numShips -= damage.toFloat()
           fleet.state = state
         }
@@ -842,8 +853,7 @@ class Simulation constructor(
 
     // No energy transports.
     if (energyTransportIndices != null) {
-      log(" - %d energy transports available, refueling from there first",
-          energyTransportIndices.size)
+      log(" - ${energyTransportIndices.size} energy transports available, refueling from there first")
       for (energyTransportIndex in energyTransportIndices) {
         var energyTransportFleet = star.fleets[energyTransportIndex!!]
         for (i in star.fleets.indices) {
@@ -862,17 +872,17 @@ class Simulation constructor(
           }
           val availableEnergy = energyTransportFleet.fuelAmount
           if (availableEnergy > requiredEnergy) {
-            log(" - filling fleet %d (%.2f required) from energy transport %d: %.2f fuel left in "
-                + "transport",
-                fleet.id, requiredEnergy, energyTransportFleet.id,
-                energyTransportFleet.fuelAmount - requiredEnergy)
+            log(" - filling fleet ${fleet.id} (${requiredEnergy.format(2)} required) from energy" +
+                " transport ${energyTransportFleet.id}:" +
+                " ${(energyTransportFleet.fuelAmount - requiredEnergy).format(2)} fuel left in" +
+                " transport")
             energyTransportFleet.fuelAmount = availableEnergy - requiredEnergy
             star.fleets[energyTransportIndex] = energyTransportFleet
             star.fleets[i].fuelAmount = fleet.fuelAmount + requiredEnergy
           } else {
-            log(" - filling fleet %d (with %.2f fuel, %.2f required) from now-empty energy "
-                + "transport #%d",
-                fleet.id, availableEnergy, requiredEnergy, energyTransportFleet.id)
+            log(" - filling fleet ${fleet.id} (with ${availableEnergy.format(2)} fuel," +
+                " ${requiredEnergy.format(2)} required) from now-empty energy transport" +
+                " #${energyTransportFleet.id}")
             star.fleets[energyTransportIndex].fuelAmount = 0f
             star.fleets[i].fuelAmount = fleet.fuelAmount + availableEnergy
 
@@ -898,14 +908,14 @@ class Simulation constructor(
         val actual = neededFuelRemaining.coerceAtMost(storage.totalEnergy)
         fleet.fuelAmount = fleet.fuelAmount + actual
         storage.totalEnergy = storage.totalEnergy - actual
-        log("--- Fleet %d [%s x %.0f] re-fueling: %.2f",
-            fleet.id, design.display_name, fleet.numShips, actual)
+        log("--- Fleet ${fleet.id} [${design.display_name} x ${fleet.numShips.format(2)}]" +
+            " re-fueling: ${actual.format(2)}")
       }
     }
   }
 
-  private fun log(format: String, vararg args: Any) {
-    logHandler?.log(String.format(Locale.US, format, *args))
+  private fun log(msg: String) {
+    logHandler?.log(msg)
   }
 
   /**
@@ -917,13 +927,13 @@ class Simulation constructor(
     fun setStarName(starName: String?)
 
     /** Log a debug message. */
-    fun log(format: String, vararg args: Any?)
+    fun log(msg: String)
 
     /**
      * Log an error message. In production, this is usually just logged as well, but can be used
      * to detect errors in tests.
      */
-    fun error(format: String, vararg args: Any?)
+    fun error(msg: String)
   }
 
   /**
@@ -940,12 +950,12 @@ class Simulation constructor(
       this.starName = starName
     }
 
-    override fun log(format: String, vararg args: Any?) {
-      write("$starName - ${String.format(Locale.US, format, args)}")
+    override fun log(msg: String) {
+      write("$starName - ${msg}")
     }
 
-    override fun error(format: String, vararg args: Any?) {
-      write("$starName - ERROR - ${String.format(Locale.US, format, args)}")
+    override fun error(msg: String) {
+      write("$starName - ERROR - ${msg}")
     }
 
     companion object {

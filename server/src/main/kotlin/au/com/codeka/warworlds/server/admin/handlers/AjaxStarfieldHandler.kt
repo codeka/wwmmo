@@ -185,13 +185,13 @@ class AjaxStarfieldHandler : AjaxHandler() {
       // ignore.
     }
 
-    override fun error(message: String, vararg args: Any?) {
-      logMessages.append(String.format(message, args))
+    override fun error(msg: String) {
+      logMessages.append(msg)
       logMessages.append("\n")
     }
 
-    override fun log(message: String, vararg args: Any?) {
-      logMessages.append(String.format(message, args))
+    override fun log(msg: String) {
+      logMessages.append(msg)
       logMessages.append("\n")
     }
   }
