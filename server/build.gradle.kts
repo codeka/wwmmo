@@ -71,7 +71,7 @@ dependencies {
   implementation("org.simplejavamail:simple-java-mail:4.2.1")
   implementation("org.eclipse.jetty:jetty-server:9.4.27.v20200227")
   implementation("org.eclipse.jetty.websocket:websocket-server:9.4.0.v20161208")
-  implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.21")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
   implementation("org.xerial:sqlite-jdbc:3.36.0")
   implementation("com.patreon:patreon:0.4.2")
   implementation(project(":common"))

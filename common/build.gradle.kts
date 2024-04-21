@@ -41,7 +41,7 @@ sourceSets {
 }
 
 dependencies {
-  implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.21")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.22")
   implementation("com.squareup.wire:wire-runtime:4.4.1")
   implementation("com.google.code.findbugs:jsr305:3.0.2")
   implementation("com.google.guava:guava:24.1-android")
