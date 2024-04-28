@@ -2,6 +2,7 @@ package au.com.codeka.warworlds.client.opengl
 
 import android.opengl.Matrix
 import android.view.animation.DecelerateInterpolator
+import au.com.codeka.warworlds.client.game.starfield.scene.StarfieldManager
 
 /** The [Camera] can be used to draw a [Scene], scroll and zoom around. */
 class Camera {
@@ -20,14 +21,27 @@ class Camera {
   private val projMatrix = FloatArray(16)
   private val viewMatrix = FloatArray(16)
 
+  private var viewProjMatrixDirty = true
   val viewProjMatrix = FloatArray(16)
     get() {
-      Matrix.setIdentityM(viewMatrix, 0)
-      Matrix.scaleM(viewMatrix, 0, zoomAmount, zoomAmount, 1.0f)
-      Matrix.translateM(viewMatrix, 0, translateX, translateY, 0.0f)
-      Matrix.multiplyMM(field, 0, projMatrix, 0, viewMatrix, 0)
+      if (viewProjMatrixDirty) {
+        Matrix.setIdentityM(viewMatrix, 0)
+        Matrix.scaleM(viewMatrix, 0, zoomAmount, zoomAmount, 1.0f)
+        Matrix.translateM(viewMatrix, 0, translateX, translateY, 0.0f)
+        Matrix.multiplyMM(field, 0, projMatrix, 0, viewMatrix, 0)
+
+        Matrix.invertM(inverseViewProjMatrix, 0, field, 0)
+      }
+
       return field
     }
+
+  /**
+   * The inverse of the viewProjMatrix, useful for projecting from screen coordinates to world
+   * coordinates, for example.
+   */
+  var inverseViewProjMatrix = FloatArray(16)
+    private set
 
   var zoomAmount = 0f
     private set
@@ -70,6 +84,18 @@ class Camera {
     }
   }
 
+  /** "Unproject" the given screen-space x,y into world coordinates. */
+  fun unproject(x: Float, y: Float): FloatArray {
+    var inputVector = FloatArray(4)
+    inputVector[0] = ((x / screenWidth) - 0.5f) * 2.0f
+    inputVector[1]  = -((y / screenHeight) - 0.5f) * 2.0f
+    inputVector[2] = 0.0f
+    inputVector[3] = 1.0f
+    var outputVector = FloatArray(4)
+    Matrix.multiplyMV(outputVector, 0, inverseViewProjMatrix, 0, inputVector, 0)
+    return outputVector
+  }
+
   /**
    * Translate by the given amount.
    *
@@ -82,8 +108,11 @@ class Camera {
     val scaledY = y / (zoomAmount * 0.5f)
     translateX += scaledX
     translateY += scaledY
-    if (listener != null && !silent) {
-      listener!!.onCameraTranslate(-translateX, translateY, scaledX, scaledY)
+    viewProjMatrixDirty = true
+    listener?.let {
+      if (!silent) {
+        it.onCameraTranslate(-translateX, translateY, scaledX, scaledY)
+      }
     }
   }
 
@@ -97,6 +126,7 @@ class Camera {
   fun warpTo(x: Float, y: Float) {
     translateX = x
     translateY = y
+    viewProjMatrixDirty = true
   }
 
   fun fling(x: Float, y: Float) {
@@ -114,6 +144,7 @@ class Camera {
     if (zoomAmount < 0.25f) {
       zoomAmount = 0.25f
     }
+    viewProjMatrixDirty = true
   }
 
   init {

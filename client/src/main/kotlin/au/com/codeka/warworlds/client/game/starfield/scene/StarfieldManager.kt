@@ -1,6 +1,7 @@
 package au.com.codeka.warworlds.client.game.starfield.scene
 
 import android.content.Context
+import android.opengl.Matrix
 import androidx.collection.LongSparseArray
 import androidx.core.util.Pair
 import au.com.codeka.warworlds.client.App
@@ -56,11 +57,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     private set
   private var centerSectorX: Long = 0
   private var centerSectorY: Long = 0
-  private var sectorRadius = 0
 
   // The following are the top/left/right/bottom of the rectangle of sectors that we're currently
-  // listening to for updates. Generally this will be the same as centreSectorX,centreSectorY +
-  // sectorRadius, but not always (in particular, just before you call updateSectorBounds())
+  // listening to for updates.
   private var sectorLeft: Long = 0
   private var sectorTop: Long = 0
   private var sectorRight: Long = 0
@@ -262,10 +261,10 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private fun warpTo(sectorX: Long, sectorY: Long, offsetX: Float, offsetY: Float) {
     centerSectorX = sectorX
     centerSectorY = sectorY
-    sectorRadius = 1
     log.info("WarpTo: $centerSectorX, $centerSectorY - $offsetX, $offsetY")
-    updateSectorBounds(centerSectorX - sectorRadius, centerSectorY - sectorRadius,
-        centerSectorX + sectorRadius, centerSectorY + sectorRadius, true)
+    // Temporarily fetch a radius of 1 around the new center location.
+    updateSectorBounds(
+        centerSectorX - 1, centerSectorY - 1, centerSectorX + 1, centerSectorY + 1, true)
     camera.warpTo(
         scene.dimensionResolver.dp2px(-offsetX),
         scene.dimensionResolver.dp2px(offsetY))
@@ -280,12 +279,29 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   }
 
   /**
+   * Calculate the new sector bounds, and update to it. The new sector bounds will be calculated by
+   * projecting the top-left and bottom right corner of the screen and seeing what sector those
+   * correspond to. That way, we'll always be showing stars that fill the whole screen.
+   */
+  private fun updateSectorBounds() {
+    val topLeft = camera.unproject(0.0f, 0.0f)
+    val bottomRight = camera.unproject(camera.screenWidth, camera.screenHeight)
+
+    val left = centerSectorX + scene.dimensionResolver.px2dp(topLeft[0] / 1024.0f).roundToInt()
+    val top = centerSectorY + scene.dimensionResolver.px2dp(-topLeft[1] / 1024.0f).roundToInt()
+    val right = centerSectorX + scene.dimensionResolver.px2dp(bottomRight[0] / 1024.0f).roundToInt()
+    val bottom = centerSectorY + scene.dimensionResolver.px2dp(-bottomRight[1] / 1024.0f).roundToInt()
+
+    updateSectorBounds(left, top, right, bottom, /*removeAllSectors=*/false)
+  }
+
+  /**
    * Update the sector "bounds", that is the area of the universe that we're currently looking at.
    * We'll need to remove stars that have gone out of bounds, add a background for stars that are
    * now in-bounds, and ask the server to keep us updated of the new stars.
    *
    * @param removeAllSectors If true, we'll clear out all the existing sectors and reload them all.
-   *        If false, we'll keep sectors that we already have an not re-request those. Only pass
+   *        If false, we'll keep sectors that we already have and not re-request those. Only pass
    *        true if you have not modified centerSectorX and centerSectorY
    */
   private fun updateSectorBounds(
@@ -381,16 +397,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
    * @param y The distance the camera has translated from the origin in the Y direction.
    */
   private fun onCameraTranslate(x: Float, y: Float) {
-    val newCentreX = centerSectorX + scene.dimensionResolver.px2dp(x / 1024.0f).roundToInt()
-    val newCentreY = centerSectorY + scene.dimensionResolver.px2dp(y / 1024.0f).roundToInt()
-    val top = newCentreY - sectorRadius
-    val left = newCentreX - sectorRadius
-    val bottom = newCentreY + sectorRadius
-    val right = newCentreX + sectorRadius
-    if (top != sectorTop || left != sectorLeft || bottom != sectorBottom || right != sectorRight) {
-      log.info("onCameraTranslate: bounds=%d,%d - %d,%d", left, top, right, bottom)
-      updateSectorBounds(left, top, right, bottom, false)
-    }
+    updateSectorBounds()
   }
 
   /** Create a [Sprite] to represent the given [Star].  */

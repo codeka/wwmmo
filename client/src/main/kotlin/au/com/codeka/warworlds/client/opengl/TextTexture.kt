@@ -8,14 +8,15 @@ import android.opengl.GLES20
 import android.opengl.GLUtils
 import au.com.codeka.warworlds.common.Log
 import java.util.*
+import kotlin.math.ceil
 
 /**
  * This is a [Texture] which is used to back an image for drawing arbitrary strings.
  */
 class TextTexture : Texture() {
-  private val bitmap: Bitmap
-  private val canvas: Canvas
-  private val paint: Paint
+  private val bitmap: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+  private val canvas: Canvas = Canvas(bitmap)
+  private val paint: Paint = Paint()
   private val characters: MutableMap<Char, Rect> = HashMap()
   private var id: Int
   private var dirty = false
@@ -49,13 +50,6 @@ class TextTexture : Texture() {
   val textHeight: Float
     get() = TEXT_HEIGHT.toFloat()
 
-  /** Ensures that we have cached all the characters needed to draw every character in the string. */
-  fun ensureText(str: String) {
-    for (i in 0 until str.length) {
-      ensureChar(str[i])
-    }
-  }
-
   /** Gets the bounds of the given char.  */
   fun getCharBounds(ch: Char): Rect {
     var bounds = characters[ch]
@@ -66,12 +60,19 @@ class TextTexture : Texture() {
     return bounds!!
   }
 
+  /** Ensures that we have cached all the characters needed to draw every character in the string. */
+  private fun ensureText(str: String) {
+    for (element in str) {
+      ensureChar(element)
+    }
+  }
+
   private fun ensureChar(ch: Char) {
     if (characters.containsKey(ch)) {
       return
     }
     val str = String(charArrayOf(ch))
-    val charWidth = Math.ceil(paint.measureText(str).toDouble()).toInt()
+    val charWidth = ceil(paint.measureText(str).toDouble()).toInt()
     if (currRowOffsetX + charWidth > width) {
       currRowOffsetX = 0
       currRowOffsetY += ROW_HEIGHT
@@ -100,9 +101,6 @@ class TextTexture : Texture() {
   }
 
   init {
-    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-    canvas = Canvas(bitmap)
-    paint = Paint()
     paint.textSize = TEXT_HEIGHT.toFloat()
     paint.isAntiAlias = true
     paint.setARGB(255, 255, 255, 255)
