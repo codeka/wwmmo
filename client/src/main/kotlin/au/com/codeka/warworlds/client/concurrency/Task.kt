@@ -1,6 +1,5 @@
 package au.com.codeka.warworlds.client.concurrency
 
-import au.com.codeka.warworlds.client.concurrency.RunnableTask.*
 import kotlin.collections.ArrayList
 
 /**
@@ -77,7 +76,7 @@ open class Task<P, R> internal constructor(private val taskRunner: TaskRunner) {
    * @return The new task (so you can chain .then().then().then() calls to get tasks to run one
    * after the other.
    */
-  fun then(runnable: Runnable?, thread: Threads): Task<R, Void> {
+  fun then(thread: Threads, runnable: Runnable): Task<R, Void> {
     return then(RunnableTask(taskRunner, runnable, thread))
   }
 
@@ -90,33 +89,7 @@ open class Task<P, R> internal constructor(private val taskRunner: TaskRunner) {
    * @return The new task (so you can chain .then().then().then() calls to get tasks to run one
    * after the other.
    */
-  fun then(runnable: RunnableP<R>?, thread: Threads): Task<R, Void> {
-    return then(RunnableTask(taskRunner, runnable, thread))
-  }
-
-  /**
-   * Queues the given runnable to run after this task. If this task returns a result, obviously the
-   * runnable will not know what it was.
-   *
-   * @param runnable The runnable to run after this task completes.
-   * @param thread The [Threads] on which to run the runnable.
-   * @return The new task (so you can chain .then().then().then() calls to get tasks to run one
-   * after the other.
-   */
-  fun <RR> then(runnable: RunnableR<RR>?, thread: Threads): Task<R, RR> {
-    return then(RunnableTask(taskRunner, runnable, thread))
-  }
-
-  /**
-   * Queues the given runnable to run after this task. If this task returns a result, obviously the
-   * runnable will not know what it was.
-   *
-   * @param runnable The runnable to run after this task completes.
-   * @param thread The [Threads] on which to run the runnable.
-   * @return The new task (so you can chain .then().then().then() calls to get tasks to run one
-   * after the other.
-   */
-  fun <RR> then(runnable: RunnablePR<R, RR>?, thread: Threads): Task<R, RR> {
+  fun <RR> then(thread: Threads, runnable: RunnablePR<R, RR>): Task<R, RR> {
     return then(RunnableTask(taskRunner, runnable, thread))
   }
 
@@ -143,12 +116,11 @@ open class Task<P, R> internal constructor(private val taskRunner: TaskRunner) {
     return this
   }
 
-  fun error(runnable: Runnable?, thread: Threads): Task<P, R> {
+  fun error(thread: Threads, runnable: Runnable): Task<P, R> {
     return error(RunnableTask(taskRunner, runnable, thread))
   }
 
-  fun error(runnable: RunnableP<Exception?>?, thread: Threads): Task<P, R> {
+  fun error(thread: Threads, runnable: RunnablePR<Exception?, Void?>): Task<P, R> {
     return error(RunnableTask(taskRunner, runnable, thread))
   }
-
 }

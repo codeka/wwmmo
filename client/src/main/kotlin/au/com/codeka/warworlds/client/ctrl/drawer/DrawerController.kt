@@ -150,8 +150,8 @@ class DrawerController(
     // TODO: update this if your icon changes
     // Replace the empire icon with... your empire's icon.
     val empireMenuItem = navigationView.menu.findItem(R.id.nav_empire)
-    App.server.waitForHello(Runnable {
-      App.taskRunner.runTask(Runnable {
+    App.server.waitForHello {
+      App.taskRunner.runOn(Threads.UI) {
         val url = ImageHelper.getEmpireImageUrl(activity, EmpireManager.getMyEmpire(), 48, 48)
         val target: Target = object : Target {
           override fun onBitmapLoaded(bitmap: Bitmap, from: LoadedFrom) {
@@ -172,7 +172,7 @@ class DrawerController(
         // as long as the nav menu is alive), so add it to a tag in the view.
         navigationView.setTag(R.id.target_tag, target)
         Picasso.get().load(url).into(target)
-      }, Threads.UI)
-    })
+      }
+    }
   }
 }

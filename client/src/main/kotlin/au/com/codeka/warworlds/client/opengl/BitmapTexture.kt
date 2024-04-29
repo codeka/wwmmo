@@ -37,24 +37,24 @@ class BitmapTexture private constructor(loader: Loader) : Texture() {
 
     fun load() {
       if (fileName != null) {
-        App.taskRunner.runTask(Runnable {
+        App.taskRunner.runOn(Threads.BACKGROUND) {
           try {
             log.info("Loading resource: %s", fileName)
             val ins = context.assets.open(fileName)
 
-            // BitmapFactory.decodeStream defaults to premultiplied alpha but since we're going to
-            // render these with OpenGL, we don't want premultiplied alpha.
+            // BitmapFactory.decodeStream defaults to pre-multiplied alpha but since we're going to
+            // render these with OpenGL, we don't want pre-multiplied alpha.
             val opt = BitmapFactory.Options()
             opt.inPremultiplied = false
             bitmap = BitmapFactory.decodeStream(ins, null, opt)
           } catch (e: IOException) {
             log.error("Error loading texture '%s'", fileName, e)
           }
-        }, Threads.BACKGROUND)
+        }
       } else {
-        App.taskRunner.runTask(
-            Runnable { Picasso.get().load(url).into(picassoTarget) },
-            Threads.UI)
+        App.taskRunner.runOn(Threads.UI) {
+          Picasso.get().load(url).into(picassoTarget)
+        }
       }
     }
 

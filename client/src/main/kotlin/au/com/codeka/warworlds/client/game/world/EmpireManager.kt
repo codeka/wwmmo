@@ -12,6 +12,7 @@ import au.com.codeka.warworlds.common.proto.Packet
 import au.com.codeka.warworlds.common.proto.RequestEmpirePacket
 import com.google.common.collect.Lists
 import java.util.*
+import kotlin.time.Duration.Companion.milliseconds
 
 /** Manages empires.  */
 object EmpireManager {
@@ -21,7 +22,7 @@ object EmpireManager {
    * The number of milliseconds to delay sending the empire request to the server, so that we can
    * batch them up a bit in case of a burst of requests (happens when you open chat for example).
    */
-  private const val EMPIRE_REQUEST_DELAY_MS: Long = 150
+  private val EMPIRE_REQUEST_DELAY = 150.milliseconds
 
   private val empires: ProtobufStore<Empire> = App.dataStore.empires()
 
@@ -122,9 +123,9 @@ object EmpireManager {
     synchronized(pendingRequestLock) {
       pendingEmpireRequests.add(id)
       if (!requestPending) {
-        App.taskRunner.runTask({ sendPendingEmpireRequests() },
-            Threads.BACKGROUND,
-            EMPIRE_REQUEST_DELAY_MS)
+        App.taskRunner.run(Threads.BACKGROUND, EMPIRE_REQUEST_DELAY) {
+          sendPendingEmpireRequests()
+        }
       }
     }
   }

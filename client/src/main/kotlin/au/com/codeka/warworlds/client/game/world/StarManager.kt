@@ -57,7 +57,7 @@ object StarManager {
    */
   fun queueSimulateStar(star: Star) {
     // Something more scalable that just queuing them all to the background thread pool...
-    App.taskRunner.runTask(Runnable { simulateStarSync(star) }, Threads.BACKGROUND)
+    App.taskRunner.runOn(Threads.BACKGROUND) { simulateStarSync(star) }
   }
 
   /**
@@ -75,7 +75,7 @@ object StarManager {
   fun updateStar(star: Star, m: StarModification) {
     // Be sure to record our empire_id in the request.
     val modification = m.copy(empire_id = EmpireManager.getMyEmpire().id)
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runOn(Threads.BACKGROUND) {
 
       // If there's any auxiliary stars, grab them now, too.
       var auxiliaryStars: MutableList<Star>? = null
@@ -94,7 +94,7 @@ object StarManager {
       } catch (e: SuspiciousModificationException) {
         // Mostly we don't care about these on the client, but it'll be good to log them.
         log.error("Unexpected suspicious modification.", e)
-        return@Runnable
+        return@runOn
       }
 
       // Save the now-modified star.
@@ -107,7 +107,7 @@ object StarManager {
         modify_star = ModifyStarPacket(
           star_id = star.id,
           modification = Lists.newArrayList(modification))))
-    }, Threads.BACKGROUND)
+    }
   }
 
   private val eventListener: Any = object : Any() {

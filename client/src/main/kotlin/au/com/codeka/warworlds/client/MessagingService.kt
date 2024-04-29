@@ -27,9 +27,9 @@ class MessagingService : FirebaseMessagingService() {
       return
     }
     if (notification.debug_message != null) {
-      App.taskRunner.runTask({
+      App.taskRunner.runOn(Threads.UI) {
         Toast.makeText(App, notification.debug_message, Toast.LENGTH_LONG).show()
-      }, Threads.UI)
+      }
     }
 
     // TODO: handle other kinds of toasts.

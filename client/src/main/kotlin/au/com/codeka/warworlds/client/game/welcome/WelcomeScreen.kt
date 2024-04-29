@@ -119,12 +119,12 @@ class WelcomeScreen : Screen() {
   }
 
   private fun refreshWelcomeMessage() {
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runOn(Threads.BACKGROUND) {
       val ins: InputStream? = try {
         fetchStream(MOTD_RSS)
       } catch (e: IOException) {
         log.warning("Error loading MOTD: %s", MOTD_RSS, e)
-        return@Runnable
+        return@runOn
       }
       val builderFactory = DocumentBuilderFactory.newInstance()
       builderFactory.isValidating = false
@@ -133,7 +133,7 @@ class WelcomeScreen : Screen() {
         builder.parse(ins)
       } catch (e: Exception) {
         log.warning("Error parsing MOTD: %s", MOTD_RSS, e)
-        return@Runnable
+        return@runOn
       }
       val inputFormat = SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US)
       val outputFormat = SimpleDateFormat("dd MMM yyyy h:mm a", Locale.US)
@@ -163,11 +163,11 @@ class WelcomeScreen : Screen() {
         motd.append("View forum post")
         motd.append("</a></div>")
       }
-      App.taskRunner.runTask({
+      App.taskRunner.runOn(Threads.UI) {
         this.motd = motd.toString()
         welcomeLayout.updateWelcomeMessage(motd.toString())
-      }, Threads.UI)
-    }, Threads.BACKGROUND)
+      }
+    }
   }
 
   private fun updateServerState(event: ServerStateEvent) {

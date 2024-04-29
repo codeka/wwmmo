@@ -68,11 +68,11 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
   private val layoutCallbacks: SignInLayout.Callbacks = object : SignInLayout.Callbacks {
     override fun onSignInClick() {
       if (App.auth.isSignedIn) {
-        App.taskRunner.runTask(Runnable {
+        App.taskRunner.runOn(Threads.BACKGROUND) {
           App.auth.signOut()
-        }, Threads.BACKGROUND).then( Runnable {
+        }.then(Threads.UI) {
           performExplicitSignIn("" /* cookie */)
-        }, Threads.UI)
+        }
       } else {
         performExplicitSignIn(GameSettings.getString(GameSettings.Key.COOKIE))
       }
@@ -89,17 +89,17 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
 
   private fun performExplicitSignIn(cookie: String) {
     val accountFuture = App.auth.explicitSignIn(context.activity)
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runOn(Threads.BACKGROUND) {
       val account = accountFuture.get()
       if (account == null) {
         // TODO: notify the user of whatever the error was.
         App.auth.signOut()
 
-        return@Runnable
+        return@runOn
       }
 
       doAssociate(account, cookie, false)
-    }, Threads.BACKGROUND)
+    }
   }
 
   /** Associate our account with the empire we're currently logged in as. */
@@ -107,13 +107,13 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
     val myEmpire = if (EmpireManager.hasMyEmpire()) EmpireManager.getMyEmpire() else null
     log.info("Associating email address '%s' with empire #%d %s (force=%s)...",
         account.email, myEmpire?.id, myEmpire?.display_name, if (force) "true" else "false")
-    App.taskRunner.runTask({
+    App.taskRunner.runOn(Threads.UI) {
       layout.updateState(
           R.string.signin_pending_help,
           false /* signInEnabled */,
           R.string.signin,
           true /* isCancel */)
-    }, Threads.UI)
+    }
 
     val request = HttpRequest.Builder()
         .url(url + "accounts/associate")
@@ -128,29 +128,28 @@ class SignInScreen(private val immediate: Boolean) : Screen() {
       resp == null -> {
         // TODO: report the error
         log.error("Didn't get AccountAssociateResponse, as expected.", request.exception)
-        App.taskRunner.runTask({
+        App.taskRunner.runOn(Threads.UI) {
           onSignInError(
             AccountAssociateStatus.STATUS_UNKNOWN,
             account,
             "An unknown error occurred.")
-        }, Threads.UI)
+        }
       }
       resp.status != AccountAssociateStatus.SUCCESS -> {
-        App.taskRunner.runTask({ onSignInError(resp.status!!, account, null) }, Threads.UI)
+        App.taskRunner.runOn(Threads.UI) { onSignInError(resp.status!!, account, null) }
       }
       else -> {
         log.info("Associate successful")
-        App.taskRunner.runTask({
-            if (resp.cookie != null && resp.cookie != "") {
-              log.info("Updating cookie: ${resp.cookie}")
-              GameSettings.edit().setString(GameSettings.Key.COOKIE, resp.cookie!!).commit()
-            }
+        App.taskRunner.runOn(Threads.UI) {
+          if (resp.cookie != null && resp.cookie != "") {
+            log.info("Updating cookie: ${resp.cookie}")
+            GameSettings.edit().setString(GameSettings.Key.COOKIE, resp.cookie!!).commit()
+          }
 
-            // After successfully associating, etc we'll go back to the welcome screen.
-            context.home()
-            context.pushScreen(WelcomeScreen())
-          },
-          Threads.UI)
+          // After successfully associating, etc we'll go back to the welcome screen.
+          context.home()
+          context.pushScreen(WelcomeScreen())
+        }
       }
     }
   }

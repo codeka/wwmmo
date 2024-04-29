@@ -19,6 +19,8 @@ import au.com.codeka.warworlds.client.util.Callback
 import au.com.codeka.warworlds.client.util.eventbus.EventHandler
 import au.com.codeka.warworlds.common.Log
 import au.com.codeka.warworlds.common.proto.Star
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A screen which shows a view of the solar system (star, planets, etc) and is the launching point
@@ -34,7 +36,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
     isCreated = true
     this.context = context
     layout = SolarSystemLayout(context.activity, layoutCallbacks, star, planetIndex)
-    App.taskRunner.runTask({ doRefresh() }, Threads.BACKGROUND, 100)
+    App.taskRunner.run(Threads.BACKGROUND, 100.milliseconds) { doRefresh() }
     App.eventBus.register(eventHandler)
   }
 
@@ -84,7 +86,7 @@ class SolarSystemScreen(private var star: Star, private val planetIndex: Int) : 
   private fun doRefresh() {
     StarManager.simulateStarSync(star)
     if (isCreated) {
-      App.taskRunner.runTask({ doRefresh() }, Threads.BACKGROUND, 5000)
+      App.taskRunner.run(Threads.BACKGROUND, 5.seconds) { doRefresh() }
     }
   }
 

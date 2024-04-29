@@ -26,12 +26,12 @@ class SettingsView(context: Context?, private val callback: Callback) : ScrollVi
       callback.onPatreonConnectClick(
         object : PatreonConnectCompleteCallback {
           override fun onPatreonConnectComplete(msg: String?) {
-            App.taskRunner.runTask(Runnable {
+            App.taskRunner.runOn(Threads.UI) {
                 patreonBtn.isEnabled = true
                 val msgView = findViewById<TextView>(R.id.patreon_complete)
                 msgView.visibility = View.VISIBLE
                 msgView.text = msg
-            }, Threads.UI)
+            }
           }
         }
       )

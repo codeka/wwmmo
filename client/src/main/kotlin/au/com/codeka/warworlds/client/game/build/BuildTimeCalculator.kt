@@ -28,7 +28,7 @@ class BuildTimeCalculator(private val star: Star, private val colony: Colony) {
 
   private fun calculateTime(
       design: Design?, building: Building?, count: Int, callback: BuildTimeCalculatorCallback) {
-    App.taskRunner.runTask(Runnable {
+    App.taskRunner.runOn(Threads.BACKGROUND) {
       // Add the build request to a temporary copy of the star, simulate it and figure out the
       // build time.
       val mutableStar = MutableStar.from(star)
@@ -44,12 +44,12 @@ class BuildTimeCalculator(private val star: Star, private val colony: Colony) {
                 design_type = design!!.type))
       } catch (e: SuspiciousModificationException) {
         log.error("Suspicious modification?", e)
-        return@Runnable
+        return@runOn
       }
       // find the build request with ID 0, that's our guy
       for (buildRequest in BuildHelper.getBuildRequests(mutableStar)) {
         if (buildRequest.id == 0L) {
-          App.taskRunner.runTask({
+          App.taskRunner.runOn(Threads.UI) {
             val buildTime = BuildHelper.formatTimeRemaining(buildRequest.build())
             val mineralsTime: String
             val mineralsColor: Int
@@ -66,11 +66,11 @@ class BuildTimeCalculator(private val star: Star, private val colony: Colony) {
               mineralsColor = Color.WHITE
             }
             callback(buildTime, mineralsTime, mineralsColor)
-          }, Threads.UI)
+          }
           break
         }
       }
-    }, Threads.BACKGROUND)
+    }
   }
 
   companion object {

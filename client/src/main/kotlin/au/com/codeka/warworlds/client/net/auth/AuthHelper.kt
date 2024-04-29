@@ -14,7 +14,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.common.util.concurrent.Futures
 import java.util.concurrent.Callable
 import java.util.concurrent.Future
-import java.util.concurrent.FutureTask
 
 const val SERVER_CLIENT_ID =
     "809181406384-obrefe4qb0hmaektbesqsc25rop0u72f.apps.googleusercontent.com"

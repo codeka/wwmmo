@@ -21,7 +21,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
   private var bitmap: Bitmap? = null
 
   init {
-    App.taskRunner.runTask({ bitmap = createBitmap(sectorCoord) }, Threads.BACKGROUND)
+    App.taskRunner.runOn(Threads.BACKGROUND) { bitmap = createBitmap(sectorCoord) }
   }
 
   override fun bind() {

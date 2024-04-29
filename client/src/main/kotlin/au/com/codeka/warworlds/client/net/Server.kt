@@ -21,6 +21,8 @@ import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.*
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /** Represents our connection to the server. */
 class Server {
@@ -28,8 +30,8 @@ class Server {
 
   companion object {
     private val log = Log("Server")
-    private const val DEFAULT_RECONNECT_TIME_MS = 1000
-    private const val MAX_RECONNECT_TIME_MS = 30000
+    private val DEFAULT_RECONNECT_TIME = 1.seconds
+    private val MAX_RECONNECT_TIME = 30.seconds
   }
 
   var currState = ServerStateEvent("", ServerStateEvent.ConnectionState.DISCONNECTED, null)
@@ -58,7 +60,7 @@ class Server {
   private val pendingRpcs: HashMap<Long, PendingRpc> = HashMap()
 
   private var reconnectPending = false
-  private var reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
+  private var reconnectTime = DEFAULT_RECONNECT_TIME
 
   fun setup() {
     GameSettings.addSettingChangedHandler { key: GameSettings.Key ->
@@ -69,7 +71,7 @@ class Server {
             .commit()
       } else if (key == GameSettings.Key.COOKIE) {
         // We got a new cookie, try connecting again (in 100ms).
-        reconnectTimeMs = 100
+        reconnectTime = 100.milliseconds
         disconnect()
       }
     }
@@ -115,46 +117,48 @@ class Server {
   private fun login(cookie: String) {
     log.info("Fetching firebase instance ID...")
     App.taskRunner.runTask(FirebaseMessaging.getInstance().token)
-        .then(object : RunnableTask.RunnableP<String> {
-          override fun run(param: String) {
-            // Make sure we have the GoogleSignInAccount (if you've signed in) before sending it
-            // to the server.
-            val googleAccount = App.auth.futureAccount().get()
+      .then(Threads.BACKGROUND) { param: String ->
+        // Make sure we have the GoogleSignInAccount (if you've signed in) before sending it
+        // to the server.
+        val googleAccount = App.auth.futureAccount().get()
 
-            log.info("Logging in: %s", ServerUrl.getUrl("/login"))
-            val request = HttpRequest.Builder()
-                .url(ServerUrl.getUrl("/login"))
-                .method(HttpRequest.Method.POST)
-                .body(LoginRequest(
-                    cookie = cookie,
-                    device_info = populateDeviceInfo(param),
-                    id_token = googleAccount?.idToken)
-                  .encode())
-                .build()
-            if (request.responseCode != 200) {
-              if (request.responseCode in 401..499) {
-                // Our cookie must not be valid, we'll clear it before trying again.
-                GameSettings.edit()
-                    .setString(GameSettings.Key.COOKIE, "")
-                    .commit()
-              }
-              log.error(
-                  "Error logging in, will try again: %d",
-                  request.responseCode,
-                  request.exception)
-              disconnect()
-            } else {
-              val loginResponse = request.getBody(LoginResponse::class.java)!!
-              if (loginResponse.status != LoginStatus.SUCCESS) {
-                updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status)
-                log.error("Error logging in, got login status: %s", loginResponse.status)
-                disconnect()
-              } else {
-                connectGameSocket(loginResponse)
-              }
-            }
+        log.info("Logging in: %s", ServerUrl.getUrl("/login"))
+        val request = HttpRequest.Builder()
+          .url(ServerUrl.getUrl("/login"))
+          .method(HttpRequest.Method.POST)
+          .body(
+            LoginRequest(
+              cookie = cookie,
+              device_info = populateDeviceInfo(param),
+              id_token = googleAccount?.idToken
+            )
+              .encode()
+          )
+          .build()
+        if (request.responseCode != 200) {
+          if (request.responseCode in 401..499) {
+            // Our cookie must not be valid, we'll clear it before trying again.
+            GameSettings.edit()
+              .setString(GameSettings.Key.COOKIE, "")
+              .commit()
           }
-        }, Threads.BACKGROUND)
+          log.error(
+            "Error logging in, will try again: %d",
+            request.responseCode,
+            request.exception
+          )
+          disconnect()
+        } else {
+          val loginResponse = request.getBody(LoginResponse::class.java)!!
+          if (loginResponse.status != LoginStatus.SUCCESS) {
+            updateState(ServerStateEvent.ConnectionState.ERROR, loginResponse.status)
+            log.error("Error logging in, got login status: %s", loginResponse.status)
+            disconnect()
+          } else {
+            connectGameSocket(loginResponse)
+          }
+        }
+      }
   }
 
   private fun connectGameSocket(loginResponse: LoginResponse) {
@@ -179,7 +183,7 @@ class Server {
               our_star_last_simulation = StarManager.lastSimulationOfOurStar,
               last_chat_time = ChatManager.i.lastChatTime)))
       EmpireManager.onHello(loginResponse.empire!!)
-      reconnectTimeMs = DEFAULT_RECONNECT_TIME_MS
+      reconnectTime = DEFAULT_RECONNECT_TIME
       updateState(ServerStateEvent.ConnectionState.CONNECTED, loginResponse.status)
       while (!oldQueuedPackets.isNullOrEmpty()) {
         send(oldQueuedPackets.remove())
@@ -222,7 +226,7 @@ class Server {
     if (Threads.BACKGROUND.isCurrentThread) {
       send(pkt)
     } else {
-      App.taskRunner.runTask({ send(pkt) }, Threads.BACKGROUND)
+      App.taskRunner.runOn(Threads.BACKGROUND) { send(pkt) }
     }
   }
 
@@ -275,14 +279,14 @@ class Server {
       synchronized(lock) {
         if (!reconnectPending) {
           reconnectPending = true
-          App.taskRunner.runTask({
-            reconnectTimeMs *= 2
-            if (reconnectTimeMs > MAX_RECONNECT_TIME_MS) {
-              reconnectTimeMs = MAX_RECONNECT_TIME_MS
+          App.taskRunner.run(Threads.BACKGROUND, reconnectTime) {
+            reconnectTime *= 2
+            if (reconnectTime > MAX_RECONNECT_TIME) {
+              reconnectTime = MAX_RECONNECT_TIME
             }
             connect()
             reconnectPending = false
-          }, Threads.BACKGROUND, reconnectTimeMs.toLong())
+          }
         }
       }
     }

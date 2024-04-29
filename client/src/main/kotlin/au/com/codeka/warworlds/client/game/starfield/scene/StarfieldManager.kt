@@ -1,7 +1,6 @@
 package au.com.codeka.warworlds.client.game.starfield.scene
 
 import android.content.Context
-import android.opengl.Matrix
 import androidx.collection.LongSparseArray
 import androidx.core.util.Pair
 import au.com.codeka.warworlds.client.App
@@ -24,6 +23,7 @@ import au.com.codeka.warworlds.common.sim.StarHelper
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * [StarfieldManager] manages the starfield view that we display in the main activity. You can
@@ -33,7 +33,7 @@ import kotlin.math.roundToInt
 class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   companion object {
     /** Number of milliseconds between updates to moving fleets.  */
-    private const val UPDATE_MOVING_FLEETS_TIME_MS = 2000L
+    private val UPDATE_MOVING_FLEETS_TIME = 2.seconds
     private val log = Log("StarfieldManager")
   }
 
@@ -159,10 +159,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
     }
     camera.setCameraUpdateListener(cameraUpdateListener)
     gestureDetector.create()
-    App.taskRunner.runTask(
-        updateMovingFleetsRunnable,
-        Threads.UI,
-        UPDATE_MOVING_FLEETS_TIME_MS)
+    App.taskRunner.run(Threads.UI, UPDATE_MOVING_FLEETS_TIME) { updateMovingFleetsRunnable.run() }
   }
 
   fun destroy() {
@@ -363,14 +360,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
     // Tell the server we want to watch these new sectors, it'll send us back all the stars we
     // don't have yet.
-    App.taskRunner.runTask({
-      App.server.send(Packet(
-          watch_sectors = WatchSectorsPacket(
-              top = top, left = left, bottom = bottom, right = right)))
-    }, Threads.BACKGROUND)
+    App.server.sendAsync(Packet(
+        watch_sectors = WatchSectorsPacket(
+            top = top, left = left, bottom = bottom, right = right)))
 
     // We'll wait at least one second before attempting to update the sector bounds again.
-    App.taskRunner.runTask({
+    App.taskRunner.run(Threads.UI, 1.seconds) {
       sectorsUpdating = false
       val pendingLeft = pendingSectorLeft
       val pendingTop = pendingSectorTop
@@ -386,15 +381,12 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
         pendingRemoveAllSectors = null
         updateSectorBounds(pendingLeft, pendingTop, pendingRight, pendingBottom, pendingRemoveAll)
       }
-    }, Threads.UI, 1000)
+    }
   }
 
   /**
    * This is called when the camera moves to a new (x,y) coord. We'll want to check whether we
    * need to re-calculate the bounds and warp the camera back to the center.
-   *
-   * @param x The distance the camera has translated from the origin in the X direction.
-   * @param y The distance the camera has translated from the origin in the Y direction.
    */
   private fun onCameraTranslate(x: Float, y: Float) {
     updateSectorBounds()
@@ -696,7 +688,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
   private fun detachNonMovingFleet(fleet: Fleet, sceneObject: SceneObject) {
     // If you had it selected, we'll need to un-select it.
     if (selectedFleet != null && selectedFleet!!.id == fleet.id) {
-      App.taskRunner.runTask({ setSelectedFleet(null, null) }, Threads.UI)
+      App.taskRunner.runOn(Threads.UI) { setSelectedFleet(null, null) }
     }
 
     val soi: SceneObjectInfo = sceneObject.tag as SceneObjectInfo
@@ -762,7 +754,7 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
           }
         }
       }
-      App.taskRunner.runTask(this, Threads.UI, UPDATE_MOVING_FLEETS_TIME_MS)
+      App.taskRunner.run(Threads.UI, UPDATE_MOVING_FLEETS_TIME, this)
     }
   }
 
@@ -935,9 +927,9 @@ class StarfieldManager(renderSurfaceView: RenderSurfaceView) {
 
   private val cameraUpdateListener: CameraUpdateListener = object : CameraUpdateListener {
     override fun onCameraTranslate(x: Float, y: Float, dx: Float, dy: Float) {
-      App.taskRunner.runTask(
-          { onCameraTranslate(x, y) },
-          Threads.BACKGROUND)
+      App.taskRunner.runOn(Threads.BACKGROUND) {
+        onCameraTranslate(x, y)
+      }
     }
   }
 

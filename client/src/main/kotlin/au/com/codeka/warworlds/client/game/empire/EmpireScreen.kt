@@ -37,7 +37,7 @@ class EmpireScreen : Screen() {
   private inner class SettingsCallbacks : SettingsView.Callback {
     override fun onPatreonConnectClick(
         completeCallback: PatreonConnectCompleteCallback) {
-      App.taskRunner.runTask(Runnable {
+      App.taskRunner.runTask(Threads.BACKGROUND) {_: Unit ->
         val req = HttpRequest.Builder()
             .url(getUrl("/accounts/patreon-begin"))
             .authenticated()
@@ -49,25 +49,27 @@ class EmpireScreen : Screen() {
           log.error("Error starting patreon connect request: %d %s",
               req.responseCode, req.exception)
           completeCallback.onPatreonConnectComplete("Unexpected error.")
-          return@Runnable
+          return@runTask null
         }
         val resp = req.getBody(PatreonBeginResponse::class.java)
         if (resp == null) {
           // TODO: better error handling.
           log.error("Got an empty response?")
           completeCallback.onPatreonConnectComplete("Unexpected error.")
-          return@Runnable
+          return@runTask null
         }
         val uri = ("https://www.patreon.com/oauth2/authorize?response_type=code"
             + "&client_id=" + resp.client_id
             + "&redirect_uri=" + Uri.encode(resp.redirect_uri)
             + "&state=" + Uri.encode(resp.state))
         log.info("Opening URL: %s", uri)
-        App.taskRunner.runTask({
+        uri
+      }.then(Threads.UI) { uri: String? ->
+        if (uri != null) {
           val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
           context.activity.startActivity(intent)
-        }, Threads.UI)
-      }, Threads.BACKGROUND)
+        }
+      }
     }
   }
 
