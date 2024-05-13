@@ -56,7 +56,7 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
     private const val CIRCLE_RADIUS = 30
 
     private val gradientColors = intArrayOf(0, 0)
-    private val gradientStops = floatArrayOf(0.1f, 1.0f)
+    private val gradientStops = floatArrayOf(0.5f, 1.0f)
 
     private val textureCache = TacticalTextureLruCache(16)
 
@@ -110,14 +110,19 @@ class TacticalTexture private constructor(private val sectorCoord: SectorCoord) 
             }
             var color = 0
             var empireId = getEmpireId(star)
-            if (empireId == null) {
+            if ((empireId ?: 0) == 0L) {
               empireId = getFleetOnlyEmpire(star)
-              if (empireId != null) {
+              if ((empireId ?: 0) != 0L) {
                 color = getShieldColour(empireId)
                 color = 0x66ffffff and color
               }
             } else {
               color = getShieldColour(empireId)
+            }
+
+            // Skip this star, no empire on it.
+            if (color == 0) {
+              continue
             }
 
             gradientColors[0] = color
